@@ -15,13 +15,7 @@ import java.util.HashMap;
 public class UtilsData {
     public static void AddNumericalParameter(HashMap<String, IBaseParam> HashParameters, String name, double value, int weight) {
         HashParameters.put(name, new NumericalParam(value, name, weight));
-    }
-
-    public static String GetUserKey(String userName) {
-        String serial = "aa";//Build.SERIAL;
-        String key = String.format("%s-%s", serial, userName);
-        return key;
-    }
+    }    
 
     public static ArrayList<VerifyooLogic.DataObjects.ValueFreq> GetListOfValueFreqs(double[] listValues) {
         HashMap<Double, ValueFreq> map = new HashMap<>();
