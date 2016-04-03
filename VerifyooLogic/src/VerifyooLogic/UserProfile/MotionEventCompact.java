@@ -15,10 +15,15 @@ public class MotionEventCompact {
     public double EventTime;
     public double RelativeEventTime;
     public double TouchSurface;
-    public double AngleZ;
+        
     public double AngleX;
     public double AngleY;
-
+    public double AngleZ;
+    
+    public double GyroX;
+    public double GyroY;
+    public double GyroZ;
+    
     public double PointerCount;
     public boolean IsPause;
     

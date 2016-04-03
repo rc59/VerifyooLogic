@@ -138,8 +138,8 @@ public class Stroke {
         mListStrokeTimeDiffs = new double[NumEvents - 1];
 
         double xdpi = UtilsDeviceProperties.Xdpi;
-        double ydpi = UtilsDeviceProperties.Ydpi;
-
+        double ydpi = UtilsDeviceProperties.Ydpi;        
+        
         double deltaX, deltaY;
         double totalDistance = 0;
 
