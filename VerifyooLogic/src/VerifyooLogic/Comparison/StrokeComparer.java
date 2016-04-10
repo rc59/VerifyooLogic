@@ -66,10 +66,10 @@ public class StrokeComparer {
 
                 double octagonAreaDiff = Math.abs(strokeTemplate.BoundingBoxAndOctagonRatio - strokeAuth.BoundingBoxAndOctagonRatio);
                 if (octagonAreaDiff >= Consts.PARAMETER_BOUNDING_BOX_AND_OCTAGON_DIFF_THRESHOLD) {
-                    finalProbResult -= octagonAreaDiff / 2;
+                    //finalProbResult -= octagonAreaDiff / 2;
                 }
                 if (octagonAreaDiff >= Consts.PARAMETER_BOUNDING_BOX_AND_OCTAGON_DIFF_THRESHOLD * 2) {
-                    finalProbResult -= octagonAreaDiff;
+                    //finalProbResult -= octagonAreaDiff;
                 }
 
                 //double octagonAreaRatio = octagonAreaDiff / strokeTemplate.BoundingBoxAndOctagonRatio;
@@ -87,7 +87,7 @@ public class StrokeComparer {
                 //finalProbResult = UtilsCalc.CalcRatioThreshold(finalProbResult, ratioDiffArea, Consts.PARAMETER_RATIO_THRESHOLD_AREA, 4);
 
                 if (octagonAreaAbsDiff > Consts.OCTAGON_RATIO_MIN_ABS_DIFF) {
-                    finalProbResult = UtilsCalc.CalcRatioThreshold(finalProbResult, ratioDiffOctagonArea, Consts.PARAMETER_RATIO_THRESHOLD_AREA, 3);
+                    //finalProbResult = UtilsCalc.CalcRatioThreshold(finalProbResult, ratioDiffOctagonArea, Consts.PARAMETER_RATIO_THRESHOLD_AREA, 3);
                 }
 
                 for (int idx = 0; idx < strokeAuth.ShapeProperties.ListEventsExtremePoints.size(); idx++) {
