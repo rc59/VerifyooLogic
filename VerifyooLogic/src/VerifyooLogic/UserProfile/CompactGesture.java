@@ -12,7 +12,8 @@ import VerifyooLogic.Utils.UtilsData;
 
 public class CompactGesture {
 	public String Instruction;
-    public HashMap<String, IBaseParam> HashParameters;
+	public boolean IsInTemplate;
+	public HashMap<String, IBaseParam> HashParameters;
 
     public ArrayList<Stroke> ListStrokes;
 
@@ -35,6 +36,7 @@ public class CompactGesture {
     }
 
     public CompactGesture(ArrayList<Stroke> listStrokes) {
+    	IsInTemplate = false;
         HashParameters = new HashMap<>();
         ListStrokes = listStrokes;
     }
