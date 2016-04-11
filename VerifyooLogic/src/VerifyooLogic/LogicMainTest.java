@@ -7,4 +7,9 @@ public class LogicMainTest {
 	  
 	  
   }
+  
+  public void Test2() {
+	  
+	  
+  }
 }
