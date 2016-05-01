@@ -307,43 +307,43 @@ public class Stroke {
     }
     
     private void CalculateDistanceBetweenFingers() {    	
-//    	mDistances = new ArrayList<DistanceObj>();
-//    	
-//    	mListDistances = new double[NumEvents];
-//    	mListDistancesX = new double[NumEvents];
-//    	mListDistancesY = new double[NumEvents];
-//    	
-//    	double x1, y1, x2, y2;
-//    	double totalDeltaX = 0;
-//		double totalDeltaY = 0;
-//		double avgDeltaX, avgDeltaY;		
-//    	DistanceObj tempDistance;
-//    	
-//    	for(int idx = 0; idx < ListEvents.size(); idx++) {
-//    		x1 = ListEvents.get(idx).Xpixel;
-//    		y1 = ListEvents.get(idx).Ypixel;    	
-//    		
-//    		x2 = ListEvents.get(idx).Xpixel2;
-//    		y2 = ListEvents.get(idx).Ypixel2;
-//    		
-//    		if(x2 != 0 && y2 != 0) {
-//    			tempDistance = new DistanceObj(x1, y1, x2, y2); 
-//    			mDistances.add(tempDistance);
-//    			mListDistances[idx] = tempDistance.Distance;
-//    			mListDistancesX[idx] = tempDistance.DeltaX;
-//    			mListDistancesY[idx] = tempDistance.DeltaY;
-//    			totalDeltaX += Math.abs(tempDistance.DeltaX);
-//    			totalDeltaY += Math.abs(tempDistance.DeltaY);
-//    		}    	    	
-//    	}
-//    	
-//    	avgDeltaX = totalDeltaX / NumEvents;
-//    	avgDeltaY = totalDeltaY / NumEvents;
-//    	
-//    	mListDistancecsXFreqs = UtilsData.GetListOfValueFreqs(mListDistancesX);
-//    	mListDistancecsYFreqs = UtilsData.GetListOfValueFreqs(mListDistancesY);
-//    	
-//    	mDistanceBetweenFingers = UtilsCalc.CalcPitagoras(avgDeltaX, avgDeltaY);
+    	mDistances = new ArrayList<DistanceObj>();
+    	
+    	mListDistances = new double[NumEvents];
+    	mListDistancesX = new double[NumEvents];
+    	mListDistancesY = new double[NumEvents];
+    	
+    	double x1, y1, x2, y2;
+    	double totalDeltaX = 0;
+		double totalDeltaY = 0;
+		double avgDeltaX, avgDeltaY;		
+    	DistanceObj tempDistance;
+    	
+    	for(int idx = 0; idx < ListEvents.size(); idx++) {
+    		x1 = ListEvents.get(idx).Xpixel;
+    		y1 = ListEvents.get(idx).Ypixel;    	
+    		
+    		x2 = ListEvents.get(idx).Xpixel2;
+    		y2 = ListEvents.get(idx).Ypixel2;
+    		
+    		if(x2 != 0 && y2 != 0) {
+    			tempDistance = new DistanceObj(x1, y1, x2, y2); 
+    			mDistances.add(tempDistance);
+    			mListDistances[idx] = tempDistance.Distance;
+    			mListDistancesX[idx] = tempDistance.DeltaX;
+    			mListDistancesY[idx] = tempDistance.DeltaY;
+    			totalDeltaX += Math.abs(tempDistance.DeltaX);
+    			totalDeltaY += Math.abs(tempDistance.DeltaY);
+    		}    	    	
+    	}
+    	
+    	avgDeltaX = totalDeltaX / NumEvents;
+    	avgDeltaY = totalDeltaY / NumEvents;
+    	
+    	mListDistancecsXFreqs = UtilsData.GetListOfValueFreqs(mListDistancesX);
+    	mListDistancecsYFreqs = UtilsData.GetListOfValueFreqs(mListDistancesY);
+    	
+    	mDistanceBetweenFingers = UtilsCalc.CalcPitagoras(avgDeltaX, avgDeltaY);
     	
     	
     	
