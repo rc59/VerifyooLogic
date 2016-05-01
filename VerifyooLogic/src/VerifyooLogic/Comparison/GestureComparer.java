@@ -35,7 +35,14 @@ public class GestureComparer {
         if (gestureTemplate.ListStrokes.size() == gestureAuth.ListStrokes.size()) {
             for (int idxStroke = 0; idxStroke < gestureTemplate.ListStrokes.size(); idxStroke++) {
                 if(gestureTemplate.ListStrokes.get(idxStroke).Length > Consts.MIN_STROKE_LENGTH && gestureAuth.ListStrokes.get(idxStroke).Length > Consts.MIN_STROKE_LENGTH) {
-                    currentScore = strokeComparer.Compare(gestureTemplate.ListStrokes.get(idxStroke), gestureAuth.ListStrokes.get(idxStroke));
+                	
+                	gestureTemplate.ListStrokes.get(idxStroke).XDpi = gestureTemplate.XDpi;
+                	gestureTemplate.ListStrokes.get(idxStroke).YDpi = gestureTemplate.YDpi;
+                	
+                	gestureAuth.ListStrokes.get(idxStroke).XDpi = gestureAuth.XDpi;
+                	gestureAuth.ListStrokes.get(idxStroke).YDpi = gestureAuth.YDpi;                	
+                	
+                	currentScore = strokeComparer.Compare(gestureTemplate.ListStrokes.get(idxStroke), gestureAuth.ListStrokes.get(idxStroke));
                     totalScore += currentScore;
 
                     listGestureEventsTemplate.addAll(0, gestureTemplate.ListStrokes.get(idxStroke).ListEvents);
@@ -69,10 +76,16 @@ public class GestureComparer {
                 double score;
                 try {
                     Stroke tempStrokeTemplate = new Stroke();
+                    tempStrokeTemplate.XDpi = gestureTemplate.XDpi;
+                    tempStrokeTemplate.YDpi = gestureTemplate.YDpi;
+                    
                     tempStrokeTemplate.Length = totalLengthTemplate;
                     tempStrokeTemplate.ListEvents = listGestureEventsTemplate;
 
                     Stroke tempStrokeAuth = new Stroke();
+                    tempStrokeAuth.XDpi = gestureAuth.XDpi;
+                    tempStrokeAuth.YDpi = gestureAuth.YDpi;
+                    
                     tempStrokeAuth.Length = totalLengthAuth;
                     tempStrokeAuth.ListEvents = listGestureEventsAuth;
 

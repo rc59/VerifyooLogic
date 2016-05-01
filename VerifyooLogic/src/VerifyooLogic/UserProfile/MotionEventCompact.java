@@ -9,6 +9,12 @@ public class MotionEventCompact {
     public double Xpixel;
     public double Ypixel;
 
+    public double Xpixel2;
+    public double Ypixel2;
+    
+    public double Xpixel3;
+    public double Ypixel3;
+    
     public double VelocityX;
     public double VelocityY;
     public double Pressure;

@@ -13,6 +13,14 @@ public class Template {
     public int NumInstructionsReg;
     public int NumInstructionsAuth;
 
+    public double XDpi;
+    public double YDpi;
+       
+    public Template()
+    {
+    	
+    }
+    
     public void Init() {
         NumInstructionsReg = Consts.DEFAULT_NUM_REQ_GESTURES_REG;
         NumInstructionsAuth = Consts.DEFAULT_NUM_REQ_GESTURES_AUTH;

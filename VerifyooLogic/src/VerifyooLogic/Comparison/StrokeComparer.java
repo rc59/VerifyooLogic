@@ -21,10 +21,10 @@ public class StrokeComparer {
     public StrokeComparer(Stroke strokeTemplate, Stroke strokeAuth) {
         mStrokeTemplate = strokeTemplate;
         mStrokeAuth = strokeAuth;
-    }
-
+    }    
+    
     public double Compare(Stroke strokeTemplate, Stroke strokeAuth) {
-        try {
+        try {        	
             mStrokeTemplate = strokeTemplate;
             mStrokeAuth = strokeAuth;
 
@@ -114,68 +114,68 @@ public class StrokeComparer {
                     sumExtremePointDistancesSqr += currentDistance * currentDistance;
                 }
 
-                double mean = sumExtremePointDistances / listExtremeAuth.size();
-
-                if (mean > Consts.EXTREME_POINTS_MEAN_THRESHOLD) {
-                    finalProbResult = finalProbResult - 0.05;
-
-                    if (mean > Consts.EXTREME_POINTS_MEAN_THRESHOLD * 2) {
-                        finalProbResult = finalProbResult - 0.05;
-                    }
-
-                    if (finalProbResult < 0) {
-                        finalProbResult = 0;
-                    }
-                }
+//                double mean = sumExtremePointDistances / listExtremeAuth.size();
+//
+//                if (mean > Consts.EXTREME_POINTS_MEAN_THRESHOLD) {
+//                    finalProbResult = finalProbResult - 0.05;
+//
+//                    if (mean > Consts.EXTREME_POINTS_MEAN_THRESHOLD * 2) {
+//                        finalProbResult = finalProbResult - 0.05;
+//                    }
+//
+//                    if (finalProbResult < 0) {
+//                        finalProbResult = 0;
+//                    }
+//                }
 
                 //double variance = (sumExtremePointDistancesSqr / listExtremeAuth.size()) - (mean * mean);
 
                 //double angleDiffSumTemplate = mStrokeTemplate.ExtremeAnglePointSum;
                 //double angleDiffSumAuth = mStrokeAuth.ExtremeAnglePointSum;
 
-                if (UtilsCalc.CheckIfBetween(shapeScore, 0, 1)) {
-                    finalProbResult = finalProbResult / 8;
-                } else {
-                    if (UtilsCalc.CheckIfBetween(shapeScore, 1, 1.5)) {
-                        finalProbResult = finalProbResult / 6;
-                    } else {
-                        if (UtilsCalc.CheckIfBetween(shapeScore, 1.5, 2)) {
-                            finalProbResult = finalProbResult / 4;
-                        } else {
-                            if (UtilsCalc.CheckIfBetween(shapeScore, 2, 2.2)) {
-                                finalProbResult = finalProbResult / 1.5;
-                            }
-//                    else {
-//                        if (UtilsCalc.CheckIfBetween(score, 2.2, 2.5)) {
-//                            result = result / 1.2;
+//                if (UtilsCalc.CheckIfBetween(shapeScore, 0, 1)) {
+//                    finalProbResult = finalProbResult / 8;
+//                } else {
+//                    if (UtilsCalc.CheckIfBetween(shapeScore, 1, 1.5)) {
+//                        finalProbResult = finalProbResult / 6;
+//                    } else {
+//                        if (UtilsCalc.CheckIfBetween(shapeScore, 1.5, 2)) {
+//                            finalProbResult = finalProbResult / 4;
+//                        } else {
+//                            if (UtilsCalc.CheckIfBetween(shapeScore, 2, 2.2)) {
+//                                finalProbResult = finalProbResult / 1.5;
+//                            }
+////                    else {
+////                        if (UtilsCalc.CheckIfBetween(score, 2.2, 2.5)) {
+////                            result = result / 1.2;
+////                        }
+////                    }
+//                        }
+//
+//                    }
+//                }
+//
+//                if (shapeScore < 2.5) {
+//                    if (UtilsCalc.CheckIfBetween(shapeScore2, 0.004, 0.005)) {
+//                        //result -= 0.2;
+//                        finalProbResult = finalProbResult / 1.2;
+//                    } else {
+//                        if (UtilsCalc.CheckIfBetween(shapeScore2, 0.005, 0.006)) {
+//                            //finalProbResult -= 0.2;
+//                            finalProbResult = finalProbResult / 1.3;
+//                        } else {
+//                            if (UtilsCalc.CheckIfBetween(shapeScore2, 0.006, 0.007)) {
+//                                //finalProbResult -= 0.3;
+//                                finalProbResult = finalProbResult / 1.5;
+//                            } else {
+//                                if (shapeScore2 > 0.007) {
+//                                    //finalProbResult -= 0.4;
+//                                    finalProbResult = finalProbResult / 2;
+//                                }
+//                            }
 //                        }
 //                    }
-                        }
-
-                    }
-                }
-
-                if (shapeScore < 2.5) {
-                    if (UtilsCalc.CheckIfBetween(shapeScore2, 0.004, 0.005)) {
-                        //result -= 0.2;
-                        finalProbResult = finalProbResult / 1.2;
-                    } else {
-                        if (UtilsCalc.CheckIfBetween(shapeScore2, 0.005, 0.006)) {
-                            //finalProbResult -= 0.2;
-                            finalProbResult = finalProbResult / 1.3;
-                        } else {
-                            if (UtilsCalc.CheckIfBetween(shapeScore2, 0.006, 0.007)) {
-                                //finalProbResult -= 0.3;
-                                finalProbResult = finalProbResult / 1.5;
-                            } else {
-                                if (shapeScore2 > 0.007) {
-                                    //finalProbResult -= 0.4;
-                                    finalProbResult = finalProbResult / 2;
-                                }
-                            }
-                        }
-                    }
-                }
+//                }
 
                 if (finalProbResult < 0) {
                     finalProbResult = 0;

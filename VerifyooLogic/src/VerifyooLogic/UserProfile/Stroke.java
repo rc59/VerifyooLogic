@@ -8,7 +8,6 @@ import VerifyooLogic.Utils.Consts;
 import VerifyooLogic.Utils.ConstsParams;
 import VerifyooLogic.Utils.UtilsCalc;
 import VerifyooLogic.Utils.UtilsData;
-import VerifyooLogic.Utils.UtilsDeviceProperties;
 
 import VerifyooLogic.DataObjects.Octagon;
 import VerifyooLogic.DataObjects.ShapeProperties;
@@ -17,8 +16,17 @@ import VerifyooLogic.DataObjects.Params.AccelerationInterval;
 import VerifyooLogic.DataObjects.Params.ParamPropertiesAbstract;
 import VerifyooLogic.DataObjects.Params.ParamPropertiesGeneral;
 import VerifyooLogic.Statistics.Interfaces.IBaseParam;
+import VerifyooLogic.Statistics.Objects.DistanceObj;
 
 public class Stroke {
+	double mDistanceBetweenFingers;
+	ArrayList<DistanceObj> mDistances;	
+	double[] mListDistances;
+	double[] mListDistancesX;
+	double[] mListDistancesY;
+	ArrayList<ValueFreq> mListDistancecsXFreqs;
+	ArrayList<ValueFreq> mListDistancecsYFreqs;
+	
 	public HashMap<String, IBaseParam> HashParameters;
 
     public double[] ExtremePointAngles;
@@ -107,11 +115,14 @@ public class Stroke {
     protected boolean mIsAddDistanceBetweenStrokes;
 
     /********************************/
+    
+    public double XDpi;
+    public double YDpi;
 
     public Stroke() {
         Length = 0;
         ListEvents = new ArrayList<MotionEventCompact>();
-
+        
         mIsUsePressure = false;
         mIsUseSurface = false;
 
@@ -137,8 +148,8 @@ public class Stroke {
         mListAccumulatedStrokeLength = new double[NumEvents];
         mListStrokeTimeDiffs = new double[NumEvents - 1];
 
-        double xdpi = UtilsDeviceProperties.Xdpi;
-        double ydpi = UtilsDeviceProperties.Ydpi;        
+        double xdpi = XDpi;
+        double ydpi = YDpi;        
         
         double deltaX, deltaY;
         double totalDistance = 0;
@@ -282,6 +293,7 @@ public class Stroke {
         /**************************************/
         if (ListEvents.size() > 0 && Length > Consts.MIN_STROKE_LENGTH) {
             PreCalculations();
+            CalculateDistanceBetweenFingers();
             CalculateLinearRegression();
             CalculateAccelerations();
             CalculateStatisticalParameters();
@@ -292,6 +304,49 @@ public class Stroke {
             CalculateRotationAngleOnExtremePoints();
             AddStatisticalParametersToHash();
         }
+    }
+    
+    private void CalculateDistanceBetweenFingers() {    	
+    	mDistances = new ArrayList<DistanceObj>();
+    	
+    	mListDistances = new double[NumEvents];
+    	mListDistancesX = new double[NumEvents];
+    	mListDistancesY = new double[NumEvents];
+    	
+    	double x1, y1, x2, y2;
+    	double totalDeltaX = 0;
+		double totalDeltaY = 0;
+		double avgDeltaX, avgDeltaY;		
+    	DistanceObj tempDistance;
+    	
+    	for(int idx = 0; idx < ListEvents.size(); idx++) {
+    		x1 = ListEvents.get(idx).Xpixel;
+    		y1 = ListEvents.get(idx).Ypixel;    	
+    		
+    		x2 = ListEvents.get(idx).Xpixel2;
+    		y2 = ListEvents.get(idx).Ypixel2;
+    		
+    		if(x2 != 0 && y2 != 0) {
+    			tempDistance = new DistanceObj(x1, y1, x2, y2); 
+    			mDistances.add(tempDistance);
+    			mListDistances[idx] = tempDistance.Distance;
+    			mListDistancesX[idx] = tempDistance.DeltaX;
+    			mListDistancesY[idx] = tempDistance.DeltaY;
+    			totalDeltaX += Math.abs(tempDistance.DeltaX);
+    			totalDeltaY += Math.abs(tempDistance.DeltaY);
+    		}    	    	
+    	}
+    	
+    	avgDeltaX = totalDeltaX / NumEvents;
+    	avgDeltaY = totalDeltaY / NumEvents;
+    	
+    	mListDistancecsXFreqs = UtilsData.GetListOfValueFreqs(mListDistancesX);
+    	mListDistancecsYFreqs = UtilsData.GetListOfValueFreqs(mListDistancesY);
+    	
+    	mDistanceBetweenFingers = UtilsCalc.CalcPitagoras(avgDeltaX, avgDeltaY);
+    	
+    	
+    	
     }
 
     private void CalculateLinearRegression() {

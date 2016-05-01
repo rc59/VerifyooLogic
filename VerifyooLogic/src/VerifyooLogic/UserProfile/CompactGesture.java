@@ -31,6 +31,9 @@ public class CompactGesture {
     public double StrokeDistanceAvg;
     public double StrokeDistanceMax;
     
+    public double XDpi;
+    public double YDpi;
+    
     public  CompactGesture() {
 
     }
