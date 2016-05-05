@@ -14,8 +14,11 @@ public class GestureComparer {
 	protected ArrayList<StrokeComparer> mListStrokeComparers;	
 	CompareResultSummary mCompareResultsGesture;	
 	
-	public GestureComparer()
+	protected boolean mIsSimilarDevices;
+	
+	public GestureComparer(boolean isSimilarDevices)
 	{
+		mIsSimilarDevices = isSimilarDevices;
 		mListStrokeComparers = new ArrayList<>();
 			
 		mCompareResultsGesture = new CompareResultSummary();		
@@ -34,7 +37,7 @@ public class GestureComparer {
 			
 			StrokeComparer strokeComparer;
 			for(int idxStroke = 0; idxStroke < mGestureStored.ListStrokes.size(); idxStroke++) {
-				strokeComparer = new StrokeComparer();
+				strokeComparer = new StrokeComparer(mIsSimilarDevices);
 				
 				tempStrokeStored = mGestureStored.ListStrokes.get(idxStroke);
 				tempStrokeAuth = mGestureAuth.ListStrokes.get(idxStroke);

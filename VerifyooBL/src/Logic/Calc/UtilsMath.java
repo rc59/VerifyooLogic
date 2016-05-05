@@ -20,6 +20,15 @@ public class UtilsMath {
         return value;
     }	
 	
+	public static double GetMaxValue(double value1, double value2) {
+		if(value1 > value2) {
+			return value1;
+		}
+		else {
+			return value2;
+		}
+	}
+	
 	public static double GetPercentageDiff(double value1, double value2) {
 
         if(value1 == 0 || value2 == 0)

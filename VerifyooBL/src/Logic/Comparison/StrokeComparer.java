@@ -1,5 +1,7 @@
 package Logic.Comparison;
 
+import java.awt.List;
+
 import Consts.ConstsParamNames;
 import Consts.ConstsParamWeights;
 import Data.Comparison.CompareResultGeneric;
@@ -8,20 +10,25 @@ import Data.Comparison.CompareResultSummary;
 import Data.Comparison.Interfaces.ICompareResult;
 import Data.UserProfile.Extended.StrokeExtended;
 import Data.UserProfile.Raw.Stroke;
-import Logic.Calc.UtilsMath;
-import Logic.Calc.UtilsSpatialSampling;
+import Logic.Calc.UtilsComparison;
 import Logic.Calc.UtilsVectors;
 
 public class StrokeComparer {
-	UtilsVectors mUtilsVectors;	
+	protected boolean mIsStrokesIdentical;
 	
-	CompareResultSummary mCompareResult;
+	protected UtilsVectors mUtilsVectors;	
+	protected UtilsComparison mUtilsComparison;
 	
-	StrokeExtended mStrokeStoredExtended;
-	StrokeExtended mStrokeAuthExtended;		
+	protected CompareResultSummary mCompareResult;
 	
-	public StrokeComparer()
+	protected StrokeExtended mStrokeStoredExtended;
+	protected StrokeExtended mStrokeAuthExtended;		
+	
+	protected boolean mIsSimilarDevices;
+	
+	public StrokeComparer(boolean isSimilarDevices)
 	{			
+		mIsSimilarDevices = isSimilarDevices;
 		mCompareResult = new CompareResultSummary();
 		InitUtils();
 	}
@@ -29,17 +36,70 @@ public class StrokeComparer {
 	protected void InitUtils()
 	{
 		mUtilsVectors = new UtilsVectors();
+		mUtilsComparison = new UtilsComparison();
 	}
 	
 	public void CompareStrokes(Stroke strokeStored, Stroke strokeAuth)	
 	{			
+		mIsStrokesIdentical = true;
 		mStrokeStoredExtended = new StrokeExtended(strokeStored);
 		mStrokeAuthExtended = new StrokeExtended(strokeAuth);
 		
-		CompareShapes();
-		CompareStrokeAreas();
-		CalculateFinalScore();		
+		CheckIfStrokesAreIdentical();
+		
+		if(!mIsStrokesIdentical) {
+			CompareMinCosineDistance();
+			CompareStrokeAreas();
+			CompareTimeInterval();
+			CompareAvgVelocity();
+			
+			CalculateFinalScore();	
+		}
+	}		
+
+	/************** Feature Score Calculations **************/
+	protected void CheckIfStrokesAreIdentical()
+	{		
+		if(mStrokeAuthExtended.ListEventsExtended.size() == mStrokeStoredExtended.ListEventsExtended.size()) {
+			for(int idxEvent = 0; idxEvent < mStrokeAuthExtended.ListEventsExtended.size(); idxEvent++) {
+				if(mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Xmm != mStrokeStoredExtended.ListEventsExtended.get(idxEvent).Xmm || 
+				   mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Ymm != mStrokeStoredExtended.ListEventsExtended.get(idxEvent).Ymm) {
+					mIsStrokesIdentical = false;
+					break;
+				}
+			}	
+		}
+		else {
+			mIsStrokesIdentical = false;
+		}
+	}
+	
+	protected void CompareStrokeAreas()
+	{
+		double areaStored = mStrokeStoredExtended.ShapeDataObj.ShapeArea;
+		double areaAuth = mStrokeAuthExtended.ShapeDataObj.ShapeArea;
+		
+		double finalScore = mUtilsComparison.CompareNumericalValues(areaStored, areaAuth, 0.65);
+		AddDoubleParameter(ConstsParamNames.STROKE_AREA, finalScore, ConstsParamWeights.HIGH);
 	}	
+	
+	protected void CompareTimeInterval()
+	{
+		double timeIntervalStored = mStrokeStoredExtended.StrokeTimeInterval;
+		double timeIntervalAuth = mStrokeAuthExtended.StrokeTimeInterval;
+		
+		double finalScore = mUtilsComparison.CompareNumericalValues(timeIntervalStored, timeIntervalAuth, 0.75);		
+		AddDoubleParameter(ConstsParamNames.TIME_INTERVAL, finalScore, ConstsParamWeights.MEDIUM);		
+	}
+	
+	protected void CompareAvgVelocity()
+	{
+		double avgVelocityStored = mStrokeStoredExtended.AverageVelocity;
+		double avgVelocityAuth = mStrokeAuthExtended.AverageVelocity;
+		
+		double finalScore = mUtilsComparison.CompareNumericalValues(avgVelocityStored, avgVelocityAuth, 0.75);
+		AddDoubleParameter(ConstsParamNames.AVERAGE_VELOCITY, finalScore, ConstsParamWeights.MEDIUM);
+	}
 	
 	protected void CalculateFinalScore()
 	{		
@@ -53,30 +113,7 @@ public class StrokeComparer {
 		mCompareResult.Score = avgScore / totalWeights;
 	}
 	
-	public double GetScore()
-	{
-		return mCompareResult.Score;
-	}
-	
-	protected void CompareStrokeAreas()
-	{
-		double areaStored = mStrokeStoredExtended.ShapeDataObj.ShapeArea;
-		double areaAuth = mStrokeAuthExtended.ShapeDataObj.ShapeArea;
-		
-		double areaScore = UtilsMath.GetPercentageDiff(areaStored, areaAuth);
-
-		double finalScore = 1;
-		double threashold = 0.65;
-		if(areaScore < threashold ) {			
-			finalScore = 1 - (threashold - areaScore);
-		}
-		
-		ICompareResult compareResult = 
-				(ICompareResult) new CompareResultGeneric(ConstsParamNames.STROKE_AREA, finalScore, ConstsParamWeights.HIGH);
-		mCompareResult.ListCompareResults.add(compareResult);
-	}
-	
-	protected void CompareShapes()
+	protected void CompareMinCosineDistance()
 	{	
 		double[] vectorStored = mStrokeStoredExtended.SpatialSamplingVector;
 		double[] vectorAuth = mStrokeAuthExtended.SpatialSamplingVector;
@@ -110,4 +147,22 @@ public class StrokeComparer {
 			msg = exc.getMessage();
 		}				
 	}
+	/****************************/
+	
+	/************** Utility Methods **************/
+	public double GetScore()
+	{
+		if(mIsStrokesIdentical) {
+			mCompareResult.Score = 1;
+		}
+		return mCompareResult.Score;
+	}	
+	
+	protected void AddDoubleParameter(String parameterName, double score, double weight)
+	{
+		ICompareResult compareResult = 
+				(ICompareResult) new CompareResultGeneric(parameterName, score, weight);
+		mCompareResult.ListCompareResults.add(compareResult);
+	}
+	/****************************/
 }

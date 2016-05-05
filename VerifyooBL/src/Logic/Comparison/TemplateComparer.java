@@ -13,11 +13,18 @@ public class TemplateComparer {
 	protected ArrayList<GestureComparer> mListGestureComparers;
 	CompareResultSummary mCompareResultsTemplate;	
 	
+	protected boolean mIsSimilarDevices;
+	
 	public TemplateComparer()
 	{		
-		mCompareResultsTemplate = new CompareResultSummary();		
-		
+		mCompareResultsTemplate = new CompareResultSummary();				
 		mListGestureComparers = new ArrayList<>();			
+		CheckIfDevicesAreIdentical();
+	}
+	
+	protected void CheckIfDevicesAreIdentical()
+	{
+		mIsSimilarDevices = true;
 	}
 	
 	public void CompareTemplates(Template templateStored, Template templateAuth)
@@ -29,7 +36,7 @@ public class TemplateComparer {
 		
 		if(templateStored.ListGestures.size() == templateAuth.ListGestures.size()) {			
 			for(int idxGesture = 0; idxGesture < templateStored.ListGestures.size(); idxGesture++) {						
-				gestureComparer = new GestureComparer();
+				gestureComparer = new GestureComparer(mIsSimilarDevices);
 				
 				gestureComparer.CompareGestures(templateStored.ListGestures.get(idxGesture), templateAuth.ListGestures.get(idxGesture)); 
 				mListGestureComparers.add(gestureComparer);

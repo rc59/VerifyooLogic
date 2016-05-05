@@ -14,7 +14,7 @@ public class Tests {
 //	public static void Test1()
 //	{
 //		String strTemplate1 = GestureStore.Test1;
-//		String strTemplate2 = GestureStore.Test2;
+//		String strTemplate2 = GestureStore.Test1;
 //		
 //		JSONDeserializer<Template> deserializer = new JSONDeserializer<Template>();
 //		
@@ -25,6 +25,17 @@ public class Tests {
 //			Template template2 = deserializer.deserialize(strTemplate2);
 //			
 //			TemplateComparer comparer = new TemplateComparer();
+//			
+//			for(int idx = 41; idx >= 21; idx--)
+//			{
+//				template1.ListGestures.remove(idx);
+//			}
+//			
+//			for(int idx = 20; idx >= 0; idx--)
+//			{
+//				template2.ListGestures.remove(idx);
+//			}
+//			
 //			comparer.CompareTemplates(template1, template2);
 //			
 //			boolean result = true;
