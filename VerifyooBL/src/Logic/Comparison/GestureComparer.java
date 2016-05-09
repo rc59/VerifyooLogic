@@ -67,7 +67,9 @@ public class GestureComparer {
 		double totalTimeNoPausesStored = mGestureStored.GestureLength;
 		double totalTimeNoPausesAuth = mGestureStored.GestureLength;
 				
-		double finalScore = mStatEngine.CompareDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.LENGTH, totalTimeNoPausesStored, totalTimeNoPausesAuth);//mUtilsComparison.CompareNumericalValues(totalTimeNoPausesStored, totalTimeNoPausesAuth, 0.75);
+		//double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.LENGTH, totalTimeNoPausesStored, totalTimeNoPausesAuth);
+		
+		double finalScore = mUtilsComparison.CompareNumericalValues(totalTimeNoPausesStored, totalTimeNoPausesAuth, 0.75);
 		AddDoubleParameter(ConstsParamNames.Gesture.LENGTH, finalScore, ConstsParamWeights.MEDIUM);
 	}
 

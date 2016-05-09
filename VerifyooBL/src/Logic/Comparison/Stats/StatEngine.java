@@ -26,7 +26,7 @@ public class StatEngine implements IStatEngine {
       return mInstance;
    }
 	
-	public double CompareDoubleValues(String instruction, String paramName, int strokeIdx, double value1, double value2)
+	public double CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double value1, double value2)
 	{
 		INormData normObj = mNormMgr.GetNormDataByParamName(paramName);
 		double mean = normObj.GetMean();
@@ -34,6 +34,20 @@ public class StatEngine implements IStatEngine {
 		double internalSd = normObj.GetInternalStandardDev();
 		
 		String key = GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
+		double internalMean = mHashFeatureMeans.get(key).GetMean();
+		
+		double score = CalculateScore(value1, value2, mean, sd, internalSd);
+		return score;
+	}
+	
+	public double CompareGestureDoubleValues(String instruction, String paramName, double value1, double value2)
+	{
+		INormData normObj = mNormMgr.GetNormDataByParamName(paramName);
+		double mean = normObj.GetMean();
+		double sd = normObj.GetStandardDev();
+		double internalSd = normObj.GetInternalStandardDev();
+		
+		String key = GenerateGestureFeatureMeanKey(instruction, paramName);
 		double internalMean = mHashFeatureMeans.get(key).GetMean();
 		
 		double score = CalculateScore(value1, value2, mean, sd, internalSd);
