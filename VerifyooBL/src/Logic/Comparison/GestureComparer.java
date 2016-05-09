@@ -65,12 +65,10 @@ public class GestureComparer {
 	
 	private void CompareGestureTotalTimeWithoutPauses() {
 		double totalTimeNoPausesStored = mGestureStored.GestureLength;
-		double totalTimeNoPausesAuth = mGestureStored.GestureLength;
-				
-		//double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.LENGTH, totalTimeNoPausesStored, totalTimeNoPausesAuth);
+		double totalTimeNoPausesAuth = mGestureStored.GestureLength;			
 		
 		double finalScore = mUtilsComparison.CompareNumericalValues(totalTimeNoPausesStored, totalTimeNoPausesAuth, 0.75);
-		AddDoubleParameter(ConstsParamNames.Gesture.LENGTH, finalScore, ConstsParamWeights.MEDIUM);
+		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITHOUT_PAUSES, finalScore, ConstsParamWeights.MEDIUM);
 	}
 
 	private void CompareGestureTotalTimeWithPauses() {
@@ -78,14 +76,16 @@ public class GestureComparer {
 		double totalTimeAuth = mGestureStored.GestureLength;
 		
 		double finalScore = mUtilsComparison.CompareNumericalValues(totalTimeStored, totalTimeAuth, 0.75);
-		AddDoubleParameter(ConstsParamNames.Gesture.LENGTH, finalScore, ConstsParamWeights.MEDIUM);
+		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, finalScore, ConstsParamWeights.MEDIUM);
 	}
 
 	private void CompareGestureAvgVelocity() {
 		double avgVelocityStored = mGestureStored.GestureAverageVelocity;
 		double avgVelocityAuth = mGestureStored.GestureAverageVelocity;
 		
-		double finalScore = mUtilsComparison.CompareNumericalValues(avgVelocityStored, avgVelocityAuth, 0.75);
+		double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.AVERAGE_VELOCITY, avgVelocityAuth);		
+		//double finalScore = mUtilsComparison.CompareNumericalValues(avgVelocityStored, avgVelocityAuth, 0.75);
+		
 		AddDoubleParameter(ConstsParamNames.Gesture.AVERAGE_VELOCITY, finalScore, ConstsParamWeights.MEDIUM);
 	}
 

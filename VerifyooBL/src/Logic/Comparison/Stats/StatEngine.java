@@ -2,20 +2,24 @@ package Logic.Comparison.Stats;
 
 import java.util.HashMap;
 
+import Logic.Calc.UtilsStat;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Comparison.Stats.Norms.NormMgr;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Comparison.Stats.Norms.Interfaces.INormMgr;
 
 public class StatEngine implements IStatEngine {
-	INormMgr mNormMgr;
-	private static IStatEngine mInstance = null;
+	
+	protected UtilsStat mUtilsStat;
+	protected INormMgr mNormMgr;
+	protected static IStatEngine mInstance = null;
 	
 	private HashMap<String, FeatureMeanData> mHashFeatureMeans;
 	
 	protected StatEngine()
 	{
 		mNormMgr = NormMgr.GetInstance();
+		mUtilsStat = new UtilsStat();
 		mHashFeatureMeans = new HashMap<>();
 	}
 	
@@ -26,36 +30,30 @@ public class StatEngine implements IStatEngine {
       return mInstance;
    }
 	
-	public double CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double value1, double value2)
+	public double CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double authValue)
 	{
-		INormData normObj = mNormMgr.GetNormDataByParamName(paramName);
-		double mean = normObj.GetMean();
-		double sd = normObj.GetStandardDev();
-		double internalSd = normObj.GetInternalStandardDev();
+		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
 		
 		String key = GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
+
 		double internalMean = mHashFeatureMeans.get(key).GetMean();
+		double internalSd = normObj.GetInternalStandardDev();
 		
-		double score = CalculateScore(value1, value2, mean, sd, internalSd);
+		double score = mUtilsStat.CalculateProbability(authValue, internalMean, internalSd);
 		return score;
 	}
 	
-	public double CompareGestureDoubleValues(String instruction, String paramName, double value1, double value2)
+	public double CompareGestureDoubleValues(String instruction, String paramName, double authValue)
 	{
-		INormData normObj = mNormMgr.GetNormDataByParamName(paramName);
-		double mean = normObj.GetMean();
-		double sd = normObj.GetStandardDev();
-		double internalSd = normObj.GetInternalStandardDev();
+		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
 		
 		String key = GenerateGestureFeatureMeanKey(instruction, paramName);
+				
 		double internalMean = mHashFeatureMeans.get(key).GetMean();
+		double internalSd = normObj.GetInternalStandardDev();
 		
-		double score = CalculateScore(value1, value2, mean, sd, internalSd);
+		double score = mUtilsStat.CalculateProbability(authValue, internalMean, internalSd);
 		return score;
-	}
-
-	private double CalculateScore(double value1, double value2, double mean, double sd, double internalSd) {		
-		return 0;
 	}
 	
 	protected String GenerateStrokeFeatureMeanKey(String instruction, String paramName, int strokeIdx)

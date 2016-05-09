@@ -2,6 +2,7 @@ package Logic.Comparison.Stats.Norms;
 
 import java.util.HashMap;
 
+import Consts.ConstsInstructions;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Comparison.Stats.Norms.Interfaces.INormMgr;
 
@@ -22,19 +23,31 @@ public class NormMgr implements INormMgr {
       return mInstance;
    }
 	
-	public INormData GetNormDataByParamName(String name) {
-		return mHashNorms.get(name);
+	public INormData GetNormDataByParamName(String name, String instruction) {
+		String key = CreateNormKey(name, instruction);
+		return mHashNorms.get(key);
 	}
 	
 	protected void InitNorms()
 	{
 		mHashNorms = new HashMap<String, INormData>();	
 		
-		CreateDoubleNorm(Consts.ConstsParamNames.Stroke.AVERAGE_VELOCITY, 0, 0, 0);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.AVERAGE_VELOCITY, ConstsInstructions.INSTRUCTION_EIGHT, 2, 1, 0.3);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.AVERAGE_VELOCITY, ConstsInstructions.INSTRUCTION_FIVE, 2, 1, 0.3);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.AVERAGE_VELOCITY, ConstsInstructions.INSTRUCTION_HEART, 2, 1, 0.3);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.AVERAGE_VELOCITY, ConstsInstructions.INSTRUCTION_LETTER_A, 2, 1, 0.3);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.AVERAGE_VELOCITY, ConstsInstructions.INSTRUCTION_LETTER_R, 2, 1, 0.3);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.AVERAGE_VELOCITY, ConstsInstructions.INSTRUCTION_LINES, 2, 1, 0.3);		
 	}
 	
-	protected void CreateDoubleNorm(String name, double mean, double standardDev, double internalStandardDev)
+	protected void CreateDoubleNorm(String name, String instruction, double mean, double standardDev, double internalStandardDev)
 	{
-		mHashNorms.put(name, new NormData(name, mean, standardDev, internalStandardDev));
+		String key = CreateNormKey(name, instruction);
+		mHashNorms.put(key, new NormData(name, mean, standardDev, internalStandardDev));
+	}
+	
+	protected String CreateNormKey(String name, String instruction) {
+		String key = String.format("%s-%s", name, instruction);
+		return key;
 	}
 }
