@@ -2,47 +2,57 @@ package Data.UserProfile.Extended;
 
 import java.util.ArrayList;
 
+import Consts.ConstsParamNames;
 import Data.MetaData.ShapeData;
 import Data.MetaData.StrokeProperties;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
 import Logic.Calc.UtilsMath;
 import Logic.Calc.UtilsSpatialSampling;
+import Logic.Comparison.Stats.StatEngine;
+import Logic.Comparison.Stats.Interfaces.IStatEngine;
 
 public class StrokeExtended extends Stroke {
 	/************** Private Members **************/
+	private String mInstruction;
+	private int mStrokeIdx;
+	
 	private UtilsSpatialSampling mUtilsSpatialSampling;
 	private UtilsMath mUtilsMath;
 	
-	private MotionEventCompact PointMinX;
-	private MotionEventCompact PointMaxX;
-	private MotionEventCompact PointMinY;
-	private MotionEventCompact PointMaxY;
+	private MotionEventCompact mPointMinX;
+	private MotionEventCompact mPointMaxX;
+	private MotionEventCompact mPointMinY;
+	private MotionEventCompact mPointMaxY;
 	
 	private double mStrokeCenterXpixel;
 	private double mStrokeCenterYpixel;	
+	
+	private IStatEngine mStatEngine;
 	/****************************************/
 	
 	/************** Stroke Features **************/
-	public double[] SpatialSamplingVector;
+	public ArrayList<MotionEventExtended> ListEventsExtended; 
 	
 	public double StrokeTimeInterval;
 	public double AverageVelocity;
-	
-	public ArrayList<MotionEventExtended> ListEventsExtended; 
-	
-	public StrokeProperties StrokePropertiesObj;
-	public ShapeData ShapeDataObj;	
-	
+				
 	public double MaxPressure;
 	public double MaxSurface;
 	
 	public boolean IsHasPressure;
 	public boolean IsHasTouchSurface;
+	
+	public double[] SpatialSamplingVector;
+	
+	public StrokeProperties StrokePropertiesObj;
+	public ShapeData ShapeDataObj;
 	/****************************************/
 	
-	public StrokeExtended(Stroke stroke)
+	public StrokeExtended(Stroke stroke, String instruction, int strokeIdx)
 	{
+		mStrokeIdx = strokeIdx;
+		mInstruction = instruction;
 		ListEvents = stroke.ListEvents;
 		Length = stroke.Length;
 		Xdpi = stroke.Xdpi;		
@@ -55,6 +65,8 @@ public class StrokeExtended extends Stroke {
 		
 		IsHasPressure = false;
 		IsHasTouchSurface = false;
+		
+		mStatEngine = StatEngine.GetInstance();
 		
 		InitUtils();
 		InitFeatures();		
@@ -147,7 +159,8 @@ public class StrokeExtended extends Stroke {
 	
 	protected void CalculateAverageVelocity()
 	{
-		AverageVelocity = Length / StrokeTimeInterval; 
+		AverageVelocity = Length / StrokeTimeInterval;
+		mStatEngine.AddStrokeValue(mInstruction, ConstsParamNames.Stroke.AVERAGE_VELOCITY, mStrokeIdx, AverageVelocity);
 	}
 	
 	protected void CalculateStrokeInterval()
@@ -163,21 +176,21 @@ public class StrokeExtended extends Stroke {
             eventCurrent = ListEvents.get(idxEvent);            
 
             if (idxEvent == 0) {
-                PointMinX = eventCurrent;
-                PointMaxX = eventCurrent;
-                PointMinY = eventCurrent;
-                PointMaxY = eventCurrent;
+                mPointMinX = eventCurrent;
+                mPointMaxX = eventCurrent;
+                mPointMinY = eventCurrent;
+                mPointMaxY = eventCurrent;
             }
             else {               
-                PointMinX = GetMinXpixel(PointMinX, eventCurrent);
-                PointMaxX = GetMaxXpixel(PointMaxX, eventCurrent);
-                PointMinY = GetMinYpixel(PointMinY, eventCurrent);
-                PointMaxY = GetMaxYpixel(PointMaxY, eventCurrent);                
+                mPointMinX = GetMinXpixel(mPointMinX, eventCurrent);
+                mPointMaxX = GetMaxXpixel(mPointMaxX, eventCurrent);
+                mPointMinY = GetMinYpixel(mPointMinY, eventCurrent);
+                mPointMaxY = GetMaxYpixel(mPointMaxY, eventCurrent);                
             }
         }
 		
-		mStrokeCenterXpixel = (PointMinX.Xpixel + PointMaxX.Xpixel) / 2;
-        mStrokeCenterYpixel = (PointMinY.Ypixel + PointMaxY.Ypixel) / 2;
+		mStrokeCenterXpixel = (mPointMinX.Xpixel + mPointMaxX.Xpixel) / 2;
+        mStrokeCenterYpixel = (mPointMinY.Ypixel + mPointMaxY.Ypixel) / 2;
 	}
 	
 	protected void CalculateSpatialSamplingVector()
@@ -208,4 +221,13 @@ public class StrokeExtended extends Stroke {
             return pointB;
         return pointA;
     }
+	
+	public int GetStrokeIdx()
+	{
+		return mStrokeIdx;
+	}
+	
+	public String GetInstruction(){
+		return mInstruction;
+	}
 }

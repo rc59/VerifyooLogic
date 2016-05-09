@@ -3,12 +3,16 @@ package Logic.Comparison;
 import java.util.ArrayList;
 
 import Data.Comparison.CompareResultSummary;
+import Data.UserProfile.Extended.TemplateExtended;
 import Data.UserProfile.Raw.Template;
 
 public class TemplateComparer {
-		
-	protected Template mTemplateStored;
-	protected Template mTemplateAuth;
+//		
+//	protected Template mTemplateStored;
+//	protected Template mTemplateAuth;
+
+	protected TemplateExtended mTemplateStored;
+	protected TemplateExtended mTemplateAuth;
 	
 	protected ArrayList<GestureComparer> mListGestureComparers;
 	CompareResultSummary mCompareResultsTemplate;	
@@ -27,18 +31,18 @@ public class TemplateComparer {
 		mIsSimilarDevices = true;
 	}
 	
-	public void CompareTemplates(Template templateStored, Template templateAuth)
+	public void CompareTemplates(TemplateExtended templateStored, TemplateExtended templateAuth)
 	{
 		GestureComparer gestureComparer;			
 				
 		mTemplateStored = templateStored;
 		mTemplateAuth = templateAuth;	
 		
-		if(templateStored.ListGestures.size() == templateAuth.ListGestures.size()) {			
-			for(int idxGesture = 0; idxGesture < templateStored.ListGestures.size(); idxGesture++) {						
+		if(templateStored.ListGestureExtended.size() == templateAuth.ListGestureExtended.size()) {			
+			for(int idxGesture = 0; idxGesture < templateStored.ListGestureExtended.size(); idxGesture++) {						
 				gestureComparer = new GestureComparer(mIsSimilarDevices);
 				
-				gestureComparer.CompareGestures(templateStored.ListGestures.get(idxGesture), templateAuth.ListGestures.get(idxGesture)); 
+				gestureComparer.CompareGestures(templateStored.ListGestureExtended.get(idxGesture), templateAuth.ListGestureExtended.get(idxGesture)); 
 				mListGestureComparers.add(gestureComparer);
 			}
 			

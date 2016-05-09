@@ -24,6 +24,25 @@ public class StrokeComparer {
     }    
     
     public double Compare(Stroke strokeTemplate, Stroke strokeAuth) {
+    	ShapeComparer shapeComparer = new ShapeComparer();
+    	double shapeScore;
+    	    	    
+        try {
+            shapeScore = shapeComparer.getScore(strokeTemplate, strokeAuth);            
+        } catch (Exception exc) {
+            shapeScore = 0.1;            
+        }
+                   
+        return 1;
+//        if(shapeScore > 1) {
+//        	return 1;
+//        }
+//        else {
+//        	return 0.5;
+//        }
+    }
+    
+    public double Compare1(Stroke strokeTemplate, Stroke strokeAuth) {
         try {        	
             mStrokeTemplate = strokeTemplate;
             mStrokeAuth = strokeAuth;
