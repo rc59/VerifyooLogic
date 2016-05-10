@@ -13,8 +13,10 @@ public class GestureExtended extends Gesture {
 	public double GestureTotalTimeWithPauses;
 	public double GestureTotalTimeWithoutPauses;
 	public double GestureAverageVelocity;
-	
+		
 	public ArrayList<StrokeExtended> ListStrokesExtended;
+
+	protected ArrayList<MotionEventExtended> mListGestureEvents;
 	
 	protected IStatEngine mStatEngine;
 	
@@ -29,6 +31,8 @@ public class GestureExtended extends Gesture {
 
 	private void InitParams() {
 		ListStrokesExtended = new ArrayList<>();
+		
+		mListGestureEvents = new ArrayList<>();
 		
 		mStatEngine = StatEngine.GetInstance();
 		
@@ -47,7 +51,9 @@ public class GestureExtended extends Gesture {
 			
 			ListStrokesExtended.add(tempStrokeExtended);
 			GestureLength += tempStrokeExtended.Length;
-			GestureTotalTimeWithoutPauses += tempStrokeExtended.StrokeTimeInterval;			
+			GestureTotalTimeWithoutPauses += tempStrokeExtended.StrokeTimeInterval;
+			
+			mListGestureEvents.addAll(tempStrokeExtended.ListEventsExtended);
 		}		
 	}
 	
