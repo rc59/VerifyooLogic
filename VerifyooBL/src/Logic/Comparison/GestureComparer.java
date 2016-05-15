@@ -1,6 +1,7 @@
 package Logic.Comparison;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import Consts.ConstsParamNames;
 import Consts.ConstsParamWeights;
@@ -10,11 +11,13 @@ import Data.Comparison.Interfaces.ICompareResult;
 import Data.UserProfile.Extended.GestureExtended;
 import Data.UserProfile.Extended.StrokeExtended;
 import Logic.Calc.UtilsComparison;
+import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 
 public class GestureComparer {
 
+	protected boolean mIsGesturesIdentical;
 	protected IStatEngine mStatEngine;
 	
 	protected GestureExtended mGestureStored;
@@ -30,7 +33,8 @@ public class GestureComparer {
 	protected boolean mIsSimilarDevices;
 	
 	public GestureComparer(boolean isSimilarDevices)
-	{
+	{		
+		mIsGesturesIdentical = true;
 		mIsSimilarDevices = isSimilarDevices;
 		mListStrokeComparers = new ArrayList<>();
 		mGestureScore = 0;
@@ -64,36 +68,38 @@ public class GestureComparer {
 	}
 	
 	private void CompareGestureTotalTimeWithoutPauses() {
-		double totalTimeNoPausesStored = mGestureStored.GestureLength;
-		double totalTimeNoPausesAuth = mGestureStored.GestureLength;			
+		double totalTimeNoPausesStored = mGestureStored.GestureTotalTimeWithoutPauses;
+		double totalTimeNoPausesAuth = mGestureAuth.GestureTotalTimeWithoutPauses;			
 		
 		double finalScore = mUtilsComparison.CompareNumericalValues(totalTimeNoPausesStored, totalTimeNoPausesAuth, 0.75);
-		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITHOUT_PAUSES, finalScore, ConstsParamWeights.MEDIUM);
+		//double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITHOUT_PAUSES, totalTimeNoPausesAuth, mGestureStored.GetFeatureMeansHash());
+		//AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITHOUT_PAUSES, finalScore, ConstsParamWeights.MEDIUM);
 	}
 
 	private void CompareGestureTotalTimeWithPauses() {
-		double totalTimeStored = mGestureStored.GestureLength;
-		double totalTimeAuth = mGestureStored.GestureLength;
-		
-		double finalScore = mUtilsComparison.CompareNumericalValues(totalTimeStored, totalTimeAuth, 0.75);
+		double totalTimeStored = mGestureStored.GestureTotalTimeWithPauses;
+		double totalTimeAuth = mGestureAuth.GestureTotalTimeWithPauses;
+				
+		//double finalScore = mUtilsComparison.CompareNumericalValues(totalTimeStored, totalTimeAuth, 0.75);
+		double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, totalTimeAuth, mGestureStored.GetFeatureMeansHash());
 		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, finalScore, ConstsParamWeights.MEDIUM);
 	}
 
 	private void CompareGestureAvgVelocity() {
 		double avgVelocityStored = mGestureStored.GestureAverageVelocity;
-		double avgVelocityAuth = mGestureStored.GestureAverageVelocity;
+		double avgVelocityAuth = mGestureAuth.GestureAverageVelocity;
 		
-		double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.AVERAGE_VELOCITY, avgVelocityAuth);		
 		//double finalScore = mUtilsComparison.CompareNumericalValues(avgVelocityStored, avgVelocityAuth, 0.75);
-		
+		double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.AVERAGE_VELOCITY, avgVelocityAuth, mGestureStored.GetFeatureMeansHash());
 		AddDoubleParameter(ConstsParamNames.Gesture.AVERAGE_VELOCITY, finalScore, ConstsParamWeights.MEDIUM);
 	}
 
 	private void CompareGestureLengths() {
-		double lengthStored = mGestureStored.GestureLength;
-		double lengthAuth = mGestureStored.GestureLength;
+		double lengthStored = mGestureStored.GestureLengthMM;
+		double lengthAuth = mGestureAuth.GestureLengthMM;
 		
-		double finalScore = mUtilsComparison.CompareNumericalValues(lengthStored, lengthAuth, 0.75);
+		//double finalScore = mUtilsComparison.CompareNumericalValues(lengthStored, lengthAuth, 0.75);
+		double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.LENGTH, lengthAuth, mGestureStored.GetFeatureMeansHash());
 		AddDoubleParameter(ConstsParamNames.Gesture.LENGTH, finalScore, ConstsParamWeights.MEDIUM);
 	}
 
@@ -123,10 +129,15 @@ public class GestureComparer {
 	
 	protected void CalculateFinalScore()
 	{
-		CalculateGestureScore();
 		CalculateStrokesScore();
-				
-		mCompareResultsGesture.Score = (mGestureScore + mStrokesScore) / 2;
+		if(!mIsGesturesIdentical) {
+			CalculateGestureScore();
+			mCompareResultsGesture.Score = mGestureScore; //(mGestureScore + mStrokesScore) / 2;
+		}		
+		else 
+		{
+			mCompareResultsGesture.Score = 1;
+		}		
 	}
 	
 	protected void CalculateGestureScore() {
@@ -142,9 +153,14 @@ public class GestureComparer {
 	
 	protected void CalculateStrokesScore() {
 		double avgScore = 0;
+				
 		
 		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {
+			if(mListStrokeComparers.get(idx).mIsSimilarDevices)
 			avgScore += mListStrokeComparers.get(idx).GetScore();
+			if(!mListStrokeComparers.get(idx).IsStrokesIdentical()) {
+				mIsGesturesIdentical = false;
+			}
 		}
 		
 		mStrokesScore = avgScore / mListStrokeComparers.size();

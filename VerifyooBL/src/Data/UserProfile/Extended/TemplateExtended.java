@@ -1,19 +1,24 @@
 package Data.UserProfile.Extended;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.Template;
+import Logic.Comparison.Stats.FeatureMeanData;
 
 public class TemplateExtended extends Template {	
 	public ArrayList<GestureExtended> ListGestureExtended;
 	
-	public TemplateExtended(Template template) {
+	private HashMap<String, FeatureMeanData> mHashFeatureMeans;
+	
+	public TemplateExtended(Template template) {		
 		InitTemplateExtended(template);
 	}
 
 	private void InitTemplateExtended(Template template) {
-		ListGestureExtended = new ArrayList<>();
+		mHashFeatureMeans = new HashMap<>();
+		ListGestureExtended = new ArrayList<GestureExtended>();
 		ListGestures = template.ListGestures;
 				
 		Gesture tempGesture;
@@ -21,7 +26,7 @@ public class TemplateExtended extends Template {
 		
 		for(int idxGesture = 0; idxGesture < template.ListGestures.size(); idxGesture++) {
 			tempGesture = template.ListGestures.get(idxGesture);
-			tempGestureExtended = new GestureExtended(tempGesture);
+			tempGestureExtended = new GestureExtended(tempGesture, mHashFeatureMeans);
 			
 			ListGestureExtended.add(tempGestureExtended);
 		}		

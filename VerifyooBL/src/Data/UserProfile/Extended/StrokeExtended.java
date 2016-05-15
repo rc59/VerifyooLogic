@@ -1,14 +1,20 @@
 package Data.UserProfile.Extended;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import Consts.ConstsMeasures;
 import Consts.ConstsParamNames;
 import Data.MetaData.ShapeData;
 import Data.MetaData.StrokeProperties;
+import Data.MetaData.VelocityAvgPoint;
+import Data.MetaData.VelocityPeak;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
+import Logic.Calc.Utils;
 import Logic.Calc.UtilsMath;
 import Logic.Calc.UtilsSpatialSampling;
+import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 
@@ -27,11 +33,13 @@ public class StrokeExtended extends Stroke {
 	
 	private double mStrokeCenterXpixel;
 	private double mStrokeCenterYpixel;	
-	
-	private IStatEngine mStatEngine;
+		
+	private HashMap<String, FeatureMeanData> mHashFeatureMeans;
 	/****************************************/
 	
-	/************** Stroke Features **************/
+	/************** Stroke Features **************/	
+	public VelocityPeak StrokeVelocityPeak;
+	
 	public ArrayList<MotionEventExtended> ListEventsExtended; 
 	
 	public double StrokeTimeInterval;
@@ -39,6 +47,9 @@ public class StrokeExtended extends Stroke {
 				
 	public double MaxPressure;
 	public double MaxSurface;
+	
+	public double MiddlePressure;
+	public double MiddleSurface;
 	
 	public boolean IsHasPressure;
 	public boolean IsHasTouchSurface;
@@ -49,12 +60,12 @@ public class StrokeExtended extends Stroke {
 	public ShapeData ShapeDataObj;
 	/****************************************/
 	
-	public StrokeExtended(Stroke stroke, String instruction, int strokeIdx)
+	public StrokeExtended(Stroke stroke, HashMap<String, FeatureMeanData> hashFeatureMeans, String instruction, int strokeIdx)
 	{
+		mHashFeatureMeans = hashFeatureMeans;
 		mStrokeIdx = strokeIdx;
 		mInstruction = instruction;
-		ListEvents = stroke.ListEvents;
-		Length = stroke.Length;
+		ListEvents = stroke.ListEvents;		
 		Xdpi = stroke.Xdpi;		
 		Ydpi = stroke.Ydpi;
 		
@@ -64,9 +75,7 @@ public class StrokeExtended extends Stroke {
 		ShapeDataObj = new ShapeData();
 		
 		IsHasPressure = false;
-		IsHasTouchSurface = false;
-		
-		mStatEngine = StatEngine.GetInstance();
+		IsHasTouchSurface = false;		
 		
 		InitUtils();
 		InitFeatures();		
@@ -74,8 +83,8 @@ public class StrokeExtended extends Stroke {
 	
 	protected void InitUtils()
 	{
-		mUtilsSpatialSampling = new UtilsSpatialSampling();
-		mUtilsMath = new UtilsMath();
+		mUtilsSpatialSampling = Utils.GetInstance().GetUtilsSpatialSampling();
+		mUtilsMath = Utils.GetInstance().GetUtilsMath();
 	}
 	
 	protected void InitFeatures()
@@ -87,7 +96,7 @@ public class StrokeExtended extends Stroke {
 	protected void PreCalculations()
 	{
 		CalculateStrokeCenter();
-		ConvertToMM();
+		ConvertToMotionEventExtended();
 		PrepareData();		
 	}
 	
@@ -96,15 +105,26 @@ public class StrokeExtended extends Stroke {
 		CalculateSpatialSamplingVector();
 		CalculateStrokeInterval();
 		CalculateAverageVelocity();
+		CalculateMiddlePressureAndSurface();
+		CalculateStrokeVelocityPeaks();
 	}
 	
-	protected void ConvertToMM()
+	protected void ConvertToMotionEventExtended()
 	{
-		MotionEventExtended tempEvent;		
+		MotionEventExtended tempEvent;
+		MotionEventExtended tempEventPrev;
 		
 		for(int idxEvent = 0; idxEvent < ListEvents.size(); idxEvent++)
 		{
-			tempEvent = new MotionEventExtended(ListEvents.get(idxEvent), mStrokeCenterXpixel, mStrokeCenterYpixel, Xdpi, Ydpi);			
+			if(idxEvent > 0) {
+				tempEventPrev = ListEventsExtended.get(idxEvent - 1);
+				
+			}
+			else {
+				tempEventPrev = null;
+			}
+			
+			tempEvent = new MotionEventExtended(ListEvents.get(idxEvent), mStrokeCenterXpixel, mStrokeCenterYpixel, Xdpi, Ydpi, tempEventPrev, idxEvent);			
 			ListEventsExtended.add(tempEvent);
 		}
 	}
@@ -122,10 +142,11 @@ public class StrokeExtended extends Stroke {
                 StrokePropertiesObj.ListDeltaXmm[idxEvent - 1] = deltaX;
                 StrokePropertiesObj.ListDeltaYmm[idxEvent - 1] = deltaY;              
 				
-                StrokePropertiesObj.ListEventLength[idxEvent - 1] = UtilsMath.CalcPitagoras(deltaX, deltaY);
+                StrokePropertiesObj.ListEventLength[idxEvent - 1] = mUtilsMath.CalcPitagoras(deltaX, deltaY);
+                StrokePropertiesObj.LengthMM += StrokePropertiesObj.ListEventLength[idxEvent - 1];
                 
                 ShapeDataObj.ShapeArea += 
-                		(StrokePropertiesObj.ListEventLength[idxEvent - 1] * UtilsMath.CalcPitagoras(ListEventsExtended.get(idxEvent - 1).Xmm, ListEventsExtended.get(idxEvent - 1).Ymm) / 2);
+                		(StrokePropertiesObj.ListEventLength[idxEvent - 1] * mUtilsMath.CalcPitagoras(ListEventsExtended.get(idxEvent - 1).Xmm, ListEventsExtended.get(idxEvent - 1).Ymm) / 2);
                                 
                 if(CheckIfPressureExists(ListEventsExtended.get(idxEvent))) {
                 	IsHasPressure = true;
@@ -137,6 +158,67 @@ public class StrokeExtended extends Stroke {
                 }
 			}
 		}				
+	}
+	
+	private void CalculateStrokeVelocityPeaks()
+	{
+		StrokeVelocityPeak = new VelocityPeak();
+		String err;
+		ArrayList<VelocityAvgPoint> listVelocityAvgPoints = new ArrayList<>();	
+		MotionEventExtended eventPrev;
+		MotionEventExtended eventCurr;
+		VelocityAvgPoint tempVelocityAvgPoint = null;
+		VelocityAvgPoint velocityAvgPointMax = null;
+		
+		double currMaxVelocity = 0;
+
+		for(int idxGesture = 1; idxGesture < ListEventsExtended.size(); idxGesture++) {
+			eventPrev = ListEventsExtended.get(idxGesture - 1);
+			eventCurr = ListEventsExtended.get(idxGesture);
+
+			if(eventPrev.Velocity < AverageVelocity && eventCurr.Velocity > AverageVelocity) {
+				tempVelocityAvgPoint = new VelocityAvgPoint(idxGesture);		
+				currMaxVelocity = eventCurr.Velocity;
+			}
+			
+			if(eventPrev.Velocity > AverageVelocity && eventCurr.Velocity < AverageVelocity) {
+				if(tempVelocityAvgPoint != null) {
+					tempVelocityAvgPoint.IndexEnd = idxGesture;
+					currMaxVelocity = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxVelocity, eventCurr.Velocity);
+					tempVelocityAvgPoint.MaxVelocityInSection = currMaxVelocity;
+					listVelocityAvgPoints.add(tempVelocityAvgPoint);
+					tempVelocityAvgPoint = null;
+					currMaxVelocity = 0;
+				}				
+			}
+			
+			if(tempVelocityAvgPoint != null && tempVelocityAvgPoint.IndexEnd == -1) {
+				currMaxVelocity = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxVelocity, eventCurr.Velocity);
+			}
+		}
+		
+		
+		if(listVelocityAvgPoints.size() > 0) {
+			tempVelocityAvgPoint = new VelocityAvgPoint(0);		
+			
+			velocityAvgPointMax = listVelocityAvgPoints.get(0);
+			for(int idxVelAvgPoint = 1; idxVelAvgPoint < listVelocityAvgPoints.size(); idxVelAvgPoint++) {
+				if(velocityAvgPointMax.MaxVelocityInSection < listVelocityAvgPoints.get(idxVelAvgPoint).MaxVelocityInSection) {
+					velocityAvgPointMax = listVelocityAvgPoints.get(idxVelAvgPoint);
+				}
+			}
+			
+			int velocityPeakMaxIdx = -1;
+			for(int idxVelocityPeakIndex = velocityAvgPointMax.IndexStart; idxVelocityPeakIndex < velocityAvgPointMax.IndexEnd; idxVelocityPeakIndex++) {
+				if(ListEventsExtended.get(idxVelocityPeakIndex).Velocity == velocityAvgPointMax.MaxVelocityInSection) {
+					velocityPeakMaxIdx = idxVelocityPeakIndex;
+				}
+			}
+			
+			StrokeVelocityPeak = new VelocityPeak();
+			StrokeVelocityPeak.Velocity = velocityAvgPointMax.MaxVelocityInSection;
+			StrokeVelocityPeak.Index = velocityPeakMaxIdx;
+		}
 	}
 
 	protected boolean CheckIfPressureExists(MotionEventExtended event) {
@@ -159,8 +241,15 @@ public class StrokeExtended extends Stroke {
 	
 	protected void CalculateAverageVelocity()
 	{
-		AverageVelocity = Length / StrokeTimeInterval;
-		mStatEngine.AddStrokeValue(mInstruction, ConstsParamNames.Stroke.AVERAGE_VELOCITY, mStrokeIdx, AverageVelocity);
+		AverageVelocity = StrokePropertiesObj.LengthMM / StrokeTimeInterval;
+		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.AVERAGE_VELOCITY, mStrokeIdx, AverageVelocity);
+	}
+	
+	protected void CalculateMiddlePressureAndSurface()
+	{
+		int idxMiddle = ListEventsExtended.size() / 2;
+		MiddlePressure = ListEventsExtended.get(idxMiddle).Pressure;
+		MiddleSurface = ListEventsExtended.get(idxMiddle).TouchSurface;
 	}
 	
 	protected void CalculateStrokeInterval()
@@ -221,6 +310,34 @@ public class StrokeExtended extends Stroke {
             return pointB;
         return pointA;
     }
+	
+	protected void AddStrokeValue(String instruction, String paramName, int strokeIdx, double value)
+	{
+		String key = GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
+		
+		FeatureMeanData tempFeatureMeanData;
+		
+		if(mHashFeatureMeans.containsKey(key)) {
+			tempFeatureMeanData = mHashFeatureMeans.get(key);
+		}
+		else {
+			tempFeatureMeanData = new FeatureMeanData(paramName);			
+			mHashFeatureMeans.put(key, tempFeatureMeanData);
+		}
+		
+		tempFeatureMeanData.AddValue(value);		
+	}
+	
+	protected String GenerateStrokeFeatureMeanKey(String instruction, String paramName, int strokeIdx)
+	{
+		String key = String.format("%s-%s-%s", instruction, String.valueOf(strokeIdx) ,paramName);
+		return key;
+	}
+	
+	public HashMap<String, FeatureMeanData> GetFeatureMeansHash() 
+	{
+		return mHashFeatureMeans;
+	}
 	
 	public int GetStrokeIdx()
 	{

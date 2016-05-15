@@ -1,10 +1,13 @@
 package Logic.Comparison;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import Data.Comparison.CompareResultSummary;
 import Data.UserProfile.Extended.TemplateExtended;
 import Data.UserProfile.Raw.Template;
+import Logic.Comparison.Stats.FeatureMeanData;
+import Logic.Comparison.Stats.StatEngine;
 
 public class TemplateComparer {
 //		
@@ -15,12 +18,12 @@ public class TemplateComparer {
 	protected TemplateExtended mTemplateAuth;
 	
 	protected ArrayList<GestureComparer> mListGestureComparers;
-	CompareResultSummary mCompareResultsTemplate;	
+	CompareResultSummary mCompareResultsTemplate;
 	
-	protected boolean mIsSimilarDevices;
+	protected boolean mIsSimilarDevices;	
 	
 	public TemplateComparer()
-	{		
+	{				
 		mCompareResultsTemplate = new CompareResultSummary();				
 		mListGestureComparers = new ArrayList<>();			
 		CheckIfDevicesAreIdentical();
@@ -32,7 +35,7 @@ public class TemplateComparer {
 	}
 	
 	public void CompareTemplates(TemplateExtended templateStored, TemplateExtended templateAuth)
-	{
+	{		
 		GestureComparer gestureComparer;			
 				
 		mTemplateStored = templateStored;

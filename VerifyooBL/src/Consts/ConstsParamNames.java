@@ -16,6 +16,6 @@ public class ConstsParamNames {
 		public static final String GESTURE_TOTAL_TIME_WITHOUT_PAUSES = "GestureTotalTimeWithoutPauses";
 		public static final String GESTURE_TOTAL_TIME_WITH_PAUSES = "GestureTotalTimeWithPauses";
 		public static final String GESTURE_ACCUMULATED_DISTANCE_BY_TIME = "GestureAccumulatedDistanceByTime";
-		
+		public static final String GESTURE_TOTAL_STROKE_AREA= "GestureTotalStrokeArea";		
 	}	
 }

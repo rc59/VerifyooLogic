@@ -13,14 +13,14 @@ public class UtilsMath {
 		return avg;
 	}
 	
-	public static double CalcPitagoras(double value1, double value2) {
+	public double CalcPitagoras(double value1, double value2) {
         double value = value1 * value1 + value2 * value2;
         value = Math.sqrt(value);
 
         return value;
     }	
 	
-	public static double GetMaxValue(double value1, double value2) {
+	public double GetMaxValue(double value1, double value2) {
 		if(value1 > value2) {
 			return value1;
 		}
@@ -29,7 +29,16 @@ public class UtilsMath {
 		}
 	}
 	
-	public static double GetPercentageDiff(double value1, double value2) {
+	public double GetMinValue(double value1, double value2) {
+		if(value1 < value2) {
+			return value1;
+		}
+		else {
+			return value2;
+		}
+	}
+	
+	public double GetPercentageDiff(double value1, double value2) {
 
         if(value1 == 0 || value2 == 0)
         {

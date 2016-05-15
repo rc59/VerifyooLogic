@@ -2,18 +2,38 @@ package Logic.Calc;
 
 public class UtilsStat {
 
-	public double CalculateProbability(double authValue, double internalMean, double internalSd) {
+	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean) {
+		
+		double distanceFromInternalMean = Math.abs(internalMean - authValue);
+		
+		double authValueLower = internalMean - distanceFromInternalMean;
+		double authValueUpper = internalMean + distanceFromInternalMean;
+		
+		double zLower = CalculateZScore(authValueLower, populationMean, populationSd);
+		double zUpper = CalculateZScore(authValueUpper, populationMean, populationSd);
+		
+		double probZLower = ConvertZToProbability(zLower);
+		double probZUpper = ConvertZToProbability(zUpper);
+		
+		double score = 1 - Math.abs(probZUpper - probZLower);		
+		return score;
+	}
+	
+	protected double CalculateProbability(double authValue, double internalMean, double internalSd, boolean isAbs) {
 		double zScore = CalculateZScore(authValue, internalMean, internalSd);
-		double probability = ConvertZToProbability(zScore);
-		return (1 - probability);
+		if(isAbs) {
+			zScore = Math.abs(zScore);	
+		}
+		double probability = 1 - ConvertZToProbability(zScore);
+		return probability;
 	}
 
-	private double CalculateZScore(double authValue, double internalMean, double internalSd) {
+	protected double CalculateZScore(double authValue, double internalMean, double internalSd) {
 		double zScore = (authValue - internalMean) / internalSd;
 		return zScore;
 	}
 	
-	private double ConvertZToProbability(double z) {
+	protected double ConvertZToProbability(double z) {
 		double y, x, w;
         double Z_MAX = 6;
 

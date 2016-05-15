@@ -8,6 +8,7 @@ import Data.Comparison.CompareResultSummary;
 import Data.Comparison.Interfaces.ICompareResult;
 import Data.UserProfile.Extended.StrokeExtended;
 import Data.UserProfile.Raw.Stroke;
+import Logic.Calc.Utils;
 import Logic.Calc.UtilsComparison;
 import Logic.Calc.UtilsVectors;
 import Logic.Comparison.Stats.StatEngine;
@@ -38,8 +39,8 @@ public class StrokeComparer {
 	
 	protected void InitUtils()
 	{
-		mUtilsVectors = new UtilsVectors();
-		mUtilsComparison = new UtilsComparison();
+		mUtilsVectors = Utils.GetInstance().GetUtilsVectors();
+		mUtilsComparison = Utils.GetInstance().GetUtilsComparison();
 	}
 	
 	public void CompareStrokes(StrokeExtended strokeStored, StrokeExtended strokeAuth)	
@@ -153,6 +154,11 @@ public class StrokeComparer {
 		}
 		return mCompareResult.Score;
 	}	
+	
+	public boolean IsStrokesIdentical()
+	{
+		return mIsStrokesIdentical;
+	}
 	
 	protected void AddDoubleParameter(String parameterName, double score, double weight)
 	{

@@ -2,14 +2,28 @@ package Data.UserProfile.Extended;
 
 import Consts.ConstsMeasures;
 import Data.UserProfile.Raw.MotionEventCompact;
+import Logic.Calc.Utils;
+import Logic.Calc.UtilsMath;
 
 public class MotionEventExtended extends MotionEventCompact {
+	
+	protected UtilsMath mUtilsMath;
+	
+	public int Index;
 	
 	public double Xmm;
 	public double Ymm;
 	
-	public MotionEventExtended(MotionEventCompact motionEvent, double strokeCenterXpixel, double strokeCenterYpixel, double xdpi, double ydpi)
+	public double VelocityX;
+	public double VelocityY;
+	public double Velocity;
+	
+	public MotionEventExtended(MotionEventCompact motionEvent, double strokeCenterXpixel, double strokeCenterYpixel, double xdpi, double ydpi, MotionEventExtended motionEventPrev, int index)
 	{
+		mUtilsMath = Utils.GetInstance().GetUtilsMath();
+		
+		Index = index;
+		
 		Xpixel = motionEvent.Xpixel;
 		Ypixel = motionEvent.Ypixel;
 		
@@ -29,6 +43,30 @@ public class MotionEventExtended extends MotionEventCompact {
 		GyroZ = motionEvent.GyroZ;
 		
 		Xmm = (Xpixel - strokeCenterXpixel) / xdpi * ConstsMeasures.INCH_TO_MM;
-        Ymm = (Ypixel - strokeCenterYpixel) / ydpi * ConstsMeasures.INCH_TO_MM;        	
+        Ymm = (Ypixel - strokeCenterYpixel) / ydpi * ConstsMeasures.INCH_TO_MM;
+        
+        if(motionEventPrev != null) {
+        	CalculateVelocities(motionEventPrev);
+        }
+	}
+	
+	protected void CalculateVelocities(MotionEventExtended motionEventPrev) {
+		double eventTimeDiff = EventTime - motionEventPrev.EventTime;
+				
+		if(eventTimeDiff > 0) {
+			double deltaX = Xmm - motionEventPrev.Xmm;
+			double deltaY = Ymm - motionEventPrev.Ymm;
+			
+			VelocityX = deltaX / eventTimeDiff;
+			VelocityY = deltaY / eventTimeDiff;
+			
+			Velocity = mUtilsMath.CalcPitagoras(VelocityX, VelocityY);
+		}
+		else {
+			VelocityX = motionEventPrev.VelocityX;
+			VelocityY = motionEventPrev.VelocityY;
+			
+			Velocity = motionEventPrev.Velocity;
+		}		
 	}
 }
