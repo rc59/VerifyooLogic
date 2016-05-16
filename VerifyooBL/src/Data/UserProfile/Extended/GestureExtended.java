@@ -15,20 +15,40 @@ import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 
 public class GestureExtended extends Gesture {
+	
+	/*************** Shape Parameters ***************/
+	
 	public double GestureLengthMM;
-	public double GestureTotalTimeWithPauses;
-	public double GestureTotalTimeWithoutPauses;
-	public double GestureAverageVelocity;
-	public double GestureAverageStartAcceleration;
-	public double GestureAverageEndAcceleration;
+	public double GestureLengthMMX;
+	public double GestureLengthMMY;
 	public double GestureTotalStrokeArea;
 	
-	public double GestureMaxPressure;
-	public double GestureMaxSurface;	
+	/*************** Time Parameters ***************/
+	
+	public double GestureTotalTimeWithPauses;
+	public double GestureTotalTimeWithoutPauses;
+	
+	/*************** Velocity & Acceleration Parameters ***************/
+	
+	public double GestureAverageVelocity;
+	
+	public double GestureAverageStartAcceleration;
+	public double GestureAverageEndAcceleration;	
+	public double GestureVelocityPeakMax;
+	
+	/*************** Pressure Parameters ***************/ 
+	
+	public double GestureMaxPressure;	
 	public double GestureAvgPressure;
-	public double GestureAvgSurface;	
 	public double GestureAvgMiddlePressure;
+		
+	/*************** Surface Parameters ***************/
+	
+	public double GestureMaxSurface;
+	public double GestureAvgSurface;	
 	public double GestureAvgMiddleSurface;
+	
+	/*************** Accelerometer Parameters ***************/ 
 	
 	public double GestureMaxAccX;
 	public double GestureMaxAccY;
@@ -36,14 +56,12 @@ public class GestureExtended extends Gesture {
 	
 	public double GestureAvgAccX;
 	public double GestureAvgAccY;
-	public double GestureAvgAccZ;
+	public double GestureAvgAccZ;	
 	
-	public double GestureVelocityPeakMax;
-		
 	public ArrayList<StrokeExtended> ListStrokesExtended;
 
 	protected ArrayList<MotionEventExtended> mListGestureEvents;
-	private HashMap<String, FeatureMeanData> mHashFeatureMeans;
+	protected HashMap<String, FeatureMeanData> mHashFeatureMeans;
 	
 	protected IStatEngine mStatEngine;
 	
@@ -57,7 +75,7 @@ public class GestureExtended extends Gesture {
 		InitFeatures();
 	}
 
-	private void InitParams() {
+	protected void InitParams() {
 		ListStrokesExtended = new ArrayList<>();
 		
 		mListGestureEvents = new ArrayList<>();
@@ -69,7 +87,7 @@ public class GestureExtended extends Gesture {
 		GestureTotalTimeWithoutPauses = 0;
 	}	
 
-	private void PreCalculations() {
+	protected void PreCalculations() {
 		Stroke tempStroke;		
 		StrokeExtended tempStrokeExtended;
 		
@@ -79,6 +97,7 @@ public class GestureExtended extends Gesture {
 			
 			ListStrokesExtended.add(tempStrokeExtended);
 			GestureLengthMM += tempStrokeExtended.StrokePropertiesObj.LengthMM;
+			
 			GestureTotalTimeWithoutPauses += tempStrokeExtended.StrokeTimeInterval;
 			GestureTotalStrokeArea += tempStrokeExtended.ShapeDataObj.ShapeArea;
 			
@@ -89,7 +108,7 @@ public class GestureExtended extends Gesture {
 		}		
 	}
 	
-	private void InitFeatures() {
+	protected void InitFeatures() {
 		CalculateListGestureEventsFeatures();
 		AddCalculatedFeatures();
 		CalculateGestureTotalTimeWithPauses();
@@ -98,9 +117,10 @@ public class GestureExtended extends Gesture {
 		CalculateAvgOfMiddlePressureAndSurface();		
 		//CalculateAccelerationAtEnd();
 		CalculateGestureVelocityPeaks();
+		CalculateAccumulatedDistanceByTime();
 	}
 	
-	private void CalculateAccelerationAtStart()
+	protected void CalculateAccelerationAtStart()
 	{
 		if(mListGestureEvents.size() >= (ConstsFeatures.ACC_CALC_MIN_NUM_EVENTS * 2)) {
 			MotionEventExtended eventPrev;
@@ -133,7 +153,7 @@ public class GestureExtended extends Gesture {
 		}		
 	}
 	
-	private void CalculateAccelerationAtEnd()
+	protected void CalculateAccelerationAtEnd()
 	{
 		if(mListGestureEvents.size() >= (2 * ConstsFeatures.ACC_CALC_MIN_NUM_EVENTS)) {
 			MotionEventExtended eventPrev;
@@ -168,7 +188,7 @@ public class GestureExtended extends Gesture {
 		}		
 	}
 	
-	private void CalculateListGestureEventsFeatures()
+	protected void CalculateListGestureEventsFeatures()
 	{
 		double totalPressure = 0;
 		double totalSurface = 0;
@@ -197,7 +217,7 @@ public class GestureExtended extends Gesture {
 		GestureAvgAccZ = totalAccZ / mListGestureEvents.size();
 	}
 	
-	private void CalculateAvgOfMiddlePressureAndSurface()
+	protected void CalculateAvgOfMiddlePressureAndSurface()
 	{
 		double totalMiddlePressure = 0;
 		double totalMiddleSurface = 0;
@@ -211,7 +231,7 @@ public class GestureExtended extends Gesture {
 		GestureAvgMiddleSurface = totalMiddleSurface / ListStrokesExtended.size();
 	}
 	
-	private void CalculateGestureVelocityPeaks()
+	protected void CalculateGestureVelocityPeaks()
 	{
 		if(ListStrokesExtended.size() > 0) {
 			VelocityPeak tempVelocityPeak = ListStrokesExtended.get(0).StrokeVelocityPeak;
@@ -226,13 +246,13 @@ public class GestureExtended extends Gesture {
 		}				
 	}
 	
-	private void AddCalculatedFeatures() {
+	protected void AddCalculatedFeatures() {
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.LENGTH, GestureLengthMM);		
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITHOUT_PAUSES, GestureTotalTimeWithoutPauses);
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, GestureTotalStrokeArea);		
 	}
 
-	private void CalculateGestureTotalTimeWithPauses() {
+	protected void CalculateGestureTotalTimeWithPauses() {
 		StrokeExtended strokeFirst = ListStrokesExtended.get(0);
 		StrokeExtended strokeLast = ListStrokesExtended.get(ListStrokesExtended.size() - 1);
 		
@@ -243,10 +263,20 @@ public class GestureExtended extends Gesture {
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, GestureTotalTimeWithPauses);
 	}
 	
-	private void CalculateGestureAvgVelocity()
+	protected void CalculateGestureAvgVelocity()
 	{
 		GestureAverageVelocity = GestureLengthMM / GestureTotalTimeWithoutPauses;
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.AVERAGE_VELOCITY, GestureAverageVelocity);
+	}
+	
+	protected void CalculateAccumulatedDistanceByTime()
+	{
+		double[] listAccumulatedDistance = new double[mListGestureEvents.size()];
+		double[] listAccumulatedTime = new double[mListGestureEvents.size()];
+		
+		for(int idxEvent = 0; idxEvent < mListGestureEvents.size(); idxEvent++) {
+			
+		}
 	}
 	
 	protected String GenerateGestureFeatureMeanKey(String instruction, String paramName)
