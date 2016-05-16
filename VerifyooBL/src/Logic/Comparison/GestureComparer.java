@@ -65,6 +65,29 @@ public class GestureComparer {
 		CompareGestureAvgVelocity();
 		CompareGestureTotalTimeWithPauses();
 		CompareGestureTotalTimeWithoutPauses();
+		CompareGestureAreas();
+		CompareGesturePressure();
+		CompareGestureSurface();
+	}
+	
+	private void CompareGesturePressure()
+	{								
+		double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, mGestureAuth.GestureAvgPressure, mGestureStored.GetFeatureMeansHash());		
+		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, finalScore, ConstsParamWeights.MEDIUM);
+	}
+	
+	private void CompareGestureSurface()
+	{
+		double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, mGestureAuth.GestureAvgPressure, mGestureStored.GetFeatureMeansHash());		
+		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, finalScore, ConstsParamWeights.MEDIUM);
+	}
+	
+	private void CompareGestureAreas()
+	{		
+		double areaAuth = mGestureAuth.GestureTotalStrokeArea;						
+		
+		double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, areaAuth, mGestureStored.GetFeatureMeansHash());		
+		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, finalScore, ConstsParamWeights.MEDIUM);
 	}
 	
 	private void CompareGestureTotalTimeWithoutPauses() {

@@ -58,10 +58,13 @@ public class StrokeExtended extends Stroke {
 	
 	public StrokeProperties StrokePropertiesObj;
 	public ShapeData ShapeDataObj;
+	
+	public double[] TimeIntervals;
+	public double[] AccumulatedTimeIntervals;
 	/****************************************/
 	
 	public StrokeExtended(Stroke stroke, HashMap<String, FeatureMeanData> hashFeatureMeans, String instruction, int strokeIdx)
-	{
+	{		
 		mHashFeatureMeans = hashFeatureMeans;
 		mStrokeIdx = strokeIdx;
 		mInstruction = instruction;
@@ -73,6 +76,9 @@ public class StrokeExtended extends Stroke {
 			
 		StrokePropertiesObj = new StrokeProperties(ListEvents.size());
 		ShapeDataObj = new ShapeData();
+		
+		TimeIntervals = new double[ListEvents.size() - 1];
+		AccumulatedTimeIntervals = new double[ListEvents.size()];
 		
 		IsHasPressure = false;
 		IsHasTouchSurface = false;		
@@ -124,7 +130,15 @@ public class StrokeExtended extends Stroke {
 				tempEventPrev = null;
 			}
 			
-			tempEvent = new MotionEventExtended(ListEvents.get(idxEvent), mStrokeCenterXpixel, mStrokeCenterYpixel, Xdpi, Ydpi, tempEventPrev, idxEvent);			
+			tempEvent = new MotionEventExtended(ListEvents.get(idxEvent), mStrokeCenterXpixel, mStrokeCenterYpixel, Xdpi, Ydpi, tempEventPrev, idxEvent);
+			
+			if(idxEvent == 0) {
+				tempEvent.IsStartOfStroke = true;
+			}
+			if(idxEvent == ListEvents.size() - 1) {
+				tempEvent.IsEndOfStroke = true;
+			}
+			
 			ListEventsExtended.add(tempEvent);
 		}
 	}
@@ -143,7 +157,7 @@ public class StrokeExtended extends Stroke {
                 StrokePropertiesObj.ListDeltaYmm[idxEvent - 1] = deltaY;              
 				
                 StrokePropertiesObj.ListEventLength[idxEvent - 1] = mUtilsMath.CalcPitagoras(deltaX, deltaY);
-                StrokePropertiesObj.LengthMM += StrokePropertiesObj.ListEventLength[idxEvent - 1];
+                StrokePropertiesObj.LengthMM += StrokePropertiesObj.ListEventLength[idxEvent - 1];                
                 
                 ShapeDataObj.ShapeArea += 
                 		(StrokePropertiesObj.ListEventLength[idxEvent - 1] * mUtilsMath.CalcPitagoras(ListEventsExtended.get(idxEvent - 1).Xmm, ListEventsExtended.get(idxEvent - 1).Ymm) / 2);
@@ -156,6 +170,12 @@ public class StrokeExtended extends Stroke {
             		IsHasTouchSurface = true;
             		MaxSurface = mUtilsMath.GetMaxValue(MaxSurface, ListEventsExtended.get(idxEvent).TouchSurface);
                 }
+            	
+            	TimeIntervals[idxEvent - 1] = ListEventsExtended.get(idxEvent).EventTime - ListEventsExtended.get(idxEvent - 1).EventTime;
+            	AccumulatedTimeIntervals[idxEvent] = AccumulatedTimeIntervals[idxEvent - 1] + TimeIntervals[idxEvent - 1]; 
+			}
+			else {
+				AccumulatedTimeIntervals[idxEvent] = 0;
 			}
 		}				
 	}
@@ -163,7 +183,7 @@ public class StrokeExtended extends Stroke {
 	private void CalculateStrokeVelocityPeaks()
 	{
 		StrokeVelocityPeak = new VelocityPeak();
-		String err;
+		
 		ArrayList<VelocityAvgPoint> listVelocityAvgPoints = new ArrayList<>();	
 		MotionEventExtended eventPrev;
 		MotionEventExtended eventCurr;
@@ -202,11 +222,11 @@ public class StrokeExtended extends Stroke {
 			tempVelocityAvgPoint = new VelocityAvgPoint(0);		
 			
 			velocityAvgPointMax = listVelocityAvgPoints.get(0);
-			for(int idxVelAvgPoint = 1; idxVelAvgPoint < listVelocityAvgPoints.size(); idxVelAvgPoint++) {
-				if(velocityAvgPointMax.MaxVelocityInSection < listVelocityAvgPoints.get(idxVelAvgPoint).MaxVelocityInSection) {
-					velocityAvgPointMax = listVelocityAvgPoints.get(idxVelAvgPoint);
-				}
-			}
+//			for(int idxVelAvgPoint = 1; idxVelAvgPoint < listVelocityAvgPoints.size(); idxVelAvgPoint++) {
+//				if(velocityAvgPointMax.MaxVelocityInSection < listVelocityAvgPoints.get(idxVelAvgPoint).MaxVelocityInSection) {
+//					velocityAvgPointMax = listVelocityAvgPoints.get(idxVelAvgPoint);
+//				}
+//			}
 			
 			int velocityPeakMaxIdx = -1;
 			for(int idxVelocityPeakIndex = velocityAvgPointMax.IndexStart; idxVelocityPeakIndex < velocityAvgPointMax.IndexEnd; idxVelocityPeakIndex++) {
@@ -241,7 +261,7 @@ public class StrokeExtended extends Stroke {
 	
 	protected void CalculateAverageVelocity()
 	{
-		AverageVelocity = StrokePropertiesObj.LengthMM / StrokeTimeInterval;
+		AverageVelocity = StrokePropertiesObj.LengthMM / StrokeTimeInterval;		
 		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.AVERAGE_VELOCITY, mStrokeIdx, AverageVelocity);
 	}
 	

@@ -18,6 +18,9 @@ public class MotionEventExtended extends MotionEventCompact {
 	public double VelocityY;
 	public double Velocity;
 	
+	public boolean IsStartOfStroke;
+	public boolean IsEndOfStroke;
+	
 	public MotionEventExtended(MotionEventCompact motionEvent, double strokeCenterXpixel, double strokeCenterYpixel, double xdpi, double ydpi, MotionEventExtended motionEventPrev, int index)
 	{
 		mUtilsMath = Utils.GetInstance().GetUtilsMath();
@@ -44,6 +47,9 @@ public class MotionEventExtended extends MotionEventCompact {
 		
 		Xmm = (Xpixel - strokeCenterXpixel) / xdpi * ConstsMeasures.INCH_TO_MM;
         Ymm = (Ypixel - strokeCenterYpixel) / ydpi * ConstsMeasures.INCH_TO_MM;
+        
+        IsStartOfStroke = false;
+        IsEndOfStroke = false;
         
         if(motionEventPrev != null) {
         	CalculateVelocities(motionEventPrev);

@@ -1,7 +1,7 @@
 package Data.MetaData;
 
 public class StrokeProperties {
-	public double LengthMM;
+	public double LengthMM;	
 	public double[] ListEventLength;
 	public double[] ListDeltaXmm;
 	public double[] ListDeltaYmm;
