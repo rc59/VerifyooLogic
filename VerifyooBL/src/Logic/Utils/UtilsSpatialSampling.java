@@ -1,7 +1,8 @@
-package Logic.Calc;
+package Logic.Utils;
 
 import java.util.ArrayList;
 
+import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Raw.MotionEventCompact;
 
 public class UtilsSpatialSampling {
@@ -12,6 +13,11 @@ public class UtilsSpatialSampling {
 	        Math.PI, -0, (-Math.PI / 4), (-Math.PI / 2),
 	                (-Math.PI * 3 / 4), -Math.PI
 	    };
+	
+	public double[] PrepareDataSpatialSamplingExtended(ArrayList<MotionEventExtended> eventsList, double length) {
+		double[] ptsDouble = PrepareDataSpatialSampling(null, length);
+		return ptsDouble;
+    }
 	
 	public double[] PrepareDataSpatialSampling(ArrayList<MotionEventCompact> eventsList, double length) {
         float[] pts = ConvertToVector(eventsList, length);

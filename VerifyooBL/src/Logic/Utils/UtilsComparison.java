@@ -1,4 +1,4 @@
-package Logic.Calc;
+package Logic.Utils;
 
 public class UtilsComparison {
 	public double CompareNumericalValues(double value1, double value2, double threshold) {

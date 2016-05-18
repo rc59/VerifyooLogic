@@ -1,4 +1,4 @@
-package Logic.Calc;
+package Logic.Utils;
 
 public class Utils {
 	private static Utils mInstance = null;
@@ -8,6 +8,7 @@ public class Utils {
 	protected static UtilsSpatialSampling mUtilsSpatialSampling;
 	protected static UtilsStat mUtilsStat;
 	protected static UtilsVectors mUtilsVectors;
+	protected static UtilsLinearReg mUtilsLinearReg;
 	
 	public static Utils GetInstance() {
 		if(mInstance == null) {
@@ -17,7 +18,8 @@ public class Utils {
 			mUtilsMath = new UtilsMath();
 			mUtilsSpatialSampling = new UtilsSpatialSampling();
 			mUtilsStat = new UtilsStat();
-			mUtilsVectors = new UtilsVectors();			
+			mUtilsVectors = new UtilsVectors();		
+			mUtilsLinearReg = new UtilsLinearReg();
 		}
 		return mInstance;
 	}
@@ -36,5 +38,8 @@ public class Utils {
 	}
 	public UtilsVectors GetUtilsVectors() {
 		return mUtilsVectors;
+	}
+	public UtilsLinearReg GetUtilsLinearReg() {
+		return mUtilsLinearReg;
 	}
 }

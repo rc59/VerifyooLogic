@@ -1,4 +1,4 @@
-package Logic.Calc;
+package Logic.Utils;
 
 public class UtilsVectors {
 	public double MinimumCosineDistanceScore(double[] vector1, double[] vector2)

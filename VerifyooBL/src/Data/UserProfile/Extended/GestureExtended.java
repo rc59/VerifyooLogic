@@ -9,7 +9,10 @@ import Data.MetaData.VelocityAvgPoint;
 import Data.MetaData.VelocityPeak;
 import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.Stroke;
-import Logic.Calc.Utils;
+import Logic.Utils.Utils;
+import Logic.Utils.UtilsLinearReg;
+import Logic.Utils.UtilsSpatialSampling;
+import Logic.Utils.UtilsLinearReg.LinearRegression;
 import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
@@ -22,6 +25,7 @@ public class GestureExtended extends Gesture {
 	public double GestureLengthMMX;
 	public double GestureLengthMMY;
 	public double GestureTotalStrokeArea;
+	public double[] SpatialSamplingVector;
 	
 	/*************** Time Parameters ***************/
 	
@@ -35,6 +39,13 @@ public class GestureExtended extends Gesture {
 	public double GestureAverageStartAcceleration;
 	public double GestureAverageEndAcceleration;	
 	public double GestureVelocityPeakMax;
+	
+	public double[] AccumulatedTime;
+	public double[] AccumulatedLength;
+	
+	public double GestureAccumulatedLengthLinearRegRSqr;
+	public double GestureAccumulatedLengthLinearRegSlope;
+	public double GestureAccumulatedLengthLinearRegIntercept;
 	
 	/*************** Pressure Parameters ***************/ 
 	
@@ -63,11 +74,17 @@ public class GestureExtended extends Gesture {
 	protected ArrayList<MotionEventExtended> mListGestureEvents;
 	protected HashMap<String, FeatureMeanData> mHashFeatureMeans;
 	
+	protected UtilsLinearReg mUtilsLinearReg;
+	protected UtilsSpatialSampling mUtilsSpatialSampling;
+	
 	protected IStatEngine mStatEngine;
 	
 	public GestureExtended(Gesture gesture, HashMap<String, FeatureMeanData> hashFeatureMeans) {		
 		Instruction = gesture.Instruction;		
 		ListStrokes = gesture.ListStrokes;
+		
+		mUtilsLinearReg = Utils.GetInstance().GetUtilsLinearReg();
+		mUtilsSpatialSampling = Utils.GetInstance().GetUtilsSpatialSampling();
 		
 		mHashFeatureMeans = hashFeatureMeans;
 		InitParams();
@@ -111,13 +128,20 @@ public class GestureExtended extends Gesture {
 	protected void InitFeatures() {
 		CalculateListGestureEventsFeatures();
 		AddCalculatedFeatures();
+		CalculateSpatialSamplingVector();
 		CalculateGestureTotalTimeWithPauses();
 		CalculateGestureAvgVelocity();		
 		CalculateAccelerationAtStart();
 		CalculateAvgOfMiddlePressureAndSurface();		
 		//CalculateAccelerationAtEnd();
 		CalculateGestureVelocityPeaks();
-		//CalculateAccumulatedDistanceByTime();
+		CalculateAccumulatedDistanceByTime();
+		CalculateAccumulatedDistanceLinearReg();
+	}
+	
+	protected void CalculateSpatialSamplingVector()
+	{
+		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListEvents, Length);
 	}
 	
 	protected void CalculateAccelerationAtStart()
@@ -267,35 +291,63 @@ public class GestureExtended extends Gesture {
 	
 	protected void CalculateAccumulatedDistanceByTime()
 	{	
-		int numStrokes = ListStrokesExtended.size();
-		double[] accumulatedLength = new double[(mListGestureEvents.size() - (numStrokes - 1))];
-		double[] accumulatedTime = new double[(mListGestureEvents.size() - (numStrokes - 1))];
-				
+		double[] accumulatedLength = new double[mListGestureEvents.size()];
+		double[] accumulatedTime = new double[mListGestureEvents.size()];
+		
 		double deltaX;
 		double deltaY;
-		double distance;
-		double timeDiff;
+		double distance = 0;
+		double timeDiff = 0;
 		
-		accumulatedLength[0] = 0;
-		accumulatedTime[0] = 0;
+		int idxAccumulated = 0;	
+		double tempLength = 0;
+		double tempTime = 0;
 		
-		int idxAccumulated = 1;
+		double prevLength = 0;
+		double prevTime = 0;
 		
-		accumulatedLength[0] = 0;
-		accumulatedTime[0] = 0;
-		for(int idxEvent = 1; idxEvent < mListGestureEvents.size(); idxEvent++) {
+		for(int idxEvent = 1; idxEvent < mListGestureEvents.size(); idxEvent++) {				
 			deltaX = mListGestureEvents.get(idxEvent).Xmm - mListGestureEvents.get(idxEvent - 1).Xmm; 
 			deltaY = mListGestureEvents.get(idxEvent).Ymm - mListGestureEvents.get(idxEvent - 1).Ymm;
 			distance = Utils.GetInstance().GetUtilsMath().CalcPitagoras(deltaX, deltaY);
 			timeDiff = mListGestureEvents.get(idxEvent).EventTime - mListGestureEvents.get(idxEvent - 1).EventTime; 
 						
 			if(!mListGestureEvents.get(idxEvent).IsStartOfStroke) {
-				accumulatedLength[idxAccumulated] = accumulatedLength[idxEvent - 1] + distance;
-				accumulatedTime[idxAccumulated] = accumulatedTime[idxEvent - 1] + timeDiff;
-				idxAccumulated++;
-			}
+				if(idxAccumulated > 0) {
+					prevLength = accumulatedLength[idxAccumulated - 1];
+					prevTime = accumulatedTime[idxAccumulated - 1];					
+				}
+				else {
+					prevLength = 0;
+					prevTime = 0;
+				}
+				
+				tempLength = prevLength + distance;
+				tempTime = prevTime + timeDiff;
+				
+				accumulatedTime[idxAccumulated] = tempTime;
+				accumulatedLength[idxAccumulated] = tempLength;	
+				idxAccumulated++;							
+			}					
+		}			
+		
+		AccumulatedLength = new double[idxAccumulated];
+		AccumulatedTime = new double[idxAccumulated];
+		
+		for(int idx = 0; idx < idxAccumulated; idx++) {
+			AccumulatedLength[idx] = accumulatedLength[idx];
+			AccumulatedTime[idx] = accumulatedTime[idx];
 		}
 	}
+	
+	protected void CalculateAccumulatedDistanceLinearReg()
+	{
+		mUtilsLinearReg.CalcLinearReg(AccumulatedTime, AccumulatedLength);
+		LinearRegression linearRegObj = mUtilsLinearReg.GetLinearRegObj();
+		GestureAccumulatedLengthLinearRegRSqr = linearRegObj.R2();
+		GestureAccumulatedLengthLinearRegSlope = linearRegObj.slope();
+		GestureAccumulatedLengthLinearRegIntercept = linearRegObj.intercept();
+	}	
 	
 	protected String GenerateGestureFeatureMeanKey(String instruction, String paramName)
 	{

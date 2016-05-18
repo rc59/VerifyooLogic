@@ -11,12 +11,12 @@ import Data.MetaData.VelocityAvgPoint;
 import Data.MetaData.VelocityPeak;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
-import Logic.Calc.Utils;
-import Logic.Calc.UtilsMath;
-import Logic.Calc.UtilsSpatialSampling;
 import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Utils.Utils;
+import Logic.Utils.UtilsMath;
+import Logic.Utils.UtilsSpatialSampling;
 
 public class StrokeExtended extends Stroke {
 	/************** Private Members **************/

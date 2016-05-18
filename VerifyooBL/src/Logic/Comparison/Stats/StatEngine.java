@@ -2,11 +2,11 @@ package Logic.Comparison.Stats;
 
 import java.util.HashMap;
 
-import Logic.Calc.UtilsStat;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Comparison.Stats.Norms.NormMgr;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Comparison.Stats.Norms.Interfaces.INormMgr;
+import Logic.Utils.UtilsStat;
 
 public class StatEngine implements IStatEngine {
 	

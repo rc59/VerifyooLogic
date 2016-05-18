@@ -10,10 +10,10 @@ import Data.Comparison.CompareResultSummary;
 import Data.Comparison.Interfaces.ICompareResult;
 import Data.UserProfile.Extended.GestureExtended;
 import Data.UserProfile.Extended.StrokeExtended;
-import Logic.Calc.UtilsComparison;
 import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Utils.UtilsComparison;
 
 public class GestureComparer {
 
@@ -61,13 +61,13 @@ public class GestureComparer {
 	
 	protected void CompareGestureFeatures()
 	{
-		CompareGestureLengths();
+//		CompareGestureLengths();
 		CompareGestureAvgVelocity();
-		CompareGestureTotalTimeWithPauses();
-		CompareGestureTotalTimeWithoutPauses();
-		CompareGestureAreas();
-		CompareGesturePressure();
-		CompareGestureSurface();
+//		CompareGestureTotalTimeWithPauses();
+//		CompareGestureTotalTimeWithoutPauses();
+//		CompareGestureAreas();
+//		CompareGesturePressure();
+//		CompareGestureSurface();
 	}
 	
 	private void CompareGesturePressure()

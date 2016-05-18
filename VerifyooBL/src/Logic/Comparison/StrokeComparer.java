@@ -8,11 +8,11 @@ import Data.Comparison.CompareResultSummary;
 import Data.Comparison.Interfaces.ICompareResult;
 import Data.UserProfile.Extended.StrokeExtended;
 import Data.UserProfile.Raw.Stroke;
-import Logic.Calc.Utils;
-import Logic.Calc.UtilsComparison;
-import Logic.Calc.UtilsVectors;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Utils.Utils;
+import Logic.Utils.UtilsComparison;
+import Logic.Utils.UtilsVectors;
 
 public class StrokeComparer {
 	protected boolean mIsStrokesIdentical;

@@ -2,8 +2,8 @@ package Data.UserProfile.Extended;
 
 import Consts.ConstsMeasures;
 import Data.UserProfile.Raw.MotionEventCompact;
-import Logic.Calc.Utils;
-import Logic.Calc.UtilsMath;
+import Logic.Utils.Utils;
+import Logic.Utils.UtilsMath;
 
 public class MotionEventExtended extends MotionEventCompact {
 	

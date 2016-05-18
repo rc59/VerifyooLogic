@@ -1,4 +1,4 @@
-package Logic.Calc;
+package Logic.Utils;
 
 public class UtilsMath {
 	public double CalcAvg(double[] values)
