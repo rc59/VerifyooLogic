@@ -57,10 +57,19 @@ public class StatEngine implements IStatEngine {
 		double internalMean = hashFeatureMeans.get(key).GetMean();
 		double internalSd = hashFeatureMeans.get(key).GetInternalSd();
 		
-		double zScore = (authValue - populationMean) / populationSd;
-		
-		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
-		return score;
+		double upper = internalMean + 2 * internalSd;
+		double lower = internalMean - 2 * internalSd;
+				
+		if(authValue > upper || authValue < lower) {
+			return 0;
+		}
+		else {
+			double zScore = (authValue - populationMean) / populationSd;
+			double zScoreForUser = (internalMean - populationMean) / populationSd;
+			
+			double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
+			return score;	
+		}
 	}
 	
 	protected String GenerateStrokeFeatureMeanKey(String instruction, String paramName, int strokeIdx)

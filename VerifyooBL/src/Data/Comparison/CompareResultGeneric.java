@@ -4,10 +4,11 @@ import Data.Comparison.Abstract.CompareResultAbstract;
 
 public class CompareResultGeneric extends CompareResultAbstract {
 
-	public CompareResultGeneric(String name, double value, double weight) {
+	public CompareResultGeneric(String name, double value, double weight, double originalValue) {
 		Name = name;
 		Value = value;
-		Weight = weight;		
+		Weight = weight;
+		OriginalValue = originalValue;
 	}
 
 }

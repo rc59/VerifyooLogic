@@ -84,7 +84,7 @@ public class StrokeComparer {
 		double areaAuth = mStrokeAuthExtended.ShapeDataObj.ShapeArea;
 		
 		double finalScore = mUtilsComparison.CompareNumericalValues(areaStored, areaAuth, 0.65);
-		AddDoubleParameter(ConstsParamNames.Stroke.STROKE_AREA, finalScore, ConstsParamWeights.HIGH);
+		AddDoubleParameter(ConstsParamNames.Stroke.STROKE_AREA, finalScore, ConstsParamWeights.HIGH, areaStored);
 	}	
 	
 	protected void CompareTimeInterval()
@@ -93,7 +93,7 @@ public class StrokeComparer {
 		double timeIntervalAuth = mStrokeAuthExtended.StrokeTimeInterval;
 		
 		double finalScore = mUtilsComparison.CompareNumericalValues(timeIntervalStored, timeIntervalAuth, 0.75);		
-		AddDoubleParameter(ConstsParamNames.Stroke.TIME_INTERVAL, finalScore, ConstsParamWeights.MEDIUM);		
+		AddDoubleParameter(ConstsParamNames.Stroke.TIME_INTERVAL, finalScore, ConstsParamWeights.MEDIUM, timeIntervalAuth);		
 	}
 	
 	protected void CompareAvgVelocity()
@@ -103,7 +103,7 @@ public class StrokeComparer {
 		
 		//double finalScore = mStatEngine.CompareStrokeDoubleValues(mStrokeStoredExtended.GetInstruction(), ConstsParamNames.Stroke.AVERAGE_VELOCITY, mStrokeStoredExtended.GetStrokeIdx(), avgVelocityStored, avgVelocityAuth);
 		double finalScore = mUtilsComparison.CompareNumericalValues(avgVelocityStored, avgVelocityAuth, 0.75);
-		AddDoubleParameter(ConstsParamNames.Stroke.AVERAGE_VELOCITY, finalScore, ConstsParamWeights.MEDIUM);
+		AddDoubleParameter(ConstsParamNames.Stroke.AVERAGE_VELOCITY, finalScore, ConstsParamWeights.MEDIUM, avgVelocityAuth);
 	}
 	
 	protected void CalculateFinalScore()
@@ -160,10 +160,10 @@ public class StrokeComparer {
 		return mIsStrokesIdentical;
 	}
 	
-	protected void AddDoubleParameter(String parameterName, double score, double weight)
+	protected void AddDoubleParameter(String parameterName, double score, double weight, double originalValue)
 	{
 		ICompareResult compareResult = 
-				(ICompareResult) new CompareResultGeneric(parameterName, score, weight);
+				(ICompareResult) new CompareResultGeneric(parameterName, score, weight, originalValue);
 		mCompareResult.ListCompareResults.add(compareResult);
 	}
 	/****************************/
