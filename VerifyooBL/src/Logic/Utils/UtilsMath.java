@@ -1,5 +1,7 @@
 package Logic.Utils;
 
+import Consts.ConstsMeasures;
+
 public class UtilsMath {
 	public double CalcAvg(double[] values)
 	{
@@ -60,5 +62,11 @@ public class UtilsMath {
         }
 
         return result;
+    }
+	
+	public double CalculateEventAngle(double deltaX, double deltaY) {
+        double eventAngle = (Math.atan2(deltaY, deltaX) + 2 * ConstsMeasures.PI);
+        eventAngle = eventAngle % (2 * ConstsMeasures.PI);
+        return eventAngle;
     }
 }

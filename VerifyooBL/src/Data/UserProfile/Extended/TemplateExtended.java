@@ -26,7 +26,7 @@ public class TemplateExtended extends Template {
 		
 		for(int idxGesture = 0; idxGesture < template.ListGestures.size(); idxGesture++) {
 			tempGesture = template.ListGestures.get(idxGesture);
-			tempGestureExtended = new GestureExtended(tempGesture, mHashFeatureMeans);
+			tempGestureExtended = new GestureExtended(tempGesture, mHashFeatureMeans, idxGesture);
 			
 			ListGestureExtended.add(tempGestureExtended);
 		}		
