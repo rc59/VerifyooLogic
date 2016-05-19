@@ -14,11 +14,6 @@ public class UtilsSpatialSampling {
 	                (-Math.PI * 3 / 4), -Math.PI
 	    };
 	
-	public double[] PrepareDataSpatialSamplingExtended(ArrayList<MotionEventExtended> eventsList, double length) {
-		double[] ptsDouble = PrepareDataSpatialSampling(null, length);
-		return ptsDouble;
-    }
-	
 	public double[] PrepareDataSpatialSampling(ArrayList<MotionEventCompact> eventsList, double length) {
         float[] pts = ConvertToVector(eventsList, length);
         float[] center = ComputeCentroid(pts);

@@ -3,6 +3,7 @@ package Data.UserProfile.Extended;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Consts.ConstsFeatures;
 import Consts.ConstsMeasures;
 import Consts.ConstsParamNames;
 import Data.MetaData.ShapeData;
@@ -37,7 +38,9 @@ public class StrokeExtended extends Stroke {
 	private HashMap<String, FeatureMeanData> mHashFeatureMeans;
 	/****************************************/
 	
-	/************** Stroke Features **************/	
+	/************** Stroke Features **************/
+	public boolean IsPoint;
+	
 	public VelocityPeak StrokeVelocityPeak;
 	
 	public ArrayList<MotionEventExtended> ListEventsExtended; 
@@ -103,9 +106,17 @@ public class StrokeExtended extends Stroke {
 	{
 		CalculateStrokeCenter();
 		ConvertToMotionEventExtended();
+		IsStrokeAPoint();
 		PrepareData();		
 	}
-	
+
+	protected void IsStrokeAPoint()
+	{
+		if(ListEvents.size() < ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS)
+			IsPoint = true;
+		else
+			IsPoint = false;
+	}
 	protected void CalculateFeatures()
 	{
 		CalculateSpatialSamplingVector();
