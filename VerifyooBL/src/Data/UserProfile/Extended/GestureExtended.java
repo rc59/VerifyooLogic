@@ -364,8 +364,8 @@ public class GestureExtended extends Gesture {
 			GestureStartDirection = 0;
 			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(0).ListEventsExtended;
 
-			double deltaY = listEventsExtendedFirstStroke.get(Consts.ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS).Ymm - listEventsExtendedFirstStroke.get(2).Ymm;
-			double deltaX = listEventsExtendedFirstStroke.get(Consts.ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS).Xmm - listEventsExtendedFirstStroke.get(2).Xmm;
+			double deltaY = listEventsExtendedFirstStroke.get(Consts.ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS - 1).Ymm - listEventsExtendedFirstStroke.get(2).Ymm;
+			double deltaX = listEventsExtendedFirstStroke.get(Consts.ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS - 1).Xmm - listEventsExtendedFirstStroke.get(2).Xmm;
 			
 			GestureStartDirection = mUtilsMath.CalculateEventAngle(deltaX, deltaY);			
 		}
