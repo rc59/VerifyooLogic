@@ -44,7 +44,6 @@ public class GestureComparer {
 	
 	protected void InitGestureComparer()
 	{
-		InitGestureComparer();
 		mIsGesturesIdentical = false;
 		
 		mListStrokeComparers = new ArrayList<>();
@@ -79,7 +78,7 @@ public class GestureComparer {
 	{
 //		CompareGestureLengths();
 		CompareGestureAvgVelocity();
-		CompareGestureMinCosineDistance();
+//		CompareGestureMinCosineDistance();
 //		CompareGestureTotalTimeWithPauses();
 //		CompareGestureTotalTimeWithoutPauses();
 //		CompareGestureAreas();
