@@ -2,6 +2,8 @@ package Logic.Comparison.Stats;
 
 import java.util.HashMap;
 
+import Logic.Comparison.Stats.Data.StatEngineResult;
+import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Comparison.Stats.Norms.NormMgr;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
@@ -27,7 +29,7 @@ public class StatEngine implements IStatEngine {
       return mInstance;
    }
 	
-	public double CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double authValue, HashMap<String, FeatureMeanData> hashFeatureMeans)
+	public IStatEngineResult CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double authValue, HashMap<String, FeatureMeanData> hashFeatureMeans)
 	{		
 		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
 				
@@ -42,10 +44,12 @@ public class StatEngine implements IStatEngine {
 		double zScore = (authValue - populationMean) / populationSd;
 		
 		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
-		return score;
+		
+		IStatEngineResult statResult = new StatEngineResult(score, zScore);
+		return statResult;
 	}
 	
-	public double CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, FeatureMeanData> hashFeatureMeans)
+	public IStatEngineResult CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, FeatureMeanData> hashFeatureMeans)
 	{
 		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
 		
@@ -53,23 +57,28 @@ public class StatEngine implements IStatEngine {
 				
 		double populationMean = normObj.GetMean();
 		double populationSd = normObj.GetStandardDev();
+		double populationInternalSd = normObj.GetInternalStandardDev();
+		
 		
 		double internalMean = hashFeatureMeans.get(key).GetMean();
-		double internalSd = hashFeatureMeans.get(key).GetInternalSd();
+		double internalSd = normObj.GetInternalStandardDev(); //hashFeatureMeans.get(key).GetInternalSd();
 		
-		double upper = internalMean + 2 * internalSd;
-		double lower = internalMean - 2 * internalSd;
+		double upper = internalMean + 2 * populationInternalSd;
+		double lower = internalMean - 2 * populationInternalSd;
+		
+		double zScore = (authValue - populationMean) / populationSd;
+		double zScoreForUser = (internalMean - populationMean) / populationSd;
+		
+		IStatEngineResult statResult;
+		
+		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
 				
 		if(authValue > upper || authValue < lower) {
-			return 0;
+			score -= 0.2;
 		}
-		else {
-			double zScore = (authValue - populationMean) / populationSd;
-			double zScoreForUser = (internalMean - populationMean) / populationSd;
-			
-			double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
-			return score;	
-		}
+		
+		statResult = new StatEngineResult(score, zScoreForUser);
+		return statResult;	
 	}
 	
 	protected String GenerateStrokeFeatureMeanKey(String instruction, String paramName, int strokeIdx)

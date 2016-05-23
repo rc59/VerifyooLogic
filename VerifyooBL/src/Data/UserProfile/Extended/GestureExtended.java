@@ -30,6 +30,7 @@ public class GestureExtended extends Gesture {
 	public double GestureTotalStrokeArea;
 	public double[] SpatialSamplingVector;
 	public double GestureStartDirection;
+	public double GestureEndDirection;
 	
 	/*************** Time Parameters ***************/
 	
@@ -153,6 +154,7 @@ public class GestureExtended extends Gesture {
 		CalculateGestureVelocityPeaks();
 		CalculateAccumulatedDistanceByTime();
 		CalculateGestureStartDirection();
+		CalculateGestureEndDirection();
 		CalculateAccumulatedDistanceLinearReg();		
 	}
 	
@@ -190,7 +192,8 @@ public class GestureExtended extends Gesture {
 				totalAcc += tempAcc;
 			}
 			
-			GestureAverageStartAcceleration = totalAcc / (ConstsFeatures.ACC_CALC_MIN_NUM_EVENTS - 1); 
+			GestureAverageStartAcceleration = totalAcc / (ConstsFeatures.ACC_CALC_MIN_NUM_EVENTS - 1);
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.AVG_START_ACCELERATION, GestureAverageStartAcceleration);
 		}		
 	}
 	
@@ -364,8 +367,25 @@ public class GestureExtended extends Gesture {
 			GestureStartDirection = 0;
 			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(0).ListEventsExtended;
 
-			double deltaY = listEventsExtendedFirstStroke.get(Consts.ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS - 1).Ymm - listEventsExtendedFirstStroke.get(2).Ymm;
-			double deltaX = listEventsExtendedFirstStroke.get(Consts.ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS - 1).Xmm - listEventsExtendedFirstStroke.get(2).Xmm;
+			double deltaY = listEventsExtendedFirstStroke.get(Consts.ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS-1).Ymm - listEventsExtendedFirstStroke.get(2).Ymm;
+			double deltaX = listEventsExtendedFirstStroke.get(Consts.ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS-1).Xmm - listEventsExtendedFirstStroke.get(2).Xmm;
+			
+			GestureStartDirection = mUtilsMath.CalculateEventAngle(deltaX, deltaY);	
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
+		}
+	}
+
+	protected void CalculateGestureEndDirection()
+	{
+		int numOfStrokes = ListStrokesExtended.size();
+		if(!ListStrokesExtended.get(numOfStrokes-1).IsPoint)
+		{
+			GestureStartDirection = 0;
+			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(numOfStrokes-1).ListEventsExtended;
+			int lastEvent = listEventsExtendedFirstStroke.size() -1;
+
+			double deltaY = listEventsExtendedFirstStroke.get(lastEvent).Ymm - listEventsExtendedFirstStroke.get(lastEvent-3).Ymm;
+			double deltaX = listEventsExtendedFirstStroke.get(lastEvent).Xmm - listEventsExtendedFirstStroke.get(lastEvent-3).Xmm;
 			
 			GestureStartDirection = mUtilsMath.CalculateEventAngle(deltaX, deltaY);			
 		}

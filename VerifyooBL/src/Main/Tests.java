@@ -11,7 +11,9 @@ public class Tests {
 		{
 			Tester t = new Tester();		
 			
-			score = t.TestByName("dalal.roy@gmail.com", "roy-STAM123");			
+			//score = t.TestSelf("roy-STAM123", "dalal.roy@gmail.com");			
+			//score = t.TestSelf("roy-STAM2", "roy-STAM2");
+			score = t.TestSelf("roy-STAM2", "roy-STAM123");
 		}
 		catch(Exception exc) {
 			msg = exc.getMessage();

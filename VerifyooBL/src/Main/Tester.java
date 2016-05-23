@@ -138,8 +138,10 @@ public class Tester {
 		return score;
 	}
 	
-	public double TestSelf(Template template1, Template template2)
+	public double TestSelf(String name1, String name2)
 	{
+		Template template1 = GetFromDB(name1);		
+		Template template2 = GetFromDB(name2);
 		TemplateComparer comparer = new TemplateComparer();
 		
 		for(int idx = 41; idx >= 21; idx--)

@@ -19,6 +19,9 @@ public class ConstsParamNames {
 		public static final String GESTURE_TOTAL_STROKE_AREA= "GestureTotalStrokeArea";		
 		public static final String GESTURE_AVG_PRESSURE = "GestureAvgPressure";
 		public static final String GESTURE_AVG_SURFACE = "GestureAvgSurface";
+		public static final String GESTURE_AVG_START_DIRECTION = "GestureAvgStartDirection";
+		public static final String AVG_START_ACCELERATION = "GestureAverageStartAcceleration";
+		
 		
 	}	
 }
