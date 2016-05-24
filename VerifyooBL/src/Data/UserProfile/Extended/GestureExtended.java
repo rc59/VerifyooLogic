@@ -359,24 +359,35 @@ public class GestureExtended extends Gesture {
 			AccumulatedTime[idx] = accumulatedTime[idx];
 		}
 	}
-	
+//TODO: adopt AddGestureValue for the addition of angles 	
 	protected void CalculateGestureStartDirection()
 	{
+		int startPoint = 0;
 		if(!ListStrokesExtended.get(0).IsPoint)
 		{
 			GestureStartDirection = 0;
 			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(0).ListEventsExtended;
 
-			double deltaY = listEventsExtendedFirstStroke.get(Consts.ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS-1).Ymm - listEventsExtendedFirstStroke.get(2).Ymm;
-			double deltaX = listEventsExtendedFirstStroke.get(Consts.ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS-1).Xmm - listEventsExtendedFirstStroke.get(2).Xmm;
+			for(int i = 0; i < listEventsExtendedFirstStroke.size(); i++)
+			{
+				if(listEventsExtendedFirstStroke.get(i).Velocity > Consts.ConstsFeatures.MIN_VELOCITY_TRESHOLD)
+				{
+					startPoint = i;
+					break;
+				}
+			}
+
+			double deltaY = listEventsExtendedFirstStroke.get(startPoint+2).Ymm - listEventsExtendedFirstStroke.get(startPoint).Ymm;
+			double deltaX = listEventsExtendedFirstStroke.get(startPoint+2).Xmm - listEventsExtendedFirstStroke.get(startPoint).Xmm;
 			
-			GestureStartDirection = mUtilsMath.CalculateEventAngle(deltaX, deltaY);	
+			GestureStartDirection = Math.atan2(deltaY, deltaX);
 			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
 		}
 	}
 
 	protected void CalculateGestureEndDirection()
 	{
+		int endPoint = 0;
 		int numOfStrokes = ListStrokesExtended.size();
 		if(!ListStrokesExtended.get(numOfStrokes-1).IsPoint)
 		{
@@ -384,10 +395,20 @@ public class GestureExtended extends Gesture {
 			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(numOfStrokes-1).ListEventsExtended;
 			int lastEvent = listEventsExtendedFirstStroke.size() -1;
 
-			double deltaY = listEventsExtendedFirstStroke.get(lastEvent).Ymm - listEventsExtendedFirstStroke.get(lastEvent-3).Ymm;
-			double deltaX = listEventsExtendedFirstStroke.get(lastEvent).Xmm - listEventsExtendedFirstStroke.get(lastEvent-3).Xmm;
+			for(int i = listEventsExtendedFirstStroke.size() - 1; i > -1 ; i--)
+			{
+				if(listEventsExtendedFirstStroke.get(i).Velocity > Consts.ConstsFeatures.MIN_VELOCITY_TRESHOLD)
+				{
+					endPoint = i;
+					break;
+				}
+			}
+
+			double deltaY = listEventsExtendedFirstStroke.get(endPoint).Ymm - listEventsExtendedFirstStroke.get(endPoint-2).Ymm;
+			double deltaX = listEventsExtendedFirstStroke.get(endPoint).Xmm - listEventsExtendedFirstStroke.get(endPoint-2).Xmm;
 			
-			GestureStartDirection = mUtilsMath.CalculateEventAngle(deltaX, deltaY);			
+			GestureEndDirection = Math.atan2(deltaY, deltaX);
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, GestureEndDirection);
 		}
 	}
 	

@@ -95,7 +95,15 @@ public class NormMgr implements INormMgr {
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, ConstsInstructions.INSTRUCTION_LINES, 3.7860, 2.6757, 0.3);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, ConstsInstructions.INSTRUCTION_LETTER_R, 2.1949, 1.2685, 0.3);		
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, ConstsInstructions.INSTRUCTION_TRIANGLE, 113, 38, 0.3);
-	}
+
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, ConstsInstructions.INSTRUCTION_LETTER_A, 3.9216, 1.469, 0.3);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, ConstsInstructions.INSTRUCTION_EIGHT, 3.8615, 1.7749, 0.3);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, ConstsInstructions.INSTRUCTION_FIVE, 2.794, 1.4553, 0.3);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, ConstsInstructions.INSTRUCTION_HEART, 4.628, 0.7115, 0.3);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, ConstsInstructions.INSTRUCTION_LINES, 3.7860, 2.6757, 0.3);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, ConstsInstructions.INSTRUCTION_LETTER_R, 2.1949, 1.2685, 0.3);		
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, ConstsInstructions.INSTRUCTION_TRIANGLE, 113, 38, 0.3);
+}
 	
 	protected void CreateDoubleNorm(String name, String instruction, double mean, double standardDev, double internalStandardDev)
 	{
