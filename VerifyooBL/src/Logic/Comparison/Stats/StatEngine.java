@@ -9,11 +9,14 @@ import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Comparison.Stats.Norms.NormMgr;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Comparison.Stats.Norms.Interfaces.INormMgr;
+import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsStat;
 
 public class StatEngine implements IStatEngine {
 	
 	protected UtilsStat mUtilsStat;
+	protected UtilsGeneral mUtilsGeneral;
+	
 	protected INormMgr mNormMgr;
 	protected static IStatEngine mInstance = null;	
 	
@@ -21,6 +24,7 @@ public class StatEngine implements IStatEngine {
 	{
 		mNormMgr = NormMgr.GetInstance();
 		mUtilsStat = new UtilsStat();
+		mUtilsGeneral = new UtilsGeneral();
 	}
 	
 	public static IStatEngine GetInstance() {
@@ -34,7 +38,7 @@ public class StatEngine implements IStatEngine {
 	{		
 		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
 				
-		String key = GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
+		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
 				
 		double populationMean = normObj.GetMean();
 		double populationSd = normObj.GetStandardDev();
@@ -54,7 +58,7 @@ public class StatEngine implements IStatEngine {
 	{
 		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
 		
-		String key = GenerateGestureFeatureMeanKey(instruction, paramName);
+		String key = mUtilsGeneral.GenerateGestureFeatureMeanKey(instruction, paramName);
 				
 		double populationMean = normObj.GetMean();
 		double populationSd = normObj.GetStandardDev();
@@ -83,17 +87,5 @@ public class StatEngine implements IStatEngine {
 		
 		statResult = new StatEngineResult(score, zScoreForUser);
 		return statResult;	
-	}
-	
-	protected String GenerateStrokeFeatureMeanKey(String instruction, String paramName, int strokeIdx)
-	{
-		String key = String.format("%s-%s-%s", instruction, String.valueOf(strokeIdx) ,paramName);
-		return key;
-	}
-	
-	protected String GenerateGestureFeatureMeanKey(String instruction, String paramName)
-	{
-		String key = String.format("%s-%s", instruction, paramName);
-		return key;
 	}
 }

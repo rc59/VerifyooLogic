@@ -9,6 +9,7 @@ public class Utils {
 	protected static UtilsStat mUtilsStat;
 	protected static UtilsVectors mUtilsVectors;
 	protected static UtilsLinearReg mUtilsLinearReg;
+	protected static UtilsGeneral mUtilsGeneral;
 	
 	public static Utils GetInstance() {
 		if(mInstance == null) {
@@ -20,6 +21,7 @@ public class Utils {
 			mUtilsStat = new UtilsStat();
 			mUtilsVectors = new UtilsVectors();		
 			mUtilsLinearReg = new UtilsLinearReg();
+			mUtilsGeneral = new UtilsGeneral();
 		}
 		return mInstance;
 	}
@@ -41,5 +43,8 @@ public class Utils {
 	}
 	public UtilsLinearReg GetUtilsLinearReg() {
 		return mUtilsLinearReg;
+	}
+	public UtilsGeneral GetUtilsGeneral() {
+		return mUtilsGeneral;
 	}
 }

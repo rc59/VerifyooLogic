@@ -17,6 +17,7 @@ import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Utils.Utils;
+import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsMath;
 import Logic.Utils.UtilsSpatialSampling;
 
@@ -27,6 +28,7 @@ public class StrokeExtended extends Stroke {
 	
 	private UtilsSpatialSampling mUtilsSpatialSampling;
 	private UtilsMath mUtilsMath;
+	protected UtilsGeneral mUtilsGeneral;
 	
 	private MotionEventCompact mPointMinX;
 	private MotionEventCompact mPointMaxX;
@@ -95,6 +97,7 @@ public class StrokeExtended extends Stroke {
 	{
 		mUtilsSpatialSampling = Utils.GetInstance().GetUtilsSpatialSampling();
 		mUtilsMath = Utils.GetInstance().GetUtilsMath();
+		mUtilsGeneral = Utils.GetInstance().GetUtilsGeneral();
 	}
 	
 	protected void InitFeatures()
@@ -345,7 +348,7 @@ public class StrokeExtended extends Stroke {
 	
 	protected void AddStrokeValue(String instruction, String paramName, int strokeIdx, double value)
 	{
-		String key = GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
+		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
 		
 		IFeatureMeanData tempFeatureMeanData;
 		
@@ -358,12 +361,6 @@ public class StrokeExtended extends Stroke {
 		}
 		
 		tempFeatureMeanData.AddValue(value);		
-	}
-	
-	protected String GenerateStrokeFeatureMeanKey(String instruction, String paramName, int strokeIdx)
-	{
-		String key = String.format("%s-%s-%s", instruction, String.valueOf(strokeIdx) ,paramName);
-		return key;
 	}
 	
 	public HashMap<String, IFeatureMeanData> GetFeatureMeansHash() 

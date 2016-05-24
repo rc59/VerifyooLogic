@@ -11,6 +11,7 @@ import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
 import Logic.Utils.Utils;
+import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsLinearReg;
 import Logic.Utils.UtilsSpatialSampling;
 import Logic.Utils.UtilsLinearReg.LinearRegression;
@@ -89,6 +90,7 @@ public class GestureExtended extends Gesture {
 	protected UtilsMath mUtilsMath;
 	protected UtilsLinearReg mUtilsLinearReg;
 	protected UtilsSpatialSampling mUtilsSpatialSampling;
+	protected UtilsGeneral mUtilsGeneral;
 	
 	protected IStatEngine mStatEngine;
 	
@@ -96,9 +98,7 @@ public class GestureExtended extends Gesture {
 		Instruction = gesture.Instruction;		
 		ListStrokes = gesture.ListStrokes;
 		
-		mUtilsLinearReg = Utils.GetInstance().GetUtilsLinearReg();
-		mUtilsSpatialSampling = Utils.GetInstance().GetUtilsSpatialSampling();
-		mUtilsMath = Utils.GetInstance().GetUtilsMath();
+		InitUtils();		
 		
 		GestureIndex = gestureIdx;
 		
@@ -106,6 +106,13 @@ public class GestureExtended extends Gesture {
 		InitParams();
 		PreCalculations();	
 		InitFeatures();
+	}
+
+	protected void InitUtils() {
+		mUtilsLinearReg = Utils.GetInstance().GetUtilsLinearReg();
+		mUtilsSpatialSampling = Utils.GetInstance().GetUtilsSpatialSampling();
+		mUtilsMath = Utils.GetInstance().GetUtilsMath();
+		mUtilsGeneral = Utils.GetInstance().GetUtilsGeneral();
 	}
 
 	protected void InitParams() {
@@ -156,7 +163,7 @@ public class GestureExtended extends Gesture {
 		CalculateGestureVelocityPeaks();
 		CalculateAccumulatedDistanceByTime();
 		CalculateGestureStartDirection();
-		CalculateGestureEndDirection();
+		//CalculateGestureEndDirection();
 		CalculateAccumulatedDistanceLinearReg();		
 	}
 	
@@ -421,12 +428,6 @@ public class GestureExtended extends Gesture {
 		GestureAccumulatedLengthLinearRegRSqr = linearRegObj.R2();
 		GestureAccumulatedLengthLinearRegSlope = linearRegObj.slope();
 		GestureAccumulatedLengthLinearRegIntercept = linearRegObj.intercept();
-	}	
-	
-	protected String GenerateGestureFeatureMeanKey(String instruction, String paramName)
-	{
-		String key = String.format("%s-%s", instruction, paramName);
-		return key;
 	}
 	
 	public void AddGestureValue(String instruction, String paramName, double value)
@@ -441,7 +442,7 @@ public class GestureExtended extends Gesture {
 	
 	public void AddGestureValue(String instruction, String paramName, double value, boolean isAngle)
 	{
-		String key = GenerateGestureFeatureMeanKey(instruction, paramName);
+		String key = mUtilsGeneral.GenerateGestureFeatureMeanKey(instruction, paramName);
 		
 		IFeatureMeanData tempFeatureMeanData;
 		
