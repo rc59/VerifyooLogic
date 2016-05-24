@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import Logic.Comparison.Stats.Data.StatEngineResult;
 import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
+import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Comparison.Stats.Norms.NormMgr;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
@@ -29,7 +30,7 @@ public class StatEngine implements IStatEngine {
       return mInstance;
    }
 	
-	public IStatEngineResult CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double authValue, HashMap<String, FeatureMeanData> hashFeatureMeans)
+	public IStatEngineResult CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
 	{		
 		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
 				
@@ -49,7 +50,7 @@ public class StatEngine implements IStatEngine {
 		return statResult;
 	}
 	
-	public IStatEngineResult CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, FeatureMeanData> hashFeatureMeans)
+	public IStatEngineResult CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
 	{
 		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
 		

@@ -14,6 +14,7 @@ import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
 import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.StatEngine;
+import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsMath;
@@ -35,7 +36,7 @@ public class StrokeExtended extends Stroke {
 	private double mStrokeCenterXpixel;
 	private double mStrokeCenterYpixel;	
 		
-	private HashMap<String, FeatureMeanData> mHashFeatureMeans;
+	private HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	/****************************************/
 	
 	/************** Stroke Features **************/
@@ -66,7 +67,7 @@ public class StrokeExtended extends Stroke {
 	public double[] AccumulatedTimeIntervals;
 	/****************************************/
 	
-	public StrokeExtended(Stroke stroke, HashMap<String, FeatureMeanData> hashFeatureMeans, String instruction, int strokeIdx)
+	public StrokeExtended(Stroke stroke, HashMap<String, IFeatureMeanData> hashFeatureMeans, String instruction, int strokeIdx)
 	{		
 		mHashFeatureMeans = hashFeatureMeans;
 		mStrokeIdx = strokeIdx;
@@ -346,7 +347,7 @@ public class StrokeExtended extends Stroke {
 	{
 		String key = GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
 		
-		FeatureMeanData tempFeatureMeanData;
+		IFeatureMeanData tempFeatureMeanData;
 		
 		if(mHashFeatureMeans.containsKey(key)) {
 			tempFeatureMeanData = mHashFeatureMeans.get(key);
@@ -365,7 +366,7 @@ public class StrokeExtended extends Stroke {
 		return key;
 	}
 	
-	public HashMap<String, FeatureMeanData> GetFeatureMeansHash() 
+	public HashMap<String, IFeatureMeanData> GetFeatureMeansHash() 
 	{
 		return mHashFeatureMeans;
 	}

@@ -111,11 +111,11 @@ public class GestureComparer {
 		else {
 			mMinCosineDistanceValid = true;
 		}
-		if(IsNeedToRun("CompareGestureTotalTimeWithPauses")){
-			CompareGestureTotalTimeWithPauses();
+		if(IsNeedToRun("CompareGestureTotalTimeInterval")){
+			CompareGestureTotalTimeInterval();
 		}
-		if(IsNeedToRun("CompareGestureTotalTimeWithoutPauses")){
-			//CompareGestureTotalTimeWithoutPauses();
+		if(IsNeedToRun("CompareGestureTotalStrokesTime")){
+			CompareGestureTotalStrokesTime();
 		}
 		if(IsNeedToRun("CompareGestureAreas")){
 			CompareGestureAreas();
@@ -172,38 +172,30 @@ public class GestureComparer {
 		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, finalScore, ConstsParamWeights.MEDIUM, areaAuth);
 	}
 	
-	protected void CompareGestureTotalTimeWithoutPauses() {
-		double totalTimeNoPausesStored = mGestureStored.GestureTotalTimeWithoutPauses;
+	protected void CompareGestureTotalStrokesTime() {		
 		double totalTimeNoPausesAuth = mGestureAuth.GestureTotalTimeWithoutPauses;			
 		
-		//double finalScore = mUtilsComparison.CompareNumericalValues(totalTimeNoPausesStored, totalTimeNoPausesAuth, 0.75);
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITHOUT_PAUSES, totalTimeNoPausesAuth, mGestureStored.GetFeatureMeansHash());
-		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITHOUT_PAUSES, finalScore, ConstsParamWeights.MEDIUM, totalTimeNoPausesAuth);
+		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, totalTimeNoPausesAuth, mGestureStored.GetFeatureMeansHash());
+		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, finalScore, ConstsParamWeights.MEDIUM, totalTimeNoPausesAuth);
 	}
 
-	protected void CompareGestureTotalTimeWithPauses() {
-		double totalTimeStored = mGestureStored.GestureTotalTimeWithPauses;
+	protected void CompareGestureTotalTimeInterval() {		
 		double totalTimeAuth = mGestureAuth.GestureTotalTimeWithPauses;
-				
-		//double finalScore = mUtilsComparison.CompareNumericalValues(totalTimeStored, totalTimeAuth, 0.75);
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, totalTimeAuth, mGestureStored.GetFeatureMeansHash());
-		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, finalScore, ConstsParamWeights.MEDIUM, totalTimeAuth);
+						
+		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, totalTimeAuth, mGestureStored.GetFeatureMeansHash());
+		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, finalScore, ConstsParamWeights.MEDIUM, totalTimeAuth);
 	}
 
-	protected void CompareGestureAvgVelocity() {
-		double avgVelocityStored = mGestureStored.GestureAverageVelocity;
+	protected void CompareGestureAvgVelocity() {		
 		double avgVelocityAuth = mGestureAuth.GestureAverageVelocity;
 		
-		//double finalScore = mUtilsComparison.CompareNumericalValues(avgVelocityStored, avgVelocityAuth, 0.75);
 		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.AVERAGE_VELOCITY, avgVelocityAuth, mGestureStored.GetFeatureMeansHash());
 		AddDoubleParameter(ConstsParamNames.Gesture.AVERAGE_VELOCITY, finalScore, ConstsParamWeights.MEDIUM, avgVelocityAuth);
 	}
 
-	protected void CompareGestureLengths() {
-		double lengthStored = mGestureStored.GestureLengthMM;
+	protected void CompareGestureLengths() {	
 		double lengthAuth = mGestureAuth.GestureLengthMM;
 		
-		//double finalScore = mUtilsComparison.CompareNumericalValues(lengthStored, lengthAuth, 0.75);
 		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.LENGTH, lengthAuth, mGestureStored.GetFeatureMeansHash());
 		AddDoubleParameter(ConstsParamNames.Gesture.LENGTH, finalScore, ConstsParamWeights.MEDIUM, lengthAuth);
 	}

@@ -5,12 +5,12 @@ import java.util.HashMap;
 
 import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.Template;
-import Logic.Comparison.Stats.FeatureMeanData;
+import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 
 public class TemplateExtended extends Template {	
 	public ArrayList<GestureExtended> ListGestureExtended;
 	
-	private HashMap<String, FeatureMeanData> mHashFeatureMeans;
+	private HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	
 	public TemplateExtended(Template template) {		
 		InitTemplateExtended(template);

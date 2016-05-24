@@ -40,13 +40,21 @@ public class NormMgr implements INormMgr {
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.LENGTH, ConstsInstructions.INSTRUCTION_LETTER_R, 118, 40, 12);		
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.LENGTH, ConstsInstructions.INSTRUCTION_TRIANGLE, 113, 38, 10);
 		
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, ConstsInstructions.INSTRUCTION_LETTER_A, 611, 202, 118);
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, ConstsInstructions.INSTRUCTION_EIGHT, 828, 286, 167);
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, ConstsInstructions.INSTRUCTION_FIVE, 762, 244, 140);
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, ConstsInstructions.INSTRUCTION_HEART, 1089, 371, 223);
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, ConstsInstructions.INSTRUCTION_LINES, 563, 405, 291);
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, ConstsInstructions.INSTRUCTION_LETTER_R, 1011, 296, 225);		
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, ConstsInstructions.INSTRUCTION_TRIANGLE, 853, 305, 145);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, ConstsInstructions.INSTRUCTION_LETTER_A, 1059, 300, 193);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, ConstsInstructions.INSTRUCTION_EIGHT, 832, 257, 116);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, ConstsInstructions.INSTRUCTION_FIVE, 968, 240, 175);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, ConstsInstructions.INSTRUCTION_HEART, 1289, 421, 195);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, ConstsInstructions.INSTRUCTION_LINES, 1094, 623, 501);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, ConstsInstructions.INSTRUCTION_LETTER_R, 1011, 296, 156);		
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, ConstsInstructions.INSTRUCTION_TRIANGLE, 942, 326, 135);
+		
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, ConstsInstructions.INSTRUCTION_LETTER_A, 611, 202, 118);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, ConstsInstructions.INSTRUCTION_EIGHT, 828, 286, 167);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, ConstsInstructions.INSTRUCTION_FIVE, 762, 244, 140);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, ConstsInstructions.INSTRUCTION_HEART, 1089, 371, 223);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, ConstsInstructions.INSTRUCTION_LINES, 563, 405, 291);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, ConstsInstructions.INSTRUCTION_LETTER_R, 905, 293, 225);		
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, ConstsInstructions.INSTRUCTION_TRIANGLE, 853, 305, 145);
 		
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, ConstsInstructions.INSTRUCTION_LETTER_A, 497, 178, 95);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, ConstsInstructions.INSTRUCTION_EIGHT, 647, 211, 121);

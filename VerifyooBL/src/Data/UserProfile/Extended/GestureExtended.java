@@ -16,7 +16,9 @@ import Logic.Utils.UtilsSpatialSampling;
 import Logic.Utils.UtilsLinearReg.LinearRegression;
 import Logic.Utils.UtilsMath;
 import Logic.Comparison.Stats.FeatureMeanData;
+import Logic.Comparison.Stats.FeatureMeanDataAngle;
 import Logic.Comparison.Stats.StatEngine;
+import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 
 public class GestureExtended extends Gesture {
@@ -82,7 +84,7 @@ public class GestureExtended extends Gesture {
 	public ArrayList<MotionEventExtended> ListGestureEventsExtended;
 	public ArrayList<MotionEventCompact> ListGestureEvents;
 	
-	protected HashMap<String, FeatureMeanData> mHashFeatureMeans;
+	protected HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	
 	protected UtilsMath mUtilsMath;
 	protected UtilsLinearReg mUtilsLinearReg;
@@ -90,7 +92,7 @@ public class GestureExtended extends Gesture {
 	
 	protected IStatEngine mStatEngine;
 	
-	public GestureExtended(Gesture gesture, HashMap<String, FeatureMeanData> hashFeatureMeans, int gestureIdx) {		
+	public GestureExtended(Gesture gesture, HashMap<String, IFeatureMeanData> hashFeatureMeans, int gestureIdx) {		
 		Instruction = gesture.Instruction;		
 		ListStrokes = gesture.ListStrokes;
 		
@@ -288,7 +290,7 @@ public class GestureExtended extends Gesture {
 	
 	protected void AddCalculatedFeatures() {
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.LENGTH, GestureLengthMM);		
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITHOUT_PAUSES, GestureTotalTimeWithoutPauses);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, GestureTotalTimeWithoutPauses);
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, GestureTotalStrokeArea);		
 	}
 
@@ -300,7 +302,7 @@ public class GestureExtended extends Gesture {
 		double gestureEndTime = strokeLast.ListEventsExtended.get(strokeLast.ListEventsExtended.size() - 1).EventTime;
 		
 		GestureTotalTimeWithPauses = gestureEndTime - gestureStartTime;
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_WITH_PAUSES, GestureTotalTimeWithPauses);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, GestureTotalTimeWithPauses);
 	}
 	
 	protected void CalculateGestureAvgVelocity()
@@ -381,7 +383,7 @@ public class GestureExtended extends Gesture {
 			double deltaX = listEventsExtendedFirstStroke.get(startPoint+2).Xmm - listEventsExtendedFirstStroke.get(startPoint).Xmm;
 			
 			GestureStartDirection = Math.atan2(deltaY, deltaX);
-			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
+			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
 		}
 	}
 
@@ -429,22 +431,38 @@ public class GestureExtended extends Gesture {
 	
 	public void AddGestureValue(String instruction, String paramName, double value)
 	{
+		AddGestureValue(instruction, paramName, value, false);
+	}
+	
+	public void AddGestureAngleValue(String instruction, String paramName, double value)
+	{
+		AddGestureValue(instruction, paramName, value, true);
+	}
+	
+	public void AddGestureValue(String instruction, String paramName, double value, boolean isAngle)
+	{
 		String key = GenerateGestureFeatureMeanKey(instruction, paramName);
 		
-		FeatureMeanData tempFeatureMeanData;
+		IFeatureMeanData tempFeatureMeanData;
 		
 		if(mHashFeatureMeans.containsKey(key)) {
 			tempFeatureMeanData = mHashFeatureMeans.get(key);
 		}
 		else {
-			tempFeatureMeanData = new FeatureMeanData(paramName);			
+			if(isAngle) {
+				tempFeatureMeanData = new FeatureMeanDataAngle(paramName);	
+			}
+			else {
+				tempFeatureMeanData = new FeatureMeanData(paramName);	
+			}
+					
 			mHashFeatureMeans.put(key, tempFeatureMeanData);
 		}
 		
 		tempFeatureMeanData.AddValue(value);		
 	}
 	
-	public HashMap<String, FeatureMeanData> GetFeatureMeansHash() 
+	public HashMap<String, IFeatureMeanData> GetFeatureMeansHash() 
 	{
 		return mHashFeatureMeans;
 	}

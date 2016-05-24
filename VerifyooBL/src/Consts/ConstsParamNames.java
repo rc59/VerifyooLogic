@@ -13,8 +13,8 @@ public class ConstsParamNames {
 	{
 		public static final String AVERAGE_VELOCITY = "GestureAvgVelocity";
 		public static final String LENGTH = "GestureLength";
-		public static final String GESTURE_TOTAL_TIME_WITHOUT_PAUSES = "GestureTotalTimeWithoutPauses";
-		public static final String GESTURE_TOTAL_TIME_WITH_PAUSES = "GestureTotalTimeWithPauses";
+		public static final String GESTURE_TOTAL_STROKES_TIME_INTERVAL = "GestureTotalStrokesTimeInterval";
+		public static final String GESTURE_TOTAL_TIME_INTERNVAL = "GestureTotalTimeInterval";
 		public static final String GESTURE_ACCUMULATED_DISTANCE_BY_TIME = "GestureAccumulatedDistanceByTime";
 		public static final String GESTURE_TOTAL_STROKE_AREA= "GestureTotalStrokeArea";		
 		public static final String GESTURE_AVG_PRESSURE = "GestureAvgPressure";
