@@ -1,5 +1,7 @@
 package Logic.Comparison;
 
+import java.util.HashMap;
+
 import Consts.ConstsParamNames;
 import Consts.ConstsParamWeights;
 import Data.Comparison.CompareResultGeneric;
@@ -9,9 +11,11 @@ import Data.Comparison.Interfaces.ICompareResult;
 import Data.UserProfile.Extended.StrokeExtended;
 import Data.UserProfile.Raw.Stroke;
 import Logic.Comparison.Stats.StatEngine;
+import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsComparison;
+import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsVectors;
 
 public class StrokeComparer {
@@ -19,6 +23,7 @@ public class StrokeComparer {
 	
 	protected IStatEngine mStatEngine;
 	
+	protected UtilsGeneral mUtilsGeneral;
 	protected UtilsVectors mUtilsVectors;	
 	protected UtilsComparison mUtilsComparison;
 	
@@ -39,6 +44,7 @@ public class StrokeComparer {
 	
 	protected void InitUtils()
 	{
+		mUtilsGeneral = Utils.GetInstance().GetUtilsGeneral();
 		mUtilsVectors = Utils.GetInstance().GetUtilsVectors();
 		mUtilsComparison = Utils.GetInstance().GetUtilsComparison();
 	}
@@ -161,9 +167,12 @@ public class StrokeComparer {
 	}
 	
 	protected void AddDoubleParameter(String parameterName, double score, double weight, double originalValue)
-	{
+	{	
+		double mean = 0;
+		double sd = 0;
+		
 		ICompareResult compareResult = 
-				(ICompareResult) new CompareResultGeneric(parameterName, score, weight, originalValue);
+				(ICompareResult) new CompareResultGeneric(parameterName, score, weight, originalValue, mean, sd);
 		mCompareResult.ListCompareResults.add(compareResult);
 	}
 	/****************************/

@@ -37,8 +37,8 @@ public class GestureExtended extends Gesture {
 	
 	/*************** Time Parameters ***************/
 	
-	public double GestureTotalTimeWithPauses;
-	public double GestureTotalTimeWithoutPauses;
+	public double GestureTotalTimeInterval;
+	public double GestureTotalStrokeTimeInterval;
 	
 	/*************** Velocity & Acceleration Parameters ***************/
 	
@@ -125,8 +125,8 @@ public class GestureExtended extends Gesture {
 		
 		GestureLengthPixel = 0;
 		GestureLengthMM = 0;
-		GestureTotalTimeWithPauses = 0;
-		GestureTotalTimeWithoutPauses = 0;
+		GestureTotalTimeInterval = 0;
+		GestureTotalStrokeTimeInterval = 0;
 	}	
 
 	protected void PreCalculations() {
@@ -141,7 +141,7 @@ public class GestureExtended extends Gesture {
 			GestureLengthMM += tempStrokeExtended.StrokePropertiesObj.LengthMM;
 			GestureLengthPixel += tempStroke.Length;
 			
-			GestureTotalTimeWithoutPauses += tempStrokeExtended.StrokeTimeInterval;
+			GestureTotalStrokeTimeInterval += tempStrokeExtended.StrokeTimeInterval;
 			GestureTotalStrokeArea += tempStrokeExtended.ShapeDataObj.ShapeArea;
 			
 			GestureMaxPressure = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxPressure, tempStrokeExtended.MaxPressure);
@@ -297,7 +297,7 @@ public class GestureExtended extends Gesture {
 	
 	protected void AddCalculatedFeatures() {
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.LENGTH, GestureLengthMM);		
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, GestureTotalTimeWithoutPauses);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, GestureTotalStrokeTimeInterval);
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, GestureTotalStrokeArea);		
 	}
 
@@ -308,13 +308,13 @@ public class GestureExtended extends Gesture {
 		double gestureStartTime = strokeFirst.ListEventsExtended.get(0).EventTime;
 		double gestureEndTime = strokeLast.ListEventsExtended.get(strokeLast.ListEventsExtended.size() - 1).EventTime;
 		
-		GestureTotalTimeWithPauses = gestureEndTime - gestureStartTime;
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, GestureTotalTimeWithPauses);
+		GestureTotalTimeInterval = gestureEndTime - gestureStartTime;
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, GestureTotalTimeInterval);
 	}
 	
 	protected void CalculateGestureAvgVelocity()
 	{
-		GestureAverageVelocity = GestureLengthMM / GestureTotalTimeWithoutPauses;
+		GestureAverageVelocity = GestureLengthMM / GestureTotalStrokeTimeInterval;
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.AVERAGE_VELOCITY, GestureAverageVelocity);
 	}
 	
@@ -368,7 +368,7 @@ public class GestureExtended extends Gesture {
 			AccumulatedTime[idx] = accumulatedTime[idx];
 		}
 	}
-//TODO: adopt AddGestureValue for the addition of angles 	
+
 	protected void CalculateGestureStartDirection()
 	{
 		int startPoint = 0;
@@ -377,20 +377,12 @@ public class GestureExtended extends Gesture {
 			GestureStartDirection = 0;
 			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(0).ListEventsExtended;
 
-			for(int i = 0; i < listEventsExtendedFirstStroke.size(); i++)
-			{
-				if(listEventsExtendedFirstStroke.get(i).Velocity > Consts.ConstsFeatures.MIN_VELOCITY_TRESHOLD)
-				{
-					startPoint = i;
-					break;
-				}
-			}
-
+			startPoint = ListStrokesExtended.get(0).StrokeStartEvent;
 			double deltaY = listEventsExtendedFirstStroke.get(startPoint+2).Ymm - listEventsExtendedFirstStroke.get(startPoint).Ymm;
 			double deltaX = listEventsExtendedFirstStroke.get(startPoint+2).Xmm - listEventsExtendedFirstStroke.get(startPoint).Xmm;
 			
 			GestureStartDirection = Math.atan2(deltaY, deltaX);
-			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
 		}
 	}
 
@@ -402,17 +394,8 @@ public class GestureExtended extends Gesture {
 		{
 			GestureStartDirection = 0;
 			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(numOfStrokes-1).ListEventsExtended;
-			int lastEvent = listEventsExtendedFirstStroke.size() -1;
 
-			for(int i = listEventsExtendedFirstStroke.size() - 1; i > -1 ; i--)
-			{
-				if(listEventsExtendedFirstStroke.get(i).Velocity > Consts.ConstsFeatures.MIN_VELOCITY_TRESHOLD)
-				{
-					endPoint = i;
-					break;
-				}
-			}
-
+			endPoint = ListStrokesExtended.get(numOfStrokes-1).StrokeEndEvent;
 			double deltaY = listEventsExtendedFirstStroke.get(endPoint).Ymm - listEventsExtendedFirstStroke.get(endPoint-2).Ymm;
 			double deltaX = listEventsExtendedFirstStroke.get(endPoint).Xmm - listEventsExtendedFirstStroke.get(endPoint-2).Xmm;
 			

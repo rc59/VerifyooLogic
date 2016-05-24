@@ -43,6 +43,8 @@ public class StrokeExtended extends Stroke {
 	
 	/************** Stroke Features **************/
 	public boolean IsPoint;
+	public int StrokeStartEvent;
+	public int StrokeEndEvent;
 	
 	public VelocityPeak StrokeVelocityPeak;
 	
@@ -110,17 +112,37 @@ public class StrokeExtended extends Stroke {
 	{
 		CalculateStrokeCenter();
 		ConvertToMotionEventExtended();
-		IsStrokeAPoint();
+		CalculateStartEndOfStroke();
 		PrepareData();		
 	}
 
-	protected void IsStrokeAPoint()
+	protected void CalculateStartEndOfStroke()
 	{
-		if(ListEvents.size() < ConstsFeatures.POINT_BY_MIN_NUM_OF_EVENTS)
-			IsPoint = true;
-		else
-			IsPoint = false;
+		IsPoint = true;
+		StrokeStartEvent = StrokeEndEvent = 0;
+		double velocityTreshold = Consts.ConstsFeatures.MIN_VELOCITY_TRESHOLD * ConstsMeasures.INCH_TO_MM /(1/ Math.sqrt(1/(Xdpi*Xdpi) + 1/(Ydpi*Ydpi))) * Math.pow(10, -3); 
+		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
+		{
+			if(ListEventsExtended.get(idxEvent).Velocity > velocityTreshold)
+			{
+				IsPoint = false;
+				StrokeStartEvent = idxEvent;
+				break;
+			}
+		}
+		if(!IsPoint)
+		{
+			for(int idxEvent = ListEventsExtended.size() - 1; idxEvent > -1; idxEvent--)
+			{
+				if(ListEventsExtended.get(idxEvent).Velocity > velocityTreshold)
+				{
+					StrokeEndEvent = idxEvent;
+					break;
+				}
+			}
+		}
 	}
+
 	protected void CalculateFeatures()
 	{
 		CalculateSpatialSamplingVector();

@@ -5,9 +5,13 @@ public interface ICompareResult {
 	public double GetWeight();
 	public double GetValue();
 	public double GetOriginalValue();
+	public double GetMean();
+	public double GetSD();
 	
 	public void SetName(String name);
 	public void SetWeight(double weight);
 	public void SetValue(double value);
 	public void SetOriginalValue(double originalValue);
+	public void SetMean(double mean);
+	public void SetStandardDev(double standardDev);
 }

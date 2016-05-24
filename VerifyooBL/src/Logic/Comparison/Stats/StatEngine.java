@@ -78,12 +78,12 @@ public class StatEngine implements IStatEngine {
 		
 		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
 				
-		if(authValue > upper || authValue < lower) {
-			score -= 0.2;
-			if(score < 0) {
-				score = 0;
-			}
-		}
+//		if(authValue > upper || authValue < lower) {
+//			score -= 0.2;
+//			if(score < 0) {
+//				score = 0;
+//			}
+//		}
 		
 		statResult = new StatEngineResult(score, zScoreForUser);
 		return statResult;	

@@ -15,9 +15,13 @@ import Data.UserProfile.Extended.StrokeExtended;
 import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
+import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Comparison.Stats.Norms.NormMgr;
+import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsComparison;
+import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsVectors;
 
 public class GestureComparer {	
@@ -28,6 +32,7 @@ public class GestureComparer {
 	protected GestureExtended mGestureStored;
 	protected GestureExtended mGestureAuth;
 	
+	protected UtilsGeneral mUtilsGeneral;
 	protected UtilsComparison mUtilsComparison;
 	protected UtilsVectors mUtilsVectors;
 	
@@ -65,6 +70,7 @@ public class GestureComparer {
 	{
 		mUtilsComparison = Utils.GetInstance().GetUtilsComparison();
 		mUtilsVectors = Utils.GetInstance().GetUtilsVectors();
+		mUtilsGeneral = Utils.GetInstance().GetUtilsGeneral();
 	}
 	
 	public void CompareGestures(GestureExtended gestureStored, GestureExtended gestureAuth) { 					
@@ -158,7 +164,7 @@ public class GestureComparer {
 	
 	protected void CompareGestureSurface()
 	{
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, mGestureAuth.GestureAvgPressure, mGestureStored.GetFeatureMeansHash());		
+		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, mGestureAuth.GestureAvgSurface, mGestureStored.GetFeatureMeansHash());		
 		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, finalScore, ConstsParamWeights.MEDIUM, mGestureAuth.GestureAvgSurface);
 	}
 	
@@ -171,14 +177,14 @@ public class GestureComparer {
 	}
 	
 	protected void CompareGestureTotalStrokesTime() {		
-		double totalTimeNoPausesAuth = mGestureAuth.GestureTotalTimeWithoutPauses;			
+		double totalTimeNoPausesAuth = mGestureAuth.GestureTotalStrokeTimeInterval;			
 		
 		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, totalTimeNoPausesAuth, mGestureStored.GetFeatureMeansHash());
 		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, finalScore, ConstsParamWeights.MEDIUM, totalTimeNoPausesAuth);
 	}
 
 	protected void CompareGestureTotalTimeInterval() {		
-		double totalTimeAuth = mGestureAuth.GestureTotalTimeWithPauses;
+		double totalTimeAuth = mGestureAuth.GestureTotalTimeInterval;
 						
 		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, totalTimeAuth, mGestureStored.GetFeatureMeansHash());
 		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, finalScore, ConstsParamWeights.MEDIUM, totalTimeAuth);
@@ -267,7 +273,7 @@ public class GestureComparer {
         });
 		
 		
-		int limit = 2;
+		int limit = 3;
 		double avgScore = 0;
 		double totalWeights = 0;
 		
@@ -303,10 +309,24 @@ public class GestureComparer {
 	protected void AddDoubleParameter(String parameterName, IStatEngineResult finalScore, double weight, double originalValue)
 	{
 		double score = finalScore.GetScore();
-		weight = finalScore.GetZScore();		
+		weight = finalScore.GetZScore();				
+		
+		String key = mUtilsGeneral.GenerateGestureFeatureMeanKey(mGestureStored.Instruction, parameterName);
+		
+		double mean = 0;
+		double sd = 0;
+		
+		HashMap<String, IFeatureMeanData> hashFeatureMeans = mGestureStored.GetFeatureMeansHash(); 
+		
+		if(hashFeatureMeans.containsKey(key)) {
+			mean = hashFeatureMeans.get(key).GetMean();
+			
+			INormData normData = NormMgr.GetInstance().GetNormDataByParamName(parameterName, mGestureStored.Instruction);			
+			sd = normData.GetInternalStandardDev();
+		}
 		
 		ICompareResult compareResult = 
-				(ICompareResult) new CompareResultGeneric(parameterName, score, weight, originalValue);
+				(ICompareResult) new CompareResultGeneric(parameterName, score, weight, originalValue, mean, sd);
 		mCompareResultsGesture.ListCompareResults.add(compareResult);
 	}
 }

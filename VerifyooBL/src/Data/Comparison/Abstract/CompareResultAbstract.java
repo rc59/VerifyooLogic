@@ -9,6 +9,8 @@ public abstract class CompareResultAbstract implements ICompareResult {
 	public double Value;
 	public double OriginalValue;
 	public double Weight;
+	public double Mean;
+	public double StandardDev;
 		
 	@Override
 	public String GetName() {
@@ -29,6 +31,14 @@ public abstract class CompareResultAbstract implements ICompareResult {
 		return Weight;
 	}
 	
+	public double GetMean() { 
+		return Mean;
+	}
+	
+	public double GetSD() { 
+		return StandardDev;
+	}
+	
 	@Override
 	public void SetName(String name) {
 		Name = name;
@@ -46,5 +56,13 @@ public abstract class CompareResultAbstract implements ICompareResult {
 	
 	public void SetOriginalValue(double originalValue) {
 		OriginalValue = originalValue;
+	}
+	
+	public void SetMean(double mean) {
+		Mean = mean;
+	}
+	
+	public void SetStandardDev(double standardDev) {
+		StandardDev = standardDev;
 	}
 }
