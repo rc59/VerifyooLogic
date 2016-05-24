@@ -99,6 +99,7 @@ public class GestureComparer {
 	
 	protected void CompareGestureFeatures()
 	{		
+		mMinCosineDistanceValid = true;
 		if(IsNeedToRun("CompareGestureLengths")){
 			CompareGestureLengths();	
 		}
@@ -107,9 +108,6 @@ public class GestureComparer {
 		}
 		if(IsNeedToRun("CompareGestureMinCosineDistance")){
 			CompareGestureMinCosineDistance();
-		}
-		else {
-			mMinCosineDistanceValid = true;
 		}
 		if(IsNeedToRun("CompareGestureTotalTimeInterval")){
 			CompareGestureTotalTimeInterval();
@@ -161,7 +159,7 @@ public class GestureComparer {
 	protected void CompareGestureSurface()
 	{
 		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, mGestureAuth.GestureAvgPressure, mGestureStored.GetFeatureMeansHash());		
-		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, finalScore, ConstsParamWeights.MEDIUM, mGestureAuth.GestureAvgPressure);
+		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, finalScore, ConstsParamWeights.MEDIUM, mGestureAuth.GestureAvgSurface);
 	}
 	
 	protected void CompareGestureAreas()
