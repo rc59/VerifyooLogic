@@ -4,5 +4,10 @@ import java.util.ArrayList;
 
 public class Gesture {
 	public ArrayList<Stroke> ListStrokes;
-	public String Instruction;	
+	public String Instruction;		
+	
+	public Gesture()
+	{
+		ListStrokes = new ArrayList<>();
+	}
 }

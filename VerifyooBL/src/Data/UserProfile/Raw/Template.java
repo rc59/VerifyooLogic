@@ -17,6 +17,7 @@ public class Template {
 	
 	public Template()
 	{
+		ListGestures = new ArrayList<>();
 		mStatEngine = StatEngine.GetInstance();		
 	}
 }

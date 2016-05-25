@@ -111,6 +111,14 @@ public class NormMgr implements INormMgr {
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, ConstsInstructions.INSTRUCTION_LINES, 3.7860, 2.6757, 0.3);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, ConstsInstructions.INSTRUCTION_LETTER_R, 2.1949, 1.2685, 0.3);		
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, ConstsInstructions.INSTRUCTION_TRIANGLE, 113, 38, 0.3);
+		
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.NUM_EVENTS, ConstsInstructions.INSTRUCTION_LETTER_A, 27, 11, 5);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.NUM_EVENTS, ConstsInstructions.INSTRUCTION_EIGHT, 50, 16, 8);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.NUM_EVENTS, ConstsInstructions.INSTRUCTION_FIVE, 40, 20, 10);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.NUM_EVENTS, ConstsInstructions.INSTRUCTION_HEART, 52, 32, 15);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.NUM_EVENTS, ConstsInstructions.INSTRUCTION_LINES, 17, 8, 4);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.NUM_EVENTS, ConstsInstructions.INSTRUCTION_LETTER_R, 38, 21, 10);		
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.NUM_EVENTS, ConstsInstructions.INSTRUCTION_TRIANGLE, 46, 19, 9);
 }
 	
 	protected void CreateDoubleNorm(String name, String instruction, double mean, double standardDev, double internalStandardDev)

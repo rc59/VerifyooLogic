@@ -296,7 +296,8 @@ public class GestureExtended extends Gesture {
 	}
 	
 	protected void AddCalculatedFeatures() {
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.LENGTH, GestureLengthMM);		
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.LENGTH, GestureLengthMM);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.NUM_EVENTS, ListGestureEventsExtended.size());
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, GestureTotalStrokeTimeInterval);
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, GestureTotalStrokeArea);		
 	}

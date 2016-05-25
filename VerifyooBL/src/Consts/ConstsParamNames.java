@@ -11,6 +11,7 @@ public class ConstsParamNames {
 	
 	public class Gesture
 	{
+		public static final String NUM_EVENTS = "NumEvents";
 		public static final String AVERAGE_VELOCITY = "GestureAvgVelocity";
 		public static final String LENGTH = "GestureLength";
 		public static final String GESTURE_TOTAL_STROKES_TIME_INTERVAL = "GestureTotalStrokesTimeInterval";

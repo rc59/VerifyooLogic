@@ -109,6 +109,9 @@ public class GestureComparer {
 		if(IsNeedToRun("CompareGestureLengths")){
 			CompareGestureLengths();	
 		}
+		if(IsNeedToRun("CompareNumEvents")){
+			CompareNumEvents();	
+		}
 		if(IsNeedToRun("CompareGestureAvgVelocity")){
 			CompareGestureAvgVelocity();
 		}
@@ -158,50 +161,52 @@ public class GestureComparer {
 	
 	protected void CompareGesturePressure()
 	{								
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, mGestureAuth.GestureAvgPressure, mGestureStored.GetFeatureMeansHash());		
-		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, finalScore, ConstsParamWeights.MEDIUM, mGestureAuth.GestureAvgPressure);
+		double avgPressure = mGestureAuth.GestureAvgPressure;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, avgPressure);
 	}
 	
 	protected void CompareGestureSurface()
 	{
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, mGestureAuth.GestureAvgSurface, mGestureStored.GetFeatureMeansHash());		
-		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, finalScore, ConstsParamWeights.MEDIUM, mGestureAuth.GestureAvgSurface);
+		double avgSurface = mGestureAuth.GestureAvgSurface;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, avgSurface);
 	}
 	
 	protected void CompareGestureAreas()
 	{		
 		double areaAuth = mGestureAuth.GestureTotalStrokeArea;						
-		
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, areaAuth, mGestureStored.GetFeatureMeansHash());		
-		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, finalScore, ConstsParamWeights.MEDIUM, areaAuth);
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, areaAuth);
 	}
 	
 	protected void CompareGestureTotalStrokesTime() {		
 		double totalTimeNoPausesAuth = mGestureAuth.GestureTotalStrokeTimeInterval;			
-		
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, totalTimeNoPausesAuth, mGestureStored.GetFeatureMeansHash());
-		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, finalScore, ConstsParamWeights.MEDIUM, totalTimeNoPausesAuth);
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, totalTimeNoPausesAuth);
 	}
 
 	protected void CompareGestureTotalTimeInterval() {		
 		double totalTimeAuth = mGestureAuth.GestureTotalTimeInterval;
-						
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, totalTimeAuth, mGestureStored.GetFeatureMeansHash());
-		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, finalScore, ConstsParamWeights.MEDIUM, totalTimeAuth);
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, totalTimeAuth);
 	}
 
 	protected void CompareGestureAvgVelocity() {		
 		double avgVelocityAuth = mGestureAuth.GestureAverageVelocity;
-		
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.AVERAGE_VELOCITY, avgVelocityAuth, mGestureStored.GetFeatureMeansHash());
-		AddDoubleParameter(ConstsParamNames.Gesture.AVERAGE_VELOCITY, finalScore, ConstsParamWeights.MEDIUM, avgVelocityAuth);
+		CalcDoubleParameter(ConstsParamNames.Gesture.AVERAGE_VELOCITY, avgVelocityAuth);	
 	}
 
 	protected void CompareGestureLengths() {	
 		double lengthAuth = mGestureAuth.GestureLengthMM;
-		
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.LENGTH, lengthAuth, mGestureStored.GetFeatureMeansHash());
-		AddDoubleParameter(ConstsParamNames.Gesture.LENGTH, finalScore, ConstsParamWeights.MEDIUM, lengthAuth);
+		CalcDoubleParameter(ConstsParamNames.Gesture.LENGTH, lengthAuth);		
+	}
+	
+	protected void CompareNumEvents()
+	{
+		int numEvents = mGestureAuth.ListGestureEventsExtended.size();		
+		CalcDoubleParameter(ConstsParamNames.Gesture.NUM_EVENTS, (double)numEvents);		
+	}
+	
+	protected void CalcDoubleParameter(String paramName, double value)
+	{
+		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, paramName, value, mGestureStored.GetFeatureMeansHash());
+		AddDoubleParameter(paramName, finalScore, ConstsParamWeights.MEDIUM, value);
 	}
 	
 	protected void CompareGestureStartDirection() {
@@ -277,16 +282,27 @@ public class GestureComparer {
 		double avgScore = 0;
 		double totalWeights = 0;
 		
-		for(int idx = 0; idx < limit; idx++) {
-			avgScore += mCompareResultsGesture.ListCompareResults.get(idx).GetValue();
-			totalWeights += 1;
+		double tempWeight;
+		double tempScore;
+				
+		for(int idx = 0; idx < mCompareResultsGesture.ListCompareResults.size(); idx++) {
+			tempWeight = Math.abs(mCompareResultsGesture.ListCompareResults.get(idx).GetWeight());
+			
+			if(tempWeight > 3) {
+				tempWeight = 3;
+			}
+			tempWeight = tempWeight * tempWeight;
+			
+			tempScore = mCompareResultsGesture.ListCompareResults.get(idx).GetValue();
+			
+			avgScore += tempScore * tempWeight;
+			totalWeights += tempWeight;
 		}
 		
-		
-//		for(int idx = 0; idx < mCompareResultsGesture.ListCompareResults.size(); idx++) {
-//			avgScore += mCompareResultsGesture.ListCompareResults.get(idx).GetValue() * mCompareResultsGesture.ListCompareResults.get(idx).GetWeight();
-//			totalWeights += mCompareResultsGesture.ListCompareResults.get(idx).GetWeight();
-//		}
+//		for(int idx = 0; idx < limit; idx++) {
+//			avgScore += mCompareResultsGesture.ListCompareResults.get(idx).GetValue();
+//			totalWeights += 1;
+//		}		
 		
 		mGestureScore = avgScore / totalWeights;
 	}
