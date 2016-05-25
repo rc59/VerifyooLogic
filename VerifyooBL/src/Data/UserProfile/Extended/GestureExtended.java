@@ -163,7 +163,7 @@ public class GestureExtended extends Gesture {
 		CalculateGestureVelocityPeaks();
 		CalculateAccumulatedDistanceByTime();
 		CalculateGestureStartDirection();
-		//CalculateGestureEndDirection();
+		CalculateGestureEndDirection();
 		CalculateAccumulatedDistanceLinearReg();		
 	}
 	
@@ -382,7 +382,7 @@ public class GestureExtended extends Gesture {
 			double deltaX = listEventsExtendedFirstStroke.get(startPoint+2).Xmm - listEventsExtendedFirstStroke.get(startPoint).Xmm;
 			
 			GestureStartDirection = Math.atan2(deltaY, deltaX);
-			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
+			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
 		}
 	}
 
@@ -392,7 +392,7 @@ public class GestureExtended extends Gesture {
 		int numOfStrokes = ListStrokesExtended.size();
 		if(!ListStrokesExtended.get(numOfStrokes-1).IsPoint)
 		{
-			GestureStartDirection = 0;
+			GestureEndDirection = 0;
 			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(numOfStrokes-1).ListEventsExtended;
 
 			endPoint = ListStrokesExtended.get(numOfStrokes-1).StrokeEndEvent;
@@ -400,7 +400,7 @@ public class GestureExtended extends Gesture {
 			double deltaX = listEventsExtendedFirstStroke.get(endPoint).Xmm - listEventsExtendedFirstStroke.get(endPoint-2).Xmm;
 			
 			GestureEndDirection = Math.atan2(deltaY, deltaX);
-			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, GestureEndDirection);
+			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, GestureEndDirection);
 		}
 	}
 	

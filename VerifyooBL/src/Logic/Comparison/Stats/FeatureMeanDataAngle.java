@@ -28,8 +28,8 @@ public class FeatureMeanDataAngle extends FeatureMeanDataAbstract {
 	      double cos = 0;
 	      for(int i = 0; i < mListValues.size(); i++)
 	      {
-	           sin += Math.sin(mListValues.get(i) * (Math.PI/180.0));
-	           cos += Math.cos(mListValues.get(i) * (Math.PI/180.0)); 
+	           sin += Math.sin(mListValues.get(i));
+	           cos += Math.cos(mListValues.get(i)); 
 	      }
 	      sin /= mListValues.size();
 	      cos /= mListValues.size();
