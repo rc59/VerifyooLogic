@@ -1,6 +1,7 @@
 package Data.UserProfile.Raw;
 
 public class MotionEventCompact {
+	public String Id;
 	public double EventTime;
 	
 	public double Xpixel;

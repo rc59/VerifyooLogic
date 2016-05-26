@@ -67,4 +67,9 @@ public class TemplateComparer {
 	{
 		return mCompareResultsTemplate.Score;
 	}
+	
+	public CompareResultSummary GetResultsSummary()
+	{
+		return mCompareResultsTemplate;
+	}
 }

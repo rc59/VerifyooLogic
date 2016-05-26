@@ -23,6 +23,7 @@ public class MotionEventExtended extends MotionEventCompact {
 	
 	public MotionEventExtended(MotionEventCompact motionEvent, double strokeCenterXpixel, double strokeCenterYpixel, double xdpi, double ydpi, MotionEventExtended motionEventPrev, int index)
 	{
+		Id = motionEvent.Id;
 		mUtilsMath = Utils.GetInstance().GetUtilsMath();
 		
 		Index = index;

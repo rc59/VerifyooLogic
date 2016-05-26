@@ -161,6 +161,11 @@ public class StrokeComparer {
 		return mCompareResult.Score;
 	}	
 	
+	public CompareResultSummary GetResultsSummary()
+	{
+		return mCompareResult;
+	}
+	
 	public boolean IsStrokesIdentical()
 	{
 		return mIsStrokesIdentical;

@@ -17,6 +17,7 @@ public class TemplateExtended extends Template {
 	}
 
 	private void InitTemplateExtended(Template template) {
+		Id = template.Id;
 		mHashFeatureMeans = new HashMap<>();
 		ListGestureExtended = new ArrayList<GestureExtended>();
 		ListGestures = template.ListGestures;

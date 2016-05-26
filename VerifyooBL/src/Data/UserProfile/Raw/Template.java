@@ -9,15 +9,15 @@ import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 
 public class Template {
+	public String Id;
 	public ArrayList<Gesture> ListGestures;
 	public String Name;
 	public String ModelName;
-	
+
 	protected IStatEngine mStatEngine;
-	
-	public Template()
-	{
+
+	public Template() {
 		ListGestures = new ArrayList<>();
-		mStatEngine = StatEngine.GetInstance();		
+		mStatEngine = StatEngine.GetInstance();
 	}
 }

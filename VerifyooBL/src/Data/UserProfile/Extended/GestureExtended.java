@@ -5,8 +5,8 @@ import java.util.HashMap;
 
 import Consts.ConstsFeatures;
 import Consts.ConstsParamNames;
-import Data.MetaData.VelocityAvgPoint;
-import Data.MetaData.VelocityPeak;
+import Data.MetaData.ParameterAvgPoint;
+import Data.MetaData.IndexValue;
 import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
@@ -95,6 +95,7 @@ public class GestureExtended extends Gesture {
 	protected IStatEngine mStatEngine;
 	
 	public GestureExtended(Gesture gesture, HashMap<String, IFeatureMeanData> hashFeatureMeans, int gestureIdx) {		
+		Id = gesture.Id;
 		Instruction = gesture.Instruction;		
 		ListStrokes = gesture.ListStrokes;
 		
@@ -202,7 +203,7 @@ public class GestureExtended extends Gesture {
 			}
 			
 			GestureAverageStartAcceleration = totalAcc / (ConstsFeatures.ACC_CALC_MIN_NUM_EVENTS - 1);
-			AddGestureValue(Instruction, ConstsParamNames.Gesture.AVG_START_ACCELERATION, GestureAverageStartAcceleration);
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_ACCELERATION, GestureAverageStartAcceleration);
 		}		
 	}
 	
@@ -290,14 +291,15 @@ public class GestureExtended extends Gesture {
 	protected void CalculateGestureVelocityPeaks()
 	{
 		if(ListStrokesExtended.size() > 0) {
-			VelocityPeak tempVelocityPeak = ListStrokesExtended.get(0).StrokeVelocityPeak;						
+			IndexValue tempVelocityPeak = ListStrokesExtended.get(0).StrokeVelocityPeak;						
 			GestureVelocityPeakMax = ((double) tempVelocityPeak.Index) / ((double) ListStrokesExtended.get(0).ListEventsExtended.size());	
-		}				
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK, GestureVelocityPeakMax);
+		}		
 	}
 	
 	protected void AddCalculatedFeatures() {
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.LENGTH, GestureLengthMM);
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.NUM_EVENTS, ListGestureEventsExtended.size());
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_LENGTH, GestureLengthMM);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_NUM_EVENTS, ListGestureEventsExtended.size());
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, GestureTotalStrokeTimeInterval);
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, GestureTotalStrokeArea);		
 	}
@@ -316,7 +318,7 @@ public class GestureExtended extends Gesture {
 	protected void CalculateGestureAvgVelocity()
 	{
 		GestureAverageVelocity = GestureLengthMM / GestureTotalStrokeTimeInterval;
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.AVERAGE_VELOCITY, GestureAverageVelocity);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVERAGE_VELOCITY, GestureAverageVelocity);
 	}
 	
 	protected void CalculateAccumulatedDistanceByTime()

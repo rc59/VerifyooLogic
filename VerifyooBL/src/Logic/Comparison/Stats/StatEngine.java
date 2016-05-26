@@ -14,22 +14,23 @@ import Logic.Utils.UtilsStat;
 
 public class StatEngine implements IStatEngine {
 	
-	protected UtilsStat mUtilsStat;
-	protected UtilsGeneral mUtilsGeneral;
+	protected static UtilsStat mUtilsStat;
+	protected static UtilsGeneral mUtilsGeneral;
 	
-	protected INormMgr mNormMgr;
+	protected static INormMgr mNormMgr;
 	protected static IStatEngine mInstance = null;	
 	
 	protected StatEngine()
 	{
-		mNormMgr = NormMgr.GetInstance();
-		mUtilsStat = new UtilsStat();
-		mUtilsGeneral = new UtilsGeneral();
+		
 	}
 	
 	public static IStatEngine GetInstance() {
       if(mInstance == null) {
-    	  mInstance = new StatEngine();
+		  mInstance = new StatEngine();
+		  mNormMgr = NormMgr.GetInstance();
+		  mUtilsStat = new UtilsStat();
+		  mUtilsGeneral = new UtilsGeneral();
       }
       return mInstance;
    }
@@ -68,8 +69,8 @@ public class StatEngine implements IStatEngine {
 		double internalMean = hashFeatureMeans.get(key).GetMean();
 		double internalSd = normObj.GetInternalStandardDev(); //hashFeatureMeans.get(key).GetInternalSd();
 		
-		double upper = internalMean + 3 * populationInternalSd;
-		double lower = internalMean - 3 * populationInternalSd;
+		double upper = internalMean + (3 * populationInternalSd);
+		double lower = internalMean - (3 * populationInternalSd);
 		
 		double zScore = (authValue - populationMean) / populationSd;
 		double zScoreForUser = (internalMean - populationMean) / populationSd;
@@ -78,14 +79,31 @@ public class StatEngine implements IStatEngine {
 		
 		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
 				
-//		if(authValue > upper || authValue < lower) {
-//			score -= 0.2;
-//			if(score < 0) {
-//				score = 0;
-//			}
-//		}
+		if(authValue > GetUpper(internalMean, populationInternalSd, 2) || authValue < GetLower(internalMean, populationInternalSd, 2)) {
+			score -= 0.3;
+		}
+		if(authValue > GetUpper(internalMean, populationInternalSd, 3) || authValue < GetLower(internalMean, populationInternalSd, 3)) {
+			score -= 0.1;
+		}
+		if(authValue > GetUpper(internalMean, populationInternalSd, 4) || authValue < GetLower(internalMean, populationInternalSd, 4)) {
+			score -= 0.2;
+		}
+		
+		if(score < 0) {
+			score = 0;
+		}
 		
 		statResult = new StatEngineResult(score, zScoreForUser);
 		return statResult;	
+	}
+	
+	protected double GetUpper(double mean, double sd, double multi) {
+		double upper = mean + (multi * sd);
+		return upper;
+	}
+	
+	protected double GetLower(double mean, double sd, double multi) {
+		double lower = mean - (multi * sd);
+		return lower;
 	}
 }

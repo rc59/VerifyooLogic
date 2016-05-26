@@ -106,6 +106,10 @@ public class GestureComparer {
 	protected void CompareGestureFeatures()
 	{		
 		mMinCosineDistanceValid = true;
+		if(IsNeedToRun("CompareGestureMinCosineDistance")){
+			CompareGestureMinCosineDistance();
+		}
+		
 		if(IsNeedToRun("CompareGestureLengths")){
 			CompareGestureLengths();	
 		}
@@ -114,10 +118,7 @@ public class GestureComparer {
 		}
 		if(IsNeedToRun("CompareGestureAvgVelocity")){
 			CompareGestureAvgVelocity();
-		}
-		if(IsNeedToRun("CompareGestureMinCosineDistance")){
-			CompareGestureMinCosineDistance();
-		}
+		}		
 		if(IsNeedToRun("CompareGestureTotalTimeInterval")){
 			CompareGestureTotalTimeInterval();
 		}
@@ -135,13 +136,22 @@ public class GestureComparer {
 		}		
 		if(IsNeedToRun("CompareGestureAverageStartAcceleration")){
 			CompareGestureAverageStartAcceleration();
-		}	
+		}
+		if(IsNeedToRun("CompareGestureVelocityPeaks")){
+			CompareGestureVelocityPeaks();
+		}
+	}
+	
+	protected void CompareGestureVelocityPeaks()
+	{
+		double velocityPeak = mGestureAuth.GestureVelocityPeakMax;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK, velocityPeak);
 	}
 	
 	protected void CompareGestureAverageStartAcceleration()
 	{
-		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.AVG_START_ACCELERATION, mGestureAuth.GestureAverageStartAcceleration, mGestureStored.GetFeatureMeansHash());		
-		AddDoubleParameter(ConstsParamNames.Gesture.AVG_START_ACCELERATION, finalScore, ConstsParamWeights.MEDIUM, mGestureAuth.GestureAverageStartAcceleration);
+		double avgStartAcceleration = mGestureAuth.GestureAverageStartAcceleration;		
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_START_ACCELERATION, avgStartAcceleration);
 	}
 	
 	protected void CompareGestureMinCosineDistance()
@@ -189,18 +199,18 @@ public class GestureComparer {
 
 	protected void CompareGestureAvgVelocity() {		
 		double avgVelocityAuth = mGestureAuth.GestureAverageVelocity;
-		CalcDoubleParameter(ConstsParamNames.Gesture.AVERAGE_VELOCITY, avgVelocityAuth);	
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVERAGE_VELOCITY, avgVelocityAuth);	
 	}
 
 	protected void CompareGestureLengths() {	
 		double lengthAuth = mGestureAuth.GestureLengthMM;
-		CalcDoubleParameter(ConstsParamNames.Gesture.LENGTH, lengthAuth);		
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_LENGTH, lengthAuth);		
 	}
 	
 	protected void CompareNumEvents()
 	{
 		int numEvents = mGestureAuth.ListGestureEventsExtended.size();		
-		CalcDoubleParameter(ConstsParamNames.Gesture.NUM_EVENTS, (double)numEvents);		
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_NUM_EVENTS, (double)numEvents);		
 	}
 	
 	protected void CalcDoubleParameter(String paramName, double value)
@@ -344,5 +354,10 @@ public class GestureComparer {
 		ICompareResult compareResult = 
 				(ICompareResult) new CompareResultGeneric(parameterName, score, weight, originalValue, mean, sd);
 		mCompareResultsGesture.ListCompareResults.add(compareResult);
+	}
+	
+	public CompareResultSummary GetResultsSummary()
+	{
+		return mCompareResultsGesture;
 	}
 }
