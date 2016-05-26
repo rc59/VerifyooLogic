@@ -156,7 +156,7 @@ public class GestureComparer {
 	
 	protected void CompareGestureStartDirection() {
 		double startDirectionAuth = mGestureAuth.GestureStartDirection;
-		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, startDirectionAuth);		
+		CalcScoreWithoutDistribution(ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, startDirectionAuth);		
 	}
 
 	protected void CompareGestureEndDirection(){
@@ -232,6 +232,13 @@ public class GestureComparer {
 	protected void CalcDoubleParameter(String paramName, double value)
 	{
 		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, paramName, value, mGestureStored.GetFeatureMeansHash());
+		AddDoubleParameter(paramName, finalScore, ConstsParamWeights.MEDIUM, value);
+	}
+
+	protected void CalcScoreWithoutDistribution(String paramName, double value)
+	{
+		
+		IStatEngineResult finalScore = mStatEngine.CompareGestureScoreWithoutDistribution(mGestureStored.Instruction, paramName, value, mGestureStored.GetFeatureMeansHash());
 		AddDoubleParameter(paramName, finalScore, ConstsParamWeights.MEDIUM, value);
 	}
 	
