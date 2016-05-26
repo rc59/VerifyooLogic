@@ -140,12 +140,28 @@ public class GestureComparer {
 		if(IsNeedToRun("CompareGestureVelocityPeaks")){
 			CompareGestureVelocityPeaks();
 		}
+		if(IsNeedToRun("CompareGestureStartDirection")){
+			CompareGestureStartDirection();
+		}	
+		if(IsNeedToRun("CompareGestureEndDirection")){
+			CompareGestureEndDirection();
+		}	
 	}
 	
 	protected void CompareGestureVelocityPeaks()
 	{
 		double velocityPeak = mGestureAuth.GestureVelocityPeakMax;
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK, velocityPeak);
+	}
+	
+	protected void CompareGestureStartDirection() {
+		double startDirectionAuth = mGestureAuth.GestureStartDirection;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, startDirectionAuth);		
+	}
+
+	protected void CompareGestureEndDirection(){
+		double endDirectionAuth = mGestureAuth.GestureEndDirection;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, endDirectionAuth);		
 	}
 	
 	protected void CompareGestureAverageStartAcceleration()
@@ -219,13 +235,6 @@ public class GestureComparer {
 		AddDoubleParameter(paramName, finalScore, ConstsParamWeights.MEDIUM, value);
 	}
 	
-	protected void CompareGestureStartDirection() {
-		double startDirectionStored = mGestureStored.GestureStartDirection;
-		double startDirectionAuth = mGestureAuth.GestureStartDirection;
-//		double finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, startDirectionAuth, mGestureStored.GetFeatureMeansHash());
-//		AddDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, finalScore, ConstsParamWeights.MEDIUM, startDirectionAuth);
-	}
-
 	protected void CompareGestureStrokes()
 	{
 		mCompareResultsGesture = new CompareResultSummary();			
