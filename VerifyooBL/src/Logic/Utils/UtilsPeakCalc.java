@@ -6,7 +6,7 @@ import Data.MetaData.IndexValue;
 import Data.MetaData.ParameterAvgPoint;
 
 public class UtilsPeakCalc {
-	public ParameterAvgPoint CalculateStrokeVelocityPeaks(double[] values, double average)
+	public ParameterAvgPoint CalculatePeaks(double[] values, double average)
 	{
 		ArrayList<ParameterAvgPoint> listVelocityAvgPoints = new ArrayList<>();	
 		double valuePrev;

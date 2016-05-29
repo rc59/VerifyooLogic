@@ -42,6 +42,7 @@ public class StrokeExtended extends Stroke {
 		
 	private HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	private double[] mVelocities;
+	private double[] mAccelerations;
 	/****************************************/
 	
 	/************** Stroke Features **************/
@@ -50,11 +51,14 @@ public class StrokeExtended extends Stroke {
 	public int StrokeEndEvent;
 	
 	public ParameterAvgPoint StrokeVelocityPeakAvgPoint;
+	public ParameterAvgPoint StrokeAccelerationPeakAvgPoint;
 	
 	public ArrayList<MotionEventExtended> ListEventsExtended; 
 	
 	public double StrokeTimeInterval;
-	public double AverageVelocity;
+	public double AverageVelocity;	
+	public double AverageAcceleration;
+	public double AverageAccelerationNegative;
 				
 	public double MaxPressure;
 	public double MaxSurface;
@@ -158,6 +162,7 @@ public class StrokeExtended extends Stroke {
 		CalculateAverageVelocity();
 		CalculateMiddlePressureAndSurface();
 		CalculateStrokeVelocityPeaks();
+		CalculateStrokeAccelerationPeaks();
 	}
 	
 	protected void ConvertToMotionEventExtended()
@@ -193,10 +198,14 @@ public class StrokeExtended extends Stroke {
 		double deltaX, deltaY;
 		
 		mVelocities = new double[ListEventsExtended.size()];
+		mAccelerations = new double[ListEventsExtended.size()];
+		
+		double totalAcc = 0;		
 		
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
 		{
 			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
+			mAccelerations[idxEvent] = ListEventsExtended.get(idxEvent).Acceleration;
 			
 			if(idxEvent > 0) {
 				deltaX = ListEventsExtended.get(idxEvent).Xmm - ListEventsExtended.get(idxEvent - 1).Xmm;
@@ -226,12 +235,21 @@ public class StrokeExtended extends Stroke {
 			else {
 				AccumulatedTimeIntervals[idxEvent] = 0;
 			}
-		}				
+						
+			totalAcc += mAccelerations[idxEvent];
+		}			
+				
+		AverageAcceleration = totalAcc / ListEventsExtended.size();
 	}
 	
-	private void CalculateStrokeVelocityPeaks()
+	protected void CalculateStrokeAccelerationPeaks()
+	{
+		StrokeAccelerationPeakAvgPoint = mUtilsPeakCalc.CalculatePeaks(mAccelerations, AverageAcceleration);
+	}
+	
+	protected void CalculateStrokeVelocityPeaks()
 	{		
-		StrokeVelocityPeakAvgPoint = mUtilsPeakCalc.CalculateStrokeVelocityPeaks(mVelocities, AverageVelocity);
+		StrokeVelocityPeakAvgPoint = mUtilsPeakCalc.CalculatePeaks(mVelocities, AverageVelocity);
 	}
 
 	protected boolean CheckIfPressureExists(MotionEventExtended event) {
