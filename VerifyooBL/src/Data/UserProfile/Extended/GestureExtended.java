@@ -33,6 +33,7 @@ public class GestureExtended extends Gesture {
 	public double GestureTotalStrokeArea;
 	public double[] SpatialSamplingVector;
 	public double GestureStartDirection;
+	public double GestureMaxDirection;
 	public double GestureEndDirection;
 	
 	/*************** Time Parameters ***************/
@@ -173,8 +174,7 @@ public class GestureExtended extends Gesture {
 		CalculateGestureVelocityPeaks();
 		CalculateGestureAccelerationPeaks();
 		CalculateAccumulatedDistanceByTime();
-		CalculateGestureStartDirection();
-		CalculateGestureEndDirection();
+		CalculateGestureStartMaxEndDirections();
 		CalculateAccumulatedDistanceLinearReg();		
 		CalculateAccelerations();
 	}
@@ -437,43 +437,35 @@ public class GestureExtended extends Gesture {
 		}
 	}
 
-	protected void CalculateGestureStartDirection()
+	protected void CalculateGestureStartMaxEndDirections()
 	{
-		
-		
-		int startPoint = 0;
 		if(!ListStrokesExtended.get(0).IsPoint)
 		{
-			GestureStartDirection = 0;
 			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(0).ListEventsExtended;
-
-			startPoint = ListStrokesExtended.get(0).StrokeStartEvent;
-			double deltaY = listEventsExtendedFirstStroke.get(startPoint+2).Ymm - listEventsExtendedFirstStroke.get(startPoint).Ymm;
-			double deltaX = listEventsExtendedFirstStroke.get(startPoint+2).Xmm - listEventsExtendedFirstStroke.get(startPoint).Xmm;
-			
+			double deltaY;
+			double deltaX;
+			ParameterAvgPoint velocityAvgPoint = ListStrokesExtended.get(0).StrokeVelocityPeakAvgPoint;
+			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Ymm -
+					 listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Ymm;
+			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Xmm -
+					 listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Xmm;
 			GestureStartDirection = Math.atan2(deltaY, deltaX);
-			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
-		}
-	}
-
-	protected void CalculateGestureEndDirection()
-	{
-		int endPoint = 0;
-		int numOfStrokes = ListStrokesExtended.size();
-		if(!ListStrokesExtended.get(numOfStrokes-1).IsPoint)
-		{
-			GestureEndDirection = 0;
-			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(numOfStrokes-1).ListEventsExtended;
-
-			endPoint = ListStrokesExtended.get(numOfStrokes-1).StrokeEndEvent;
-			double deltaY = listEventsExtendedFirstStroke.get(endPoint).Ymm - listEventsExtendedFirstStroke.get(endPoint-2).Ymm;
-			double deltaX = listEventsExtendedFirstStroke.get(endPoint).Xmm - listEventsExtendedFirstStroke.get(endPoint-2).Xmm;
-			
+			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Ymm -
+					 listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Ymm;
+			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Xmm -
+					 listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Xmm;
+			GestureMaxDirection = Math.atan2(deltaY, deltaX);
+			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Ymm -
+					 listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Ymm;
+			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Xmm -
+					 listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Xmm;
 			GestureEndDirection = Math.atan2(deltaY, deltaX);
-			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, GestureEndDirection);
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_MAX_DIRECTION, GestureMaxDirection);
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, GestureEndDirection);
 		}
 	}
-	
+
 	protected void CalculateAccumulatedDistanceLinearReg()
 	{
 		mUtilsLinearReg.CalcLinearReg(AccumulatedTime, AccumulatedLength);

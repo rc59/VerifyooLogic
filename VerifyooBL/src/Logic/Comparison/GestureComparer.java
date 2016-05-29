@@ -146,6 +146,9 @@ public class GestureComparer {
 		if(IsNeedToRun("CompareGestureStartDirection")){
 			CompareGestureStartDirection();
 		}	
+		if(IsNeedToRun("CompareGestureMaxDirection")){
+			CompareGestureMaxDirection();
+		}	
 		if(IsNeedToRun("CompareGestureEndDirection")){
 			CompareGestureEndDirection();
 		}	
@@ -166,6 +169,11 @@ public class GestureComparer {
 	protected void CompareGestureStartDirection() {
 		double startDirectionAuth = mGestureAuth.GestureStartDirection;
 		CalcScoreWithoutDistribution(ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, startDirectionAuth);		
+	}
+
+	protected void CompareGestureMaxDirection() {
+		double maxDirectionAuth = mGestureAuth.GestureMaxDirection;
+		CalcScoreWithoutDistribution(ConstsParamNames.Gesture.GESTURE_AVG_MAX_DIRECTION, maxDirectionAuth);		
 	}
 
 	protected void CompareGestureEndDirection(){
