@@ -42,11 +42,13 @@ public class GestureExtended extends Gesture {
 	
 	/*************** Velocity & Acceleration Parameters ***************/
 	
+	public double GestureMaxVelocity;
 	public double GestureAverageVelocity;
 	
 	public double GestureAverageStartAcceleration;
 	public double GestureAverageEndAcceleration;	
 	public double GestureVelocityPeakMax;
+	public double GestureVelocityPeakIntervalPercentage;
 	
 	public double[] AccumulatedTime;
 	public double[] AccumulatedLength;
@@ -86,6 +88,8 @@ public class GestureExtended extends Gesture {
 	public ArrayList<MotionEventCompact> ListGestureEvents;
 	
 	protected HashMap<String, IFeatureMeanData> mHashFeatureMeans;
+	
+	protected double[] mAccelerations;
 	
 	protected UtilsMath mUtilsMath;
 	protected UtilsLinearReg mUtilsLinearReg;
@@ -166,6 +170,26 @@ public class GestureExtended extends Gesture {
 		CalculateGestureStartDirection();
 		CalculateGestureEndDirection();
 		CalculateAccumulatedDistanceLinearReg();		
+		CalculateAccelerations();
+	}
+	
+	protected void CalculateAccelerations()
+	{
+//		MotionEventExtended eventCurr, eventPrev;
+//		double velocityCurr, velocityPrev;
+//		double timeCurr, timePrev;
+//		double tempAcc;
+//		
+//		for(int idxEvent = 1; idxEvent < ListGestureEventsExtended.size(); idxEvent++) {
+//			eventCurr = ListGestureEventsExtended.get(idxEvent);
+//			
+//			velocityCurr = ListGestureEventsExtended.get(idxEvent);
+//			velocityPrev = ListGestureEventsExtended.get(idxEvent - 1);
+//			
+//			timeCurr = 
+//			
+//			tempAcc = 
+//		}	
 	}
 	
 	protected void CalculateSpatialSamplingVector()
@@ -250,6 +274,8 @@ public class GestureExtended extends Gesture {
 		double totalAccY = 0;
 		double totalAccZ = 0;
 		
+		GestureMaxVelocity = 0;
+		
 		for(int idxEvent = 0; idxEvent < ListGestureEventsExtended.size(); idxEvent++) {
 			totalPressure += ListGestureEventsExtended.get(idxEvent).Pressure;
 			totalSurface += ListGestureEventsExtended.get(idxEvent).TouchSurface;
@@ -261,6 +287,8 @@ public class GestureExtended extends Gesture {
 			GestureMaxAccX = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccX, ListGestureEventsExtended.get(idxEvent).AccelerometerX);
 			GestureMaxAccY = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccY, ListGestureEventsExtended.get(idxEvent).AccelerometerY);
 			GestureMaxAccZ = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccZ, ListGestureEventsExtended.get(idxEvent).AccelerometerZ);
+			
+			GestureMaxVelocity = mUtilsMath.GetMaxValue(GestureMaxVelocity, ListGestureEventsExtended.get(idxEvent).Velocity);			
 		}
 		
 		GestureAvgPressure = totalPressure / ListGestureEventsExtended.size();
@@ -291,9 +319,16 @@ public class GestureExtended extends Gesture {
 	protected void CalculateGestureVelocityPeaks()
 	{
 		if(ListStrokesExtended.size() > 0) {
-			IndexValue tempVelocityPeak = ListStrokesExtended.get(0).StrokeVelocityPeak;						
+			IndexValue tempVelocityPeak = ListStrokesExtended.get(0).StrokeVelocityPeakAvgPoint.MaxValueInSection;	
+			ParameterAvgPoint velocityAvgPoint = ListStrokesExtended.get(0).StrokeVelocityPeakAvgPoint;
+			
 			GestureVelocityPeakMax = ((double) tempVelocityPeak.Index) / ((double) ListStrokesExtended.get(0).ListEventsExtended.size());	
+						
+			double velocityPeakIndexDiff = velocityAvgPoint.IndexEnd - velocityAvgPoint.IndexStart; 
+			GestureVelocityPeakIntervalPercentage = velocityPeakIndexDiff / ((double) ListStrokesExtended.get(0).ListEventsExtended.size());
+			
 			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK, GestureVelocityPeakMax);
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, GestureVelocityPeakIntervalPercentage);
 		}		
 	}
 	

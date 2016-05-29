@@ -10,6 +10,7 @@ public class Utils {
 	protected static UtilsVectors mUtilsVectors;
 	protected static UtilsLinearReg mUtilsLinearReg;
 	protected static UtilsGeneral mUtilsGeneral;
+	protected static UtilsPeakCalc mUtilsPeakCalc;
 	
 	public static Utils GetInstance() {
 		if(mInstance == null) {
@@ -22,6 +23,7 @@ public class Utils {
 			mUtilsVectors = new UtilsVectors();		
 			mUtilsLinearReg = new UtilsLinearReg();
 			mUtilsGeneral = new UtilsGeneral();
+			mUtilsPeakCalc = new UtilsPeakCalc();
 		}
 		return mInstance;
 	}
@@ -46,5 +48,8 @@ public class Utils {
 	}
 	public UtilsGeneral GetUtilsGeneral() {
 		return mUtilsGeneral;
+	}
+	public UtilsPeakCalc GetUtilsPeakCalc() {
+		return mUtilsPeakCalc;
 	}
 }

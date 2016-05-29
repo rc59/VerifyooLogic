@@ -30,6 +30,6 @@ public class TemplateExtended extends Template {
 			tempGestureExtended = new GestureExtended(tempGesture, mHashFeatureMeans, idxGesture);
 			
 			ListGestureExtended.add(tempGestureExtended);
-		}		
+		}
 	}
 }

@@ -127,6 +127,15 @@ public class NormMgr implements INormMgr {
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK, ConstsInstructions.INSTRUCTION_LINES, 0.41, 0.146, 0.07);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK, ConstsInstructions.INSTRUCTION_LETTER_R, 0.211, 0.168, 0.08);		
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.161, 0.109, 0.05);
+		
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.305736515, 0.108577521, 0.04194959);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, ConstsInstructions.INSTRUCTION_EIGHT, 0.109720037, 0.036925864, 0.049276306);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, ConstsInstructions.INSTRUCTION_FIVE, 0.163067673, 0.123151249, 0.047892004);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, ConstsInstructions.INSTRUCTION_HEART, 0.158082136, 0.061944225, 0.081365275);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, ConstsInstructions.INSTRUCTION_LINES, 0.492334979, 0.043389264, 0.07047037);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.268975903, 0.154860413, 0.058679639);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.212823789, 0.096278821, 0.031827845);
+
 }
 	
 	protected void CreateDoubleNorm(String name, String instruction, double mean, double standardDev, double internalStandardDev)

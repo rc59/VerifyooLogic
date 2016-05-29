@@ -140,12 +140,21 @@ public class GestureComparer {
 		if(IsNeedToRun("CompareGestureVelocityPeaks")){
 			CompareGestureVelocityPeaks();
 		}
+		if(IsNeedToRun("CompareGestureVelocityPeaksIntervalPercentage")){
+			CompareGestureVelocityPeaksIntervalPercentage();
+		}
 		if(IsNeedToRun("CompareGestureStartDirection")){
 			CompareGestureStartDirection();
 		}	
 		if(IsNeedToRun("CompareGestureEndDirection")){
 			CompareGestureEndDirection();
 		}	
+	}
+	
+	protected void CompareGestureVelocityPeaksIntervalPercentage()
+	{
+		double velocityPeakIntervalPercentage = mGestureAuth.GestureVelocityPeakIntervalPercentage;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, velocityPeakIntervalPercentage);
 	}
 	
 	protected void CompareGestureVelocityPeaks()
@@ -180,7 +189,7 @@ public class GestureComparer {
 		mMinCosineDistanceScore = 
 				mUtilsVectors.MinimumCosineDistanceScore(vectorStored, vectorAuth);
 		
-		if(mMinCosineDistanceScore > 1) {
+		if(mMinCosineDistanceScore > 1.5) {
 			mMinCosineDistanceValid = true;
 		}
 	}
@@ -294,10 +303,9 @@ public class GestureComparer {
                 }
                 return 0;
             }
-        });
+        });		
 		
-		
-		int limit = 3;
+		int zLimit = 2;
 		double avgScore = 0;
 		double totalWeights = 0;
 		
@@ -307,8 +315,8 @@ public class GestureComparer {
 		for(int idx = 0; idx < mCompareResultsGesture.ListCompareResults.size(); idx++) {
 			tempWeight = Math.abs(mCompareResultsGesture.ListCompareResults.get(idx).GetWeight());
 			
-			if(tempWeight > 3) {
-				tempWeight = 3;
+			if(tempWeight > zLimit) {
+				tempWeight = zLimit;
 			}
 			tempWeight = tempWeight * tempWeight;
 			
@@ -316,12 +324,7 @@ public class GestureComparer {
 			
 			avgScore += tempScore * tempWeight;
 			totalWeights += tempWeight;
-		}
-		
-//		for(int idx = 0; idx < limit; idx++) {
-//			avgScore += mCompareResultsGesture.ListCompareResults.get(idx).GetValue();
-//			totalWeights += 1;
-//		}		
+		}		
 		
 		mGestureScore = avgScore / totalWeights;
 	}

@@ -19,6 +19,7 @@ import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsMath;
+import Logic.Utils.UtilsPeakCalc;
 import Logic.Utils.UtilsSpatialSampling;
 
 public class StrokeExtended extends Stroke {
@@ -29,6 +30,7 @@ public class StrokeExtended extends Stroke {
 	private UtilsSpatialSampling mUtilsSpatialSampling;
 	private UtilsMath mUtilsMath;
 	protected UtilsGeneral mUtilsGeneral;
+	protected UtilsPeakCalc mUtilsPeakCalc;
 	
 	private MotionEventCompact mPointMinX;
 	private MotionEventCompact mPointMaxX;
@@ -39,6 +41,7 @@ public class StrokeExtended extends Stroke {
 	private double mStrokeCenterYpixel;	
 		
 	private HashMap<String, IFeatureMeanData> mHashFeatureMeans;
+	private double[] mVelocities;
 	/****************************************/
 	
 	/************** Stroke Features **************/
@@ -46,7 +49,7 @@ public class StrokeExtended extends Stroke {
 	public int StrokeStartEvent;
 	public int StrokeEndEvent;
 	
-	public IndexValue StrokeVelocityPeak;
+	public ParameterAvgPoint StrokeVelocityPeakAvgPoint;
 	
 	public ArrayList<MotionEventExtended> ListEventsExtended; 
 	
@@ -104,6 +107,7 @@ public class StrokeExtended extends Stroke {
 		mUtilsSpatialSampling = Utils.GetInstance().GetUtilsSpatialSampling();
 		mUtilsMath = Utils.GetInstance().GetUtilsMath();
 		mUtilsGeneral = Utils.GetInstance().GetUtilsGeneral();
+		mUtilsPeakCalc = Utils.GetInstance().GetUtilsPeakCalc();
 	}
 	
 	protected void InitFeatures()
@@ -188,8 +192,12 @@ public class StrokeExtended extends Stroke {
 	{
 		double deltaX, deltaY;
 		
+		mVelocities = new double[ListEventsExtended.size()];
+		
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
 		{
+			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
+			
 			if(idxEvent > 0) {
 				deltaX = ListEventsExtended.get(idxEvent).Xmm - ListEventsExtended.get(idxEvent - 1).Xmm;
                 deltaY = ListEventsExtended.get(idxEvent).Ymm - ListEventsExtended.get(idxEvent - 1).Ymm;
@@ -222,69 +230,8 @@ public class StrokeExtended extends Stroke {
 	}
 	
 	private void CalculateStrokeVelocityPeaks()
-	{
-		StrokeVelocityPeak = new IndexValue();
-		
-		ArrayList<ParameterAvgPoint> listVelocityAvgPoints = new ArrayList<>();	
-		MotionEventExtended eventPrev;
-		MotionEventExtended eventCurr;
-		ParameterAvgPoint tempVelocityAvgPoint = null;
-		ParameterAvgPoint velocityAvgPointMax = null;
-		
-		double currMaxVelocity = 0;
-		int currMaxVelocityIdx = 0;
-
-		for(int idxEvent = 1; idxEvent < ListEventsExtended.size(); idxEvent++) {
-			eventPrev = ListEventsExtended.get(idxEvent - 1);
-			eventCurr = ListEventsExtended.get(idxEvent);
-
-			if(eventPrev.Velocity < AverageVelocity && eventCurr.Velocity > AverageVelocity) {
-				tempVelocityAvgPoint = new ParameterAvgPoint(idxEvent);		
-				currMaxVelocity = eventCurr.Velocity;
-			}
-			
-			if(eventPrev.Velocity > AverageVelocity && eventCurr.Velocity < AverageVelocity) {
-				if(tempVelocityAvgPoint != null) {
-					tempVelocityAvgPoint.IndexEnd = idxEvent;
-					currMaxVelocity = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxVelocity, eventCurr.Velocity);
-					tempVelocityAvgPoint.MaxValueInSection = new IndexValue();
-					tempVelocityAvgPoint.MaxValueInSection.Value = currMaxVelocity;
-					tempVelocityAvgPoint.MaxValueInSection.Index = currMaxVelocityIdx;
-					listVelocityAvgPoints.add(tempVelocityAvgPoint);
-					tempVelocityAvgPoint = null;
-					currMaxVelocity = 0;
-				}				
-			}
-			
-			if(tempVelocityAvgPoint != null && tempVelocityAvgPoint.IndexEnd == -1) {
-				currMaxVelocity = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxVelocity, eventCurr.Velocity);
-				if(currMaxVelocity == eventCurr.Velocity) {
-					currMaxVelocityIdx = idxEvent;
-				}
-			}
-		}		
-		
-		if(listVelocityAvgPoints.size() > 0) {
-			tempVelocityAvgPoint = new ParameterAvgPoint(0);		
-			
-			velocityAvgPointMax = listVelocityAvgPoints.get(0);
-//			for(int idxVelAvgPoint = 1; idxVelAvgPoint < listVelocityAvgPoints.size(); idxVelAvgPoint++) {
-//				if(velocityAvgPointMax.MaxVelocityInSection < listVelocityAvgPoints.get(idxVelAvgPoint).MaxVelocityInSection) {
-//					velocityAvgPointMax = listVelocityAvgPoints.get(idxVelAvgPoint);
-//				}
-//			}
-			
-//			int velocityPeakMaxIdx = -1;
-//			for(int idxVelocityPeakIndex = velocityAvgPointMax.IndexStart; idxVelocityPeakIndex < velocityAvgPointMax.IndexEnd; idxVelocityPeakIndex++) {
-//				if(ListEventsExtended.get(idxVelocityPeakIndex).Velocity == velocityAvgPointMax.MaxVelocityInSection) {
-//					velocityPeakMaxIdx = idxVelocityPeakIndex;
-//				}
-//			}
-			
-			StrokeVelocityPeak = new IndexValue();
-			StrokeVelocityPeak.Value = velocityAvgPointMax.MaxValueInSection.Value;
-			StrokeVelocityPeak.Index = velocityAvgPointMax.MaxValueInSection.Index;
-		}
+	{		
+		StrokeVelocityPeakAvgPoint = mUtilsPeakCalc.CalculateStrokeVelocityPeaks(mVelocities, AverageVelocity);
 	}
 
 	protected boolean CheckIfPressureExists(MotionEventExtended event) {
