@@ -96,7 +96,32 @@ public class StatEngine implements IStatEngine {
 		statResult = new StatEngineResult(score, zScoreForUser);
 		return statResult;	
 	}
-	
+
+	public IStatEngineResult CompareGestureScoreWithoutDistribution(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
+	{
+		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
+		
+		String key = mUtilsGeneral.GenerateGestureFeatureMeanKey(instruction, paramName);
+		double populationInternalSd = normObj.GetInternalStandardDev();
+		double internalMean = hashFeatureMeans.get(key).GetMean();
+		
+		double upper = internalMean + (2.5 * populationInternalSd);
+		double lower = internalMean - (2.5 * populationInternalSd);
+		
+		IStatEngineResult statResult;
+		
+		double score;
+
+		if(authValue < upper && authValue > lower)
+			score = 1;
+		else
+			score = 0;
+
+		double zScoreForUser = 3.0;
+		statResult = new StatEngineResult(score, zScoreForUser);
+		return statResult;	
+	}
+
 	protected double GetUpper(double mean, double sd, double multi) {
 		double upper = mean + (multi * sd);
 		return upper;
