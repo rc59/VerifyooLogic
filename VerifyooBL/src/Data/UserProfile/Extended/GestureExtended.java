@@ -324,7 +324,7 @@ public class GestureExtended extends Gesture {
 			
 			GestureVelocityPeakMax = ((double) tempVelocityPeak.Index) / ((double) ListStrokesExtended.get(0).ListEventsExtended.size());	
 						
-			double velocityPeakIndexDiff = velocityAvgPoint.IndexEnd - velocityAvgPoint.IndexStart; 
+			double velocityPeakIndexDiff = velocityAvgPoint.IndexEnd.Index - velocityAvgPoint.IndexStart.Index; 
 			GestureVelocityPeakIntervalPercentage = velocityPeakIndexDiff / ((double) ListStrokesExtended.get(0).ListEventsExtended.size());
 			
 			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK, GestureVelocityPeakMax);
@@ -409,6 +409,8 @@ public class GestureExtended extends Gesture {
 
 	protected void CalculateGestureStartDirection()
 	{
+		
+		
 		int startPoint = 0;
 		if(!ListStrokesExtended.get(0).IsPoint)
 		{

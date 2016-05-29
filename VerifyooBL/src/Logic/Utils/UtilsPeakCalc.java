@@ -11,8 +11,7 @@ public class UtilsPeakCalc {
 		ArrayList<ParameterAvgPoint> listVelocityAvgPoints = new ArrayList<>();	
 		double valuePrev;
 		double valueCurr;
-		ParameterAvgPoint tempVelocityAvgPoint = null;
-		ParameterAvgPoint avgPointMax = new ParameterAvgPoint(0);
+		ParameterAvgPoint tempVelocityAvgPoint = null;		
 		
 		double currMaxValue = 0;
 		int currMaxVelocityIdx = 0;
@@ -22,13 +21,15 @@ public class UtilsPeakCalc {
 			valueCurr = values[idxValue];
 
 			if(valuePrev < average && valueCurr > average) {
-				tempVelocityAvgPoint = new ParameterAvgPoint(idxValue);		
+				tempVelocityAvgPoint = new ParameterAvgPoint(idxValue, valueCurr, average);				
 				currMaxValue = valueCurr;
 			}
 			
 			if((valuePrev > average && valueCurr < average) || (idxValue == values.length - 1)) {
 				if(tempVelocityAvgPoint != null) {
-					tempVelocityAvgPoint.IndexEnd = idxValue;
+					tempVelocityAvgPoint.IndexEnd.Index = idxValue;
+					tempVelocityAvgPoint.IndexEnd.Value = valueCurr; 
+					
 					currMaxValue = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxValue, valueCurr);
 					tempVelocityAvgPoint.MaxValueInSection = new IndexValue();
 					tempVelocityAvgPoint.MaxValueInSection.Value = currMaxValue;
@@ -39,7 +40,7 @@ public class UtilsPeakCalc {
 				}				
 			}
 			
-			if(tempVelocityAvgPoint != null && tempVelocityAvgPoint.IndexEnd == -1) {
+			if(tempVelocityAvgPoint != null && tempVelocityAvgPoint.IndexEnd.Index == -1) {
 				currMaxValue = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxValue, valueCurr);
 				if(currMaxValue == valueCurr) {
 					currMaxVelocityIdx = idxValue;
@@ -47,12 +48,11 @@ public class UtilsPeakCalc {
 			}
 		}		
 		
-		if(listVelocityAvgPoints.size() > 0) {
-			avgPointMax = new ParameterAvgPoint(0);		
-			
+		ParameterAvgPoint avgPointMax = null;
+		if(listVelocityAvgPoints.size() > 0) {				
 			avgPointMax = listVelocityAvgPoints.get(0);		
 			avgPointMax.MaxValueInSection.Value = avgPointMax.MaxValueInSection.Value;
-			avgPointMax.MaxValueInSection.Index = avgPointMax.MaxValueInSection.Index;
+			avgPointMax.MaxValueInSection.Index = avgPointMax.MaxValueInSection.Index;			
 		}
 		
 		return avgPointMax;
