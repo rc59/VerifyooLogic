@@ -184,6 +184,14 @@ public class GestureComparer {
 //		if(IsNeedToRun("CompareGestureEndDirection")){
 //			CompareGestureEndDirection();
 //		}	
+		if(IsNeedToRun("CompareMidOfFirstStrokeVelocity")){
+			CompareMidOfFirstStrokeVelocity();
+		}	
+
+		if(IsNeedToRun("CompareMidOfFirstStrokeAngle")){
+			CompareMidOfFirstStrokeAngle();
+		}	
+
 		if(IsNeedToRun("CompareGestureAccumulatedLengthRSqr")){
 			CompareGestureAccumulatedLengthRSqr();
 		}
@@ -231,6 +239,18 @@ public class GestureComparer {
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, endDirectionAuth);		
 	}
 	
+	protected void CompareMidOfFirstStrokeVelocity()
+	{
+		double midOfFirstStrokeVelocity = mGestureAuth.MidOfFirstStrokeVelocity;
+		CalcScoreWithoutDistribution(ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_VELOCITY, midOfFirstStrokeVelocity);		
+	}
+
+	protected void CompareMidOfFirstStrokeAngle()
+	{
+		double midOfFirstStrokeAngle = mGestureAuth.MidOfFirstStrokeAngle;
+		CalcScoreWithoutDistribution(ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_ANGLE, midOfFirstStrokeAngle);		
+	}
+
 	protected void CompareGestureAverageStartAcceleration()
 	{
 		double avgStartAcceleration = mGestureAuth.GestureAverageStartAcceleration;		
