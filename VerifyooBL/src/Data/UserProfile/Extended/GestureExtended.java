@@ -37,7 +37,9 @@ public class GestureExtended extends Gesture {
 	public double GestureMaxDirection;
 	public double GestureEndDirection;
 	public double GestureDirectionAtFirstStrokeMaxVelocity;
-	
+	public double MidOfFirstStrokeVelocity;
+	public double MidOfFirstStrokeAngle;
+
 	/*************** Time Parameters ***************/
 	
 	public double GestureTotalTimeInterval;
@@ -452,56 +454,64 @@ public class GestureExtended extends Gesture {
 	{
 		if(!ListStrokesExtended.get(0).IsPoint)
 		{
+			int midIndex = ListStrokesExtended.get(0).ListEventsExtended.size() / 2;
+			double velocity = ListStrokesExtended.get(0).ListEventsExtended.get(midIndex).Velocity;
 			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(0).ListEventsExtended;
 			
 			double deltaY;
 			double deltaX;
-			
-			ParameterAvgPoint velocityAvgPoint = ListStrokesExtended.get(0).StrokeVelocityPeakAvgPoint;
-			
-			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Ymm;
-			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Xmm;
-			GestureStartDirection = Math.atan2(deltaY, deltaX);
-			
-			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Ymm;
-			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Xmm;
-			GestureMaxDirection = Math.atan2(deltaY, deltaX);
-			
-			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Ymm;
-			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Xmm;
-			GestureEndDirection = Math.atan2(deltaY, deltaX);
-			
-			deltaY = listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index).Ymm - listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index - 1).Ymm;
-			deltaX = listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index).Xmm - listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index - 1).Xmm;
-			GestureDirectionAtFirstStrokeMaxVelocity = Math.atan2(deltaY, deltaX);
-			
-			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
-			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_MAX_DIRECTION,   GestureMaxDirection);
-			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION,   GestureEndDirection);
-			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_MAX_VELOCITY_DIRECTION, GestureDirectionAtFirstStrokeMaxVelocity);
 
-			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Ymm -
-					 listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Ymm;
-			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Xmm -
-					 listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Xmm;
+			deltaY = listEventsExtendedFirstStroke.get(midIndex).Ymm - listEventsExtendedFirstStroke.get(midIndex-1).Ymm;
+			deltaX = listEventsExtendedFirstStroke.get(midIndex).Xmm - listEventsExtendedFirstStroke.get(midIndex-1).Xmm;
+			MidOfFirstStrokeAngle = Math.atan2(deltaY, deltaX);
+			MidOfFirstStrokeVelocity = ListStrokesExtended.get(0).ListEventsExtended.get(midIndex).Velocity;
+			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_VELOCITY, MidOfFirstStrokeVelocity);
+			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_ANGLE, MidOfFirstStrokeAngle);
 			
-			GestureStartDirection = Math.atan2(deltaY, deltaX);
-			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Ymm -
-					 listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Ymm;
-			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Xmm -
-					 listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Xmm;
+//			ParameterAvgPoint velocityAvgPoint = ListStrokesExtended.get(0).StrokeVelocityPeakAvgPoint;
 			
-			GestureMaxDirection = Math.atan2(deltaY, deltaX);
-			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Ymm -
-					 listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Ymm;
-			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Xmm -
-					 listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Xmm;
+//			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Ymm;
+//			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Xmm;
+//			GestureStartDirection = Math.atan2(deltaY, deltaX);
+//			
+//			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Ymm;
+//			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Xmm;
+//			GestureMaxDirection = Math.atan2(deltaY, deltaX);
+//			
+//			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Ymm;
+//			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Xmm;
+//			GestureEndDirection = Math.atan2(deltaY, deltaX);
+//			
+//			deltaY = listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index).Ymm - listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index - 1).Ymm;
+//			deltaX = listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index).Xmm - listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index - 1).Xmm;
+//			GestureDirectionAtFirstStrokeMaxVelocity = Math.atan2(deltaY, deltaX);
+//			
+//			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
+//			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_MAX_DIRECTION,   GestureMaxDirection);
+//			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION,   GestureEndDirection);
+//			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_MAX_VELOCITY_DIRECTION, GestureDirectionAtFirstStrokeMaxVelocity);
+//
+//			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Ymm;
+//			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Xmm;
+//			GestureStartDirection = Math.atan2(deltaY, deltaX);
+//			
+//			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Ymm;
+//			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Xmm;
+//			GestureMaxDirection = Math.atan2(deltaY, deltaX);
+//			
+//			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Ymm;
+//			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Xmm;
+//			GestureEndDirection = Math.atan2(deltaY, deltaX);
 			
-			GestureEndDirection = Math.atan2(deltaY, deltaX);
+//			deltaY = listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index).Ymm - listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index-1).Ymm;
+//			deltaX = listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index).Xmm - listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index-1).Xmm;
+//			GestureDirectionAtFirstStrokeMaxVelocity = Math.atan2(deltaY, deltaX);
+					
 			
-			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
-			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_MAX_DIRECTION, GestureMaxDirection);
-			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, GestureEndDirection);
+//			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
+//			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_MAX_DIRECTION, GestureMaxDirection);
+//			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION, GestureEndDirection);
+//			AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_MAX_VELOCITY_DIRECTION, GestureDirectionAtFirstStrokeMaxVelocity);
 		}
 	}
 
