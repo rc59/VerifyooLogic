@@ -154,10 +154,10 @@ public class Tester {
 			template2.ListGestures.remove(idx);
 		}
 					
-		TemplateExtended templateExtended1 = new TemplateExtended(template1);
-		TemplateExtended templateExtended2 = new TemplateExtended(template2);
+		TemplateExtended baseTemplate = new TemplateExtended(template1);
+		TemplateExtended authTemplate = new TemplateExtended(template2);
 		
-		comparer.CompareTemplates(templateExtended1, templateExtended2);
+		comparer.CompareTemplates(baseTemplate, authTemplate);
 		
 		boolean result = true;
 		double score = comparer.GetScore();

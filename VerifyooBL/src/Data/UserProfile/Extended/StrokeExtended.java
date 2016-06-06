@@ -55,6 +55,7 @@ public class StrokeExtended extends Stroke {
 	
 	public double StrokeTimeInterval;
 	public double AverageVelocity;
+	public IndexValue StrokeMaxVelocity;
 				
 	public double MaxPressure;
 	public double MaxSurface;
@@ -97,6 +98,8 @@ public class StrokeExtended extends Stroke {
 		
 		IsHasPressure = false;
 		IsHasTouchSurface = false;		
+		
+		StrokeMaxVelocity = new IndexValue();
 		
 		InitUtils();
 		InitFeatures();		
@@ -193,14 +196,22 @@ public class StrokeExtended extends Stroke {
 		double deltaX, deltaY;
 		
 		mVelocities = new double[ListEventsExtended.size()];
-		
+		StrokeMaxVelocity.Index = 0;
+		StrokeMaxVelocity.Value = 0;
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
 		{
 			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
+			if(mVelocities[idxEvent] > StrokeMaxVelocity.Value)
+			{
+				StrokeMaxVelocity.Value = mVelocities[idxEvent];
+				StrokeMaxVelocity.Index = idxEvent;
+			}
 			
 			if(idxEvent > 0) {
 				deltaX = ListEventsExtended.get(idxEvent).Xmm - ListEventsExtended.get(idxEvent - 1).Xmm;
                 deltaY = ListEventsExtended.get(idxEvent).Ymm - ListEventsExtended.get(idxEvent - 1).Ymm;
+                
+                ListEventsExtended.get(idxEvent-1).Angle = Math.atan2(deltaY, deltaX);
 
                 StrokePropertiesObj.ListDeltaXmm[idxEvent - 1] = deltaX;
                 StrokePropertiesObj.ListDeltaYmm[idxEvent - 1] = deltaY;              
@@ -226,7 +237,12 @@ public class StrokeExtended extends Stroke {
 			else {
 				AccumulatedTimeIntervals[idxEvent] = 0;
 			}
-		}				
+		}
+		for(int idxEvent = 1; idxEvent < ListEventsExtended.size() - 1; idxEvent++)
+		{
+			ListEventsExtended.get(idxEvent-1).AngleDiff = mUtilsMath.CalcAbsAngleDifference(ListEventsExtended.get(idxEvent).Angle, ListEventsExtended.get(idxEvent - 1).Angle);
+			assert Boolean.TRUE;
+		}
 	}
 	
 	private void CalculateStrokeVelocityPeaks()

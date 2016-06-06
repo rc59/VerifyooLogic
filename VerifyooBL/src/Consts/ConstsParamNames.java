@@ -23,6 +23,7 @@ public class ConstsParamNames {
 		public static final String GESTURE_AVG_START_DIRECTION = "GestureAvgStartDirection";
 		public static final String GESTURE_AVG_MAX_DIRECTION = "GestureAvgMaxDirection";
 		public static final String GESTURE_AVG_END_DIRECTION = "GestureAvgEndDirection";
+		public static final String GESTURE_MAX_VELOCITY_DIRECTION = "GestureDirectionAtFirstStrokeMaxVelocity";
 		public static final String GESTURE_AVG_START_ACCELERATION = "GestureAverageStartAcceleration";
 		public static final String GESTURE_VELOCITY_PEAK = "GestureVelocityPeak";
 		public static final String GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE = "GestureVelocityPeakIntervalPercentage";
