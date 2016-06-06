@@ -205,6 +205,8 @@ public class StrokeExtended extends Stroke {
 		double deltaX, deltaY;
 		
 		mVelocities = new double[ListEventsExtended.size()];
+		mAccelerations = new double[ListEventsExtended.size()];
+		StrokeMaxVelocity = new IndexValue();
 		StrokeMaxVelocity.Index = 0;
 		StrokeMaxVelocity.Value = 0;
 		
