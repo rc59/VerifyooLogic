@@ -295,7 +295,7 @@ public class GestureComparer {
 		int numEvents = mGestureAuth.ListGestureEventsExtended.size();		
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_NUM_EVENTS, (double)numEvents);		
 	}
-	
+//if finalScore=-1 it is not added
 	protected void CalcDoubleParameter(String paramName, double value)
 	{
 		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.Instruction, paramName, value, mGestureStored.GetFeatureMeansHash());

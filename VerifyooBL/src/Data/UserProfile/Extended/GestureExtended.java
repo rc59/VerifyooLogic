@@ -36,6 +36,7 @@ public class GestureExtended extends Gesture {
 	public double GestureStartDirection;
 	public double GestureMaxDirection;
 	public double GestureEndDirection;
+	public double GestureDirectionAtFirstStrokeMaxVelocity;
 	
 	/*************** Time Parameters ***************/
 	
@@ -290,10 +291,10 @@ public class GestureExtended extends Gesture {
 		double totalAccZ = 0;
 		
 		GestureMaxVelocity = 0;
+
 		GestureMaxAcceleration = 0;
-		
 		double totalAcceleration = 0;
-		
+
 		for(int idxEvent = 0; idxEvent < ListGestureEventsExtended.size(); idxEvent++) {
 			totalPressure += ListGestureEventsExtended.get(idxEvent).Pressure;
 			totalSurface += ListGestureEventsExtended.get(idxEvent).TouchSurface;
@@ -305,11 +306,12 @@ public class GestureExtended extends Gesture {
 			GestureMaxAccX = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccX, ListGestureEventsExtended.get(idxEvent).AccelerometerX);
 			GestureMaxAccY = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccY, ListGestureEventsExtended.get(idxEvent).AccelerometerY);
 			GestureMaxAccZ = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccZ, ListGestureEventsExtended.get(idxEvent).AccelerometerZ);
-			
+
 			GestureMaxVelocity = mUtilsMath.GetMaxValue(GestureMaxVelocity, ListGestureEventsExtended.get(idxEvent).Velocity);
 			GestureMaxAcceleration = mUtilsMath.GetMaxValue(GestureMaxAcceleration, ListGestureEventsExtended.get(idxEvent).Acceleration);
 			
 			totalAcceleration += ListGestureEventsExtended.get(idxEvent).Acceleration;			
+
 		}
 		
 		GestureAverageAcceleration = totalAcceleration / ListGestureEventsExtended.size();
@@ -456,6 +458,28 @@ public class GestureExtended extends Gesture {
 			double deltaX;
 			
 			ParameterAvgPoint velocityAvgPoint = ListStrokesExtended.get(0).StrokeVelocityPeakAvgPoint;
+			
+			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Ymm;
+			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Xmm;
+			GestureStartDirection = Math.atan2(deltaY, deltaX);
+			
+			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Ymm;
+			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.MaxValueInSection.Index-1).Xmm;
+			GestureMaxDirection = Math.atan2(deltaY, deltaX);
+			
+			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Ymm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Ymm;
+			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index).Xmm - listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexEnd.Index-1).Xmm;
+			GestureEndDirection = Math.atan2(deltaY, deltaX);
+			
+			deltaY = listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index).Ymm - listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index - 1).Ymm;
+			deltaX = listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index).Xmm - listEventsExtendedFirstStroke.get(ListStrokesExtended.get(0).StrokeMaxVelocity.Index - 1).Xmm;
+			GestureDirectionAtFirstStrokeMaxVelocity = Math.atan2(deltaY, deltaX);
+			
+			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_START_DIRECTION, GestureStartDirection);
+			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_MAX_DIRECTION,   GestureMaxDirection);
+			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_END_DIRECTION,   GestureEndDirection);
+			AddGestureAngleValue(Instruction, ConstsParamNames.Gesture.GESTURE_MAX_VELOCITY_DIRECTION, GestureDirectionAtFirstStrokeMaxVelocity);
+
 			deltaY = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Ymm -
 					 listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index-1).Ymm;
 			deltaX = listEventsExtendedFirstStroke.get(velocityAvgPoint.IndexStart.Index).Xmm -

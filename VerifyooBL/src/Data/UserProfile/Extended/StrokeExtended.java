@@ -56,7 +56,9 @@ public class StrokeExtended extends Stroke {
 	public ArrayList<MotionEventExtended> ListEventsExtended; 
 	
 	public double StrokeTimeInterval;
-	public double AverageVelocity;	
+	public double AverageVelocity;
+	public IndexValue StrokeMaxVelocity;
+
 	public double AverageAcceleration;
 	public double AverageAccelerationNegative;
 				
@@ -203,18 +205,28 @@ public class StrokeExtended extends Stroke {
 		double deltaX, deltaY;
 		
 		mVelocities = new double[ListEventsExtended.size()];
-		mAccelerations = new double[ListEventsExtended.size()];
+		StrokeMaxVelocity.Index = 0;
+		StrokeMaxVelocity.Value = 0;
 		
 		double totalAcc = 0;		
 		
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
 		{
 			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
+			if(mVelocities[idxEvent] > StrokeMaxVelocity.Value)
+			{
+				StrokeMaxVelocity.Value = mVelocities[idxEvent];
+				StrokeMaxVelocity.Index = idxEvent;
+			}
+			
+			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
 			mAccelerations[idxEvent] = ListEventsExtended.get(idxEvent).Acceleration;
 			
 			if(idxEvent > 0) {
 				deltaX = ListEventsExtended.get(idxEvent).Xmm - ListEventsExtended.get(idxEvent - 1).Xmm;
                 deltaY = ListEventsExtended.get(idxEvent).Ymm - ListEventsExtended.get(idxEvent - 1).Ymm;
+                
+                ListEventsExtended.get(idxEvent-1).Angle = Math.atan2(deltaY, deltaX);
 
                 StrokePropertiesObj.ListDeltaXmm[idxEvent - 1] = deltaX;
                 StrokePropertiesObj.ListDeltaYmm[idxEvent - 1] = deltaY;              
@@ -240,7 +252,10 @@ public class StrokeExtended extends Stroke {
 			else {
 				AccumulatedTimeIntervals[idxEvent] = 0;
 			}
-						
+		}
+		for(int idxEvent = 1; idxEvent < ListEventsExtended.size() - 1; idxEvent++)
+		{
+			ListEventsExtended.get(idxEvent-1).AngleDiff = mUtilsMath.CalcAbsAngleDifference(ListEventsExtended.get(idxEvent).Angle, ListEventsExtended.get(idxEvent - 1).Angle);
 			totalAcc += mAccelerations[idxEvent];
 		}			
 				

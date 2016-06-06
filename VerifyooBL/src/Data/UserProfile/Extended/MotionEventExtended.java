@@ -17,7 +17,10 @@ public class MotionEventExtended extends MotionEventCompact {
 	public double VelocityX;
 	public double VelocityY;
 	public double Velocity;
-	
+
+	public double Angle;
+	public double AngleDiff;
+
 	public double Acceleration;
 	
 	public boolean IsStartOfStroke;

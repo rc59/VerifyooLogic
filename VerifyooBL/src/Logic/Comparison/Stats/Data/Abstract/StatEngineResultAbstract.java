@@ -22,5 +22,9 @@ public abstract class StatEngineResultAbstract implements IStatEngineResult {
 		return mZscore;
 	}
 	
-	
+//	@Override
+//	public boolean IsValid() {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 }

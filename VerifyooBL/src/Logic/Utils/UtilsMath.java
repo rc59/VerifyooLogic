@@ -3,6 +3,14 @@ package Logic.Utils;
 import Consts.ConstsMeasures;
 
 public class UtilsMath {
+//calculate alpha-beta
+	public double CalcAbsAngleDifference(double alpha, double beta)
+	{
+		double phi = Math.abs(beta - alpha) % (2*Math.PI);       
+        double angularDiff = phi > Math.PI ? (2*Math.PI) - phi : phi;
+        return angularDiff;
+	}
+	
 	public double CalcAvg(double[] values)
 	{
 		double avg = 0;		
