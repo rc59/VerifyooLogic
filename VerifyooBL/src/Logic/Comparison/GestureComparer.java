@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import Consts.ConstsParamNames;
 import Consts.ConstsParamWeights;
+import Consts.Enums.PointStatus;
 import Data.Comparison.CompareResultGeneric;
 import Data.Comparison.CompareResultSummary;
 import Data.Comparison.Interfaces.ICompareResult;
@@ -78,14 +79,45 @@ public class GestureComparer {
 		mGestureAuth = gestureAuth;
 		
 		if(mGestureAuth.ListStrokesExtended.size() == mGestureStored.ListStrokesExtended.size())
-		{						
-			CompareGestureStrokes();
-			CompareGestureFeatures();
-			CalculateFinalScore();	
+		{
+			PointStatus pointStatus = CheckPoints();
+			
+			if(pointStatus == PointStatus.BOTH) {
+				mCompareResultsGesture.Score = 1;
+			}
+			
+			if(pointStatus == PointStatus.ONE) {
+				mCompareResultsGesture.Score = 0;
+			}
+			
+			if(pointStatus == PointStatus.NONE) {
+				CompareGestureStrokes();			
+				CompareGestureFeatures();
+				CalculateFinalScore();
+			}		
 		}
 		else {
-			mCompareResultsGesture.Score = 0;
+			mCompareResultsGesture.Score = 0;	
+		}	
+	}
+	
+	public PointStatus CheckPoints()
+	{
+		PointStatus pointStatus = PointStatus.BOTH;
+		
+		if(!mGestureStored.IsOnlyPoints && !mGestureAuth.IsOnlyPoints) {
+			pointStatus = PointStatus.NONE;
 		}
+		
+		if(!mGestureStored.IsOnlyPoints && mGestureAuth.IsOnlyPoints) {
+			pointStatus = PointStatus.ONE;
+		}
+		
+		if(mGestureStored.IsOnlyPoints && !mGestureAuth.IsOnlyPoints) {
+			pointStatus = PointStatus.ONE;
+		}
+		
+		return pointStatus;
 	}
 	
 	public void CompareGestures(GestureExtended gestureStored, GestureExtended gestureAuth, HashMap<String, Double> compareFilters) { 					
@@ -96,7 +128,7 @@ public class GestureComparer {
 	protected boolean IsNeedToRun(String methodName)
 	{
 		boolean isNeedToRun = true;
-		if(mCompareFilters != null && !mCompareFilters.containsKey(methodName)) {
+		if(mCompareFilters != null && mCompareFilters.containsKey(methodName)) {
 			isNeedToRun = false;
 		}
 		
@@ -140,19 +172,37 @@ public class GestureComparer {
 		if(IsNeedToRun("CompareGestureVelocityPeaks")){
 			CompareGestureVelocityPeaks();
 		}
-		if(IsNeedToRun("CompareGestureVelocityPeaksIntervalPercentage")){
-			CompareGestureVelocityPeaksIntervalPercentage();
+//		if(IsNeedToRun("CompareGestureVelocityPeaksIntervalPercentage")){
+//			CompareGestureVelocityPeaksIntervalPercentage();
+//		}
+//		if(IsNeedToRun("CompareGestureStartDirection")){
+//			CompareGestureStartDirection();
+//		}	
+//		if(IsNeedToRun("CompareGestureMaxDirection")){
+//			CompareGestureMaxDirection();
+//		}	
+//		if(IsNeedToRun("CompareGestureEndDirection")){
+//			CompareGestureEndDirection();
+//		}	
+		if(IsNeedToRun("CompareGestureAccumulatedLengthRSqr")){
+			CompareGestureAccumulatedLengthRSqr();
 		}
-		if(IsNeedToRun("CompareGestureStartDirection")){
-			CompareGestureStartDirection();
-		}	
-		if(IsNeedToRun("CompareGestureMaxDirection")){
-			CompareGestureMaxDirection();
-		}	
-		if(IsNeedToRun("CompareGestureEndDirection")){
-			CompareGestureEndDirection();
-		}	
+		if(IsNeedToRun("CompareGestureAccumulatedLengthSlope")){
+			CompareGestureAccumulatedLengthSlope();
+		}
 	}
+	
+	protected void CompareGestureAccumulatedLengthRSqr()
+	{
+		double accumulatedLengthRSqr = mGestureAuth.GestureAccumulatedLengthLinearRegRSqr;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_R2, accumulatedLengthRSqr);
+	}
+	
+	protected void CompareGestureAccumulatedLengthSlope()
+	{
+		double accumulatedLengthSlope = mGestureAuth.GestureAccumulatedLengthLinearRegSlope;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_SLOPE, accumulatedLengthSlope);
+	}	
 	
 	protected void CompareGestureVelocityPeaksIntervalPercentage()
 	{

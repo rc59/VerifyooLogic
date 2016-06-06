@@ -144,6 +144,24 @@ public class NormMgr implements INormMgr {
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.268975903, 0.154860413, 0.058679639);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.212823789, 0.096278821, 0.031827845);
 
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_R2, ConstsInstructions.INSTRUCTION_LETTER_A, 0.977750624, 0.01498735, 0.013011328);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_R2, ConstsInstructions.INSTRUCTION_EIGHT, 0.98916811, 0.011639231, 0.007473029);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_R2, ConstsInstructions.INSTRUCTION_FIVE, 0.976305383, 0.014129027, 0.013124739);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_R2, ConstsInstructions.INSTRUCTION_HEART, 0.984681632, 0.007050072, 0.005934556);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_R2, ConstsInstructions.INSTRUCTION_LINES, 0.977305228, 0.012574781, 0.012041201);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_R2, ConstsInstructions.INSTRUCTION_LETTER_R, 0.974674672, 0.017346707, 0.016010183);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_R2, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.978605907, 0.00882214, 0.007890556);
+
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_SLOPE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.305736515, 0.108577521, 0.04194959);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_SLOPE, ConstsInstructions.INSTRUCTION_EIGHT, 0.109720037, 0.036925864, 0.049276306);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_SLOPE, ConstsInstructions.INSTRUCTION_FIVE, 0.163067673, 0.123151249, 0.047892004);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_SLOPE, ConstsInstructions.INSTRUCTION_HEART, 0.158082136, 0.061944225, 0.081365275);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_SLOPE, ConstsInstructions.INSTRUCTION_LINES, 0.492334979, 0.043389264, 0.07047037);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_SLOPE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.268975903, 0.154860413, 0.058679639);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_SLOPE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.212823789, 0.096278821, 0.031827845);
+
+		
+		
 }
 	
 	protected void CreateDoubleNorm(String name, String instruction, double mean, double standardDev, double internalStandardDev)

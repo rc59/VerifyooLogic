@@ -12,6 +12,11 @@ public class Utils {
 	protected static UtilsGeneral mUtilsGeneral;
 	protected static UtilsPeakCalc mUtilsPeakCalc;
 	
+	private Utils()
+	{
+		
+	}
+	
 	public static Utils GetInstance() {
 		if(mInstance == null) {
 			mInstance = new Utils();

@@ -82,28 +82,33 @@ public class StrokeExtended extends Stroke {
 	
 	public StrokeExtended(Stroke stroke, HashMap<String, IFeatureMeanData> hashFeatureMeans, String instruction, int strokeIdx)
 	{		
-		Id = stroke.Id;
-		mHashFeatureMeans = hashFeatureMeans;
-		mStrokeIdx = strokeIdx;
-		mInstruction = instruction;
-		LengthPixel = stroke.Length;
-		ListEvents = stroke.ListEvents;		
-		Xdpi = stroke.Xdpi;		
-		Ydpi = stroke.Ydpi;
-		
-		ListEventsExtended = new ArrayList<>();
+		if(stroke.Length == 0) {
+			IsPoint = true;	
+		}
+		else {
+			Id = stroke.Id;
+			mHashFeatureMeans = hashFeatureMeans;
+			mStrokeIdx = strokeIdx;
+			mInstruction = instruction;
+			LengthPixel = stroke.Length;
+			ListEvents = stroke.ListEvents;		
+			Xdpi = stroke.Xdpi;		
+			Ydpi = stroke.Ydpi;
 			
-		StrokePropertiesObj = new StrokeProperties(ListEvents.size());
-		ShapeDataObj = new ShapeData();
-		
-		TimeIntervals = new double[ListEvents.size() - 1];
-		AccumulatedTimeIntervals = new double[ListEvents.size()];
-		
-		IsHasPressure = false;
-		IsHasTouchSurface = false;		
-		
-		InitUtils();
-		InitFeatures();		
+			ListEventsExtended = new ArrayList<>();
+				
+			StrokePropertiesObj = new StrokeProperties(ListEvents.size());
+			ShapeDataObj = new ShapeData();
+			
+			TimeIntervals = new double[ListEvents.size() - 1];
+			AccumulatedTimeIntervals = new double[ListEvents.size()];
+			
+			IsHasPressure = false;
+			IsHasTouchSurface = false;		
+			
+			InitUtils();
+			InitFeatures();		
+		}
 	}
 	
 	protected void InitUtils()

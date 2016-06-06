@@ -89,6 +89,7 @@ public class GestureExtended extends Gesture {
 	/*************** General Parameters ***************/ 
 	
 	public int GestureIndex;
+	public boolean IsOnlyPoints;
 	
 	public ArrayList<StrokeExtended> ListStrokesExtended;
 	public ArrayList<MotionEventExtended> ListGestureEventsExtended;
@@ -103,7 +104,7 @@ public class GestureExtended extends Gesture {
 	protected UtilsSpatialSampling mUtilsSpatialSampling;
 	protected UtilsGeneral mUtilsGeneral;
 	
-	protected IStatEngine mStatEngine;
+	protected IStatEngine mStatEngine;	
 	
 	public GestureExtended(Gesture gesture, HashMap<String, IFeatureMeanData> hashFeatureMeans, int gestureIdx) {		
 		Id = gesture.Id;
@@ -117,7 +118,9 @@ public class GestureExtended extends Gesture {
 		mHashFeatureMeans = hashFeatureMeans;
 		InitParams();
 		PreCalculations();	
-		InitFeatures();
+		if(!IsOnlyPoints) {
+			InitFeatures();	
+		}
 	}
 
 	protected void InitUtils() {
@@ -144,23 +147,28 @@ public class GestureExtended extends Gesture {
 	protected void PreCalculations() {
 		Stroke tempStroke;		
 		StrokeExtended tempStrokeExtended;		
+		IsOnlyPoints = true;
 		
 		for(int idxStroke = 0; idxStroke < ListStrokes.size(); idxStroke++) {
 			tempStroke = ListStrokes.get(idxStroke);				
 			tempStrokeExtended = new StrokeExtended(tempStroke, mHashFeatureMeans, Instruction, idxStroke);
 			
 			ListStrokesExtended.add(tempStrokeExtended);
-			GestureLengthMM += tempStrokeExtended.StrokePropertiesObj.LengthMM;
-			GestureLengthPixel += tempStroke.Length;
+			if(!tempStrokeExtended.IsPoint) {
+				GestureLengthMM += tempStrokeExtended.StrokePropertiesObj.LengthMM;
+				GestureLengthPixel += tempStroke.Length;
+				
+				GestureTotalStrokeTimeInterval += tempStrokeExtended.StrokeTimeInterval;
+				GestureTotalStrokeArea += tempStrokeExtended.ShapeDataObj.ShapeArea;
+				
+				GestureMaxPressure = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxPressure, tempStrokeExtended.MaxPressure);
+				GestureMaxSurface = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxSurface, tempStrokeExtended.MaxSurface);	
+				
+				ListGestureEvents.addAll(tempStroke.ListEvents);
+				ListGestureEventsExtended.addAll(tempStrokeExtended.ListEventsExtended);	
 			
-			GestureTotalStrokeTimeInterval += tempStrokeExtended.StrokeTimeInterval;
-			GestureTotalStrokeArea += tempStrokeExtended.ShapeDataObj.ShapeArea;
-			
-			GestureMaxPressure = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxPressure, tempStrokeExtended.MaxPressure);
-			GestureMaxSurface = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxSurface, tempStrokeExtended.MaxSurface);	
-			
-			ListGestureEvents.addAll(tempStroke.ListEvents);
-			ListGestureEventsExtended.addAll(tempStrokeExtended.ListEventsExtended);			
+				IsOnlyPoints = false;
+			}
 		}		
 	}
 	
@@ -333,7 +341,7 @@ public class GestureExtended extends Gesture {
 	
 	protected void CalculateGestureVelocityPeaks()
 	{
-		if(ListStrokesExtended.size() > 0) {
+		if(ListStrokesExtended.size() > 0 && !ListStrokesExtended.get(0).IsPoint) {
 			IndexValue tempVelocityPeak = ListStrokesExtended.get(0).StrokeVelocityPeakAvgPoint.MaxValueInSection;	
 			ParameterAvgPoint velocityAvgPoint = ListStrokesExtended.get(0).StrokeVelocityPeakAvgPoint;
 			
@@ -349,7 +357,7 @@ public class GestureExtended extends Gesture {
 	
 	protected void CalculateGestureAccelerationPeaks()
 	{
-		if(ListStrokesExtended.size() > 0) {
+		if(ListStrokesExtended.size() > 0 && !ListStrokesExtended.get(0).IsPoint) {
 			IndexValue tempAccelerationPeak = ListStrokesExtended.get(0).StrokeAccelerationPeakAvgPoint.MaxValueInSection;	
 			ParameterAvgPoint accelerationAvgPoint = ListStrokesExtended.get(0).StrokeAccelerationPeakAvgPoint;
 			
@@ -371,11 +379,11 @@ public class GestureExtended extends Gesture {
 	}
 
 	protected void CalculateGestureTotalTimeWithPauses() {
-		StrokeExtended strokeFirst = ListStrokesExtended.get(0);
-		StrokeExtended strokeLast = ListStrokesExtended.get(ListStrokesExtended.size() - 1);
+		MotionEventExtended eventFirst  = ListGestureEventsExtended.get(0);
+		MotionEventExtended eventLast = ListGestureEventsExtended.get(ListGestureEventsExtended.size() - 1);
 		
-		double gestureStartTime = strokeFirst.ListEventsExtended.get(0).EventTime;
-		double gestureEndTime = strokeLast.ListEventsExtended.get(strokeLast.ListEventsExtended.size() - 1).EventTime;
+		double gestureStartTime = eventFirst.EventTime;
+		double gestureEndTime = eventLast.EventTime;
 		
 		GestureTotalTimeInterval = gestureEndTime - gestureStartTime;
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, GestureTotalTimeInterval);
@@ -480,6 +488,9 @@ public class GestureExtended extends Gesture {
 		GestureAccumulatedLengthLinearRegRSqr = linearRegObj.R2();
 		GestureAccumulatedLengthLinearRegSlope = linearRegObj.slope();
 		GestureAccumulatedLengthLinearRegIntercept = linearRegObj.intercept();
+		
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_R2, GestureAccumulatedLengthLinearRegRSqr);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_ACCUMULATED_LENGTH_SLOPE, GestureAccumulatedLengthLinearRegSlope);	
 	}
 	
 	public void AddGestureValue(String instruction, String paramName, double value)

@@ -27,6 +27,9 @@ public class ConstsParamNames {
 		public static final String GESTURE_VELOCITY_PEAK = "GestureVelocityPeak";
 		public static final String GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE = "GestureVelocityPeakIntervalPercentage";
 		public static final String GESTURE_ACCELERATION_PEAK = "GestureAccelerationPeak";
-		public static final String GESTURE_ACCELERATION_PEAK_INTERVAL_PERCENTAGE = "GestureAccelerationPeakIntervalPercentage";		
+		public static final String GESTURE_ACCELERATION_PEAK_INTERVAL_PERCENTAGE = "GestureAccelerationPeakIntervalPercentage";
+		
+		public static final String GESTURE_ACCUMULATED_LENGTH_R2 = "GestureAccumulatedLengthRSqr";
+		public static final String GESTURE_ACCUMULATED_LENGTH_SLOPE = "GestureAccumulatedLengthSlope";				
 	}	
 }

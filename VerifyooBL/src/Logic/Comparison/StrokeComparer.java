@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import Consts.ConstsParamNames;
 import Consts.ConstsParamWeights;
+import Consts.Enums.PointStatus;
 import Data.Comparison.CompareResultGeneric;
 import Data.Comparison.CompareResultParamVectors;
 import Data.Comparison.CompareResultSummary;
@@ -49,22 +50,51 @@ public class StrokeComparer {
 		mUtilsComparison = Utils.GetInstance().GetUtilsComparison();
 	}
 	
+	public PointStatus CheckPoints() {
+		PointStatus pointStatus = PointStatus.BOTH;
+		
+		if(!mStrokeStoredExtended.IsPoint && !mStrokeAuthExtended.IsPoint) {
+			pointStatus = PointStatus.NONE;
+		}
+		
+		if(!mStrokeStoredExtended.IsPoint && mStrokeAuthExtended.IsPoint) {
+			pointStatus = PointStatus.ONE;
+		}
+		
+		if(mStrokeStoredExtended.IsPoint && !mStrokeAuthExtended.IsPoint) {
+			pointStatus = PointStatus.ONE;
+		}
+		
+		return pointStatus;
+	}
+	
 	public void CompareStrokes(StrokeExtended strokeStored, StrokeExtended strokeAuth)	
-	{			
-		mIsStrokesIdentical = true;
+	{		
 		mStrokeStoredExtended = strokeStored;
 		mStrokeAuthExtended = strokeAuth;
+		PointStatus pointStatus= CheckPoints();
 		
-		CheckIfStrokesAreIdentical();
-		
-		if(!mIsStrokesIdentical) {
-			CompareMinCosineDistance();
-			CompareStrokeAreas();
-			CompareTimeInterval();
-			CompareAvgVelocity();
+		if(pointStatus == PointStatus.NONE) {
+			mIsStrokesIdentical = true;			
 			
-			CalculateFinalScore();	
+			CheckIfStrokesAreIdentical();
+			
+			if(!mIsStrokesIdentical) {
+				CompareMinCosineDistance();
+				CompareStrokeAreas();
+				CompareTimeInterval();
+				CompareAvgVelocity();
+				
+				CalculateFinalScore();	
+			}
 		}
+		
+		if(pointStatus == PointStatus.BOTH) {
+			mCompareResult.Score = 1;
+		}
+		if(pointStatus == PointStatus.ONE) {
+			mCompareResult.Score = 0;
+		}		
 	}		
 
 	/************** Feature Score Calculations **************/
