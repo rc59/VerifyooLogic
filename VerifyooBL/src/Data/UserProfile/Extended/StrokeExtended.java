@@ -42,6 +42,7 @@ public class StrokeExtended extends Stroke {
 		
 	private HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	private double[] mVelocities;
+	private double[] mAccelerations;
 	/****************************************/
 	
 	/************** Stroke Features **************/
@@ -50,12 +51,16 @@ public class StrokeExtended extends Stroke {
 	public int StrokeEndEvent;
 	
 	public ParameterAvgPoint StrokeVelocityPeakAvgPoint;
+	public ParameterAvgPoint StrokeAccelerationPeakAvgPoint;
 	
 	public ArrayList<MotionEventExtended> ListEventsExtended; 
 	
 	public double StrokeTimeInterval;
 	public double AverageVelocity;
 	public IndexValue StrokeMaxVelocity;
+
+	public double AverageAcceleration;
+	public double AverageAccelerationNegative;
 				
 	public double MaxPressure;
 	public double MaxSurface;
@@ -161,6 +166,7 @@ public class StrokeExtended extends Stroke {
 		CalculateAverageVelocity();
 		CalculateMiddlePressureAndSurface();
 		CalculateStrokeVelocityPeaks();
+		CalculateStrokeAccelerationPeaks();
 	}
 	
 	protected void ConvertToMotionEventExtended()
@@ -198,6 +204,9 @@ public class StrokeExtended extends Stroke {
 		mVelocities = new double[ListEventsExtended.size()];
 		StrokeMaxVelocity.Index = 0;
 		StrokeMaxVelocity.Value = 0;
+		
+		double totalAcc = 0;		
+		
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
 		{
 			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
@@ -206,6 +215,9 @@ public class StrokeExtended extends Stroke {
 				StrokeMaxVelocity.Value = mVelocities[idxEvent];
 				StrokeMaxVelocity.Index = idxEvent;
 			}
+			
+			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
+			mAccelerations[idxEvent] = ListEventsExtended.get(idxEvent).Acceleration;
 			
 			if(idxEvent > 0) {
 				deltaX = ListEventsExtended.get(idxEvent).Xmm - ListEventsExtended.get(idxEvent - 1).Xmm;
@@ -241,13 +253,20 @@ public class StrokeExtended extends Stroke {
 		for(int idxEvent = 1; idxEvent < ListEventsExtended.size() - 1; idxEvent++)
 		{
 			ListEventsExtended.get(idxEvent-1).AngleDiff = mUtilsMath.CalcAbsAngleDifference(ListEventsExtended.get(idxEvent).Angle, ListEventsExtended.get(idxEvent - 1).Angle);
-			assert Boolean.TRUE;
-		}
+			totalAcc += mAccelerations[idxEvent];
+		}			
+				
+		AverageAcceleration = totalAcc / ListEventsExtended.size();
 	}
 	
-	private void CalculateStrokeVelocityPeaks()
+	protected void CalculateStrokeAccelerationPeaks()
+	{
+		StrokeAccelerationPeakAvgPoint = mUtilsPeakCalc.CalculatePeaks(mAccelerations, AverageAcceleration);
+	}
+	
+	protected void CalculateStrokeVelocityPeaks()
 	{		
-		StrokeVelocityPeakAvgPoint = mUtilsPeakCalc.CalculateStrokeVelocityPeaks(mVelocities, AverageVelocity);
+		StrokeVelocityPeakAvgPoint = mUtilsPeakCalc.CalculatePeaks(mVelocities, AverageVelocity);
 	}
 
 	protected boolean CheckIfPressureExists(MotionEventExtended event) {

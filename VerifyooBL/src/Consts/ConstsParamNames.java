@@ -27,5 +27,7 @@ public class ConstsParamNames {
 		public static final String GESTURE_AVG_START_ACCELERATION = "GestureAverageStartAcceleration";
 		public static final String GESTURE_VELOCITY_PEAK = "GestureVelocityPeak";
 		public static final String GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE = "GestureVelocityPeakIntervalPercentage";
+		public static final String GESTURE_ACCELERATION_PEAK = "GestureAccelerationPeak";
+		public static final String GESTURE_ACCELERATION_PEAK_INTERVAL_PERCENTAGE = "GestureAccelerationPeakIntervalPercentage";		
 	}	
 }
