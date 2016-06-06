@@ -454,8 +454,31 @@ public class GestureExtended extends Gesture {
 	{
 		if(!ListStrokesExtended.get(0).IsPoint)
 		{
-			int midIndex = ListStrokesExtended.get(0).ListEventsExtended.size() / 2;
-			double velocity = ListStrokesExtended.get(0).ListEventsExtended.get(midIndex).Velocity;
+			StrokeExtended firstStroke = ListStrokesExtended.get(0);
+			int numOfSamples = firstStroke.StrokeEndEvent - firstStroke.StrokeStartEvent + 1;
+			int lastPoint = 0;
+			for(int idxEvent = firstStroke.StrokeStartEvent; idxEvent < firstStroke.StrokeEndEvent - 2; ++idxEvent)
+			{
+				if(((firstStroke.ListEventsExtended.get(idxEvent).AngleDiff + 
+						firstStroke.ListEventsExtended.get(idxEvent + 1).AngleDiff + 
+						firstStroke.ListEventsExtended.get(idxEvent + 2).AngleDiff +
+						firstStroke.ListEventsExtended.get(idxEvent + 3).AngleDiff)								
+						> Math.PI/2)
+						&&
+						((firstStroke.ListEventsExtended.get(idxEvent).AngleDiff > 0.7)||
+								(firstStroke.ListEventsExtended.get(idxEvent+1).AngleDiff > 0.7)||
+								(firstStroke.ListEventsExtended.get(idxEvent+2).AngleDiff > 0.7)||
+								(firstStroke.ListEventsExtended.get(idxEvent+3).AngleDiff > 0.7)
+								)
+						)
+				{
+					lastPoint = idxEvent+3;
+					break;
+				}
+			}
+			if(lastPoint == 0) lastPoint = firstStroke.StrokeEndEvent;
+//			int midIndex = ListStrokesExtended.get(0).ListEventsExtended.size() / 2;
+			int midIndex = lastPoint / 2;
 			ArrayList<MotionEventExtended> listEventsExtendedFirstStroke = ListStrokesExtended.get(0).ListEventsExtended;
 			
 			double deltaY;
