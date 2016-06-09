@@ -366,7 +366,7 @@ public class GestureComparer {
 			mCompareResultsGesture.Score = mGestureScore; //(mGestureScore + mStrokesScore) / 2;
 			
 			if(!mMinCosineDistanceValid) {
-				mCompareResultsGesture.Score = 0.5;	
+				mCompareResultsGesture.Score = 0;	
 			}
 		}		
 		else 
