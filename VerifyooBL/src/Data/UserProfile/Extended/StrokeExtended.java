@@ -39,7 +39,12 @@ public class StrokeExtended extends Stroke {
 	
 	private double mStrokeCenterXpixel;
 	private double mStrokeCenterYpixel;	
-		
+
+	private double mPointMinXMM;
+	private double mPointMaxXMM;
+	private double mPointMinYMM;
+	private double mPointMaxYMM;
+
 	private HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	private double[] mVelocities;
 	private double[] mAccelerations;
@@ -211,7 +216,8 @@ public class StrokeExtended extends Stroke {
 		StrokeMaxVelocity.Value = 0;
 		
 		double totalAcc = 0;		
-		
+		double x1, y1, x2, y2, x3, y3;
+		double tmpArea = 0;
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
 		{
 			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
@@ -236,9 +242,16 @@ public class StrokeExtended extends Stroke {
                 StrokePropertiesObj.ListEventLength[idxEvent - 1] = mUtilsMath.CalcPitagoras(deltaX, deltaY);
                 StrokePropertiesObj.LengthMM += StrokePropertiesObj.ListEventLength[idxEvent - 1];                
                 
-                ShapeDataObj.ShapeArea += 
-                		(StrokePropertiesObj.ListEventLength[idxEvent - 1] * mUtilsMath.CalcPitagoras(ListEventsExtended.get(idxEvent - 1).Xmm, ListEventsExtended.get(idxEvent - 1).Ymm) / 2);
-                                
+                x1 = 0; y1 = 0;
+                x2 = ListEventsExtended.get(idxEvent - 1).Xmm; y2 = ListEventsExtended.get(idxEvent - 1).Ymm;
+                x3 = ListEventsExtended.get(idxEvent).Xmm; y3 = ListEventsExtended.get(idxEvent).Ymm;
+                ShapeDataObj.ShapeArea += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
+
+                x1 = 0; y1 = 0;
+                x2 = ListEventsExtended.get(idxEvent - 1).Xmm - mPointMinXMM; y2 = ListEventsExtended.get(idxEvent - 1).Ymm - mPointMinYMM;
+                x3 = ListEventsExtended.get(idxEvent).Xmm - mPointMinXMM; y3 = ListEventsExtended.get(idxEvent).Ymm - mPointMinYMM;
+                ShapeDataObj.ShapeAreaMinXMinY += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
+                
                 if(CheckIfPressureExists(ListEventsExtended.get(idxEvent))) {
                 	IsHasPressure = true;
                 	MaxPressure = mUtilsMath.GetMaxValue(MaxPressure, ListEventsExtended.get(idxEvent).Pressure);	
@@ -271,6 +284,14 @@ public class StrokeExtended extends Stroke {
 	
 	protected void CalculateStrokeVelocityPeaks()
 	{		
+		double totalVel = 0;
+		for(int idx = 0; idx < mVelocities.length; idx++) 
+		{
+			totalVel += mVelocities[idx];
+		}
+		
+		totalVel = totalVel / mVelocities.length;		
+		
 		StrokeVelocityPeakAvgPoint = mUtilsPeakCalc.CalculatePeaks(mVelocities, AverageVelocity);
 	}
 
@@ -333,6 +354,11 @@ public class StrokeExtended extends Stroke {
 		
 		mStrokeCenterXpixel = (mPointMinX.Xpixel + mPointMaxX.Xpixel) / 2;
         mStrokeCenterYpixel = (mPointMinY.Ypixel + mPointMaxY.Ypixel) / 2;
+
+        mPointMinXMM = (mPointMinX.Xpixel - mStrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
+        mPointMaxXMM = (mPointMaxX.Xpixel - mStrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
+        mPointMinYMM = (mPointMinY.Ypixel - mStrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
+        mPointMaxYMM = (mPointMinY.Ypixel - mStrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
 	}
 	
 	protected void CalculateSpatialSamplingVector()

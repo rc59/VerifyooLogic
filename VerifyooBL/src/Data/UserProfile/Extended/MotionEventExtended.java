@@ -74,9 +74,9 @@ public class MotionEventExtended extends MotionEventCompact {
 			double deltaY = Ymm - motionEventPrev.Ymm;
 			
 			VelocityX = deltaX / eventTimeDiff;
-			VelocityY = deltaY / eventTimeDiff;
+			VelocityY = deltaY / eventTimeDiff;			
 			
-			Velocity = mUtilsMath.CalcPitagoras(VelocityX, VelocityY);
+			Velocity = mUtilsMath.CalcPitagoras(deltaX, deltaY) / eventTimeDiff;
 		}
 		else {
 			VelocityX = motionEventPrev.VelocityX;

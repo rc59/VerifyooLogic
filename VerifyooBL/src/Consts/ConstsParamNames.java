@@ -5,6 +5,7 @@ public class ConstsParamNames {
 	{
 		public static final String MINIMUM_COSINE_DISTANCE = "StrokeMinimumCosineDistance";
 		public static final String STROKE_AREA = "StrokeArea";
+		public static final String STROKE_AREA_MINX_MINY = "StrokeAreaMinXMinY";
 		public static final String AVERAGE_VELOCITY = "StrokeAvgVelocity";
 		public static final String TIME_INTERVAL = "StrokeTimeInterval";	
 	}
@@ -17,7 +18,8 @@ public class ConstsParamNames {
 		public static final String GESTURE_TOTAL_STROKES_TIME_INTERVAL = "GestureTotalStrokesTimeInterval";
 		public static final String GESTURE_TOTAL_TIME_INTERNVAL = "GestureTotalTimeInterval";
 		public static final String GESTURE_ACCUMULATED_DISTANCE_BY_TIME = "GestureAccumulatedDistanceByTime";
-		public static final String GESTURE_TOTAL_STROKE_AREA= "GestureTotalStrokeArea";		
+		public static final String GESTURE_TOTAL_STROKE_AREA= "GestureTotalStrokeArea";	
+		public static final String GESTURE_TOTAL_STROKE_AREA_MINX_MINY = "GestureTotalStrokeAreaMinXMinY";
 		public static final String GESTURE_AVG_PRESSURE = "GestureAvgPressure";
 		public static final String GESTURE_AVG_SURFACE = "GestureAvgSurface";
 		public static final String GESTURE_AVG_START_DIRECTION = "GestureAvgStartDirection";

@@ -31,6 +31,7 @@ public class GestureExtended extends Gesture {
 	public double GestureLengthMMX;
 	public double GestureLengthMMY;
 	public double GestureTotalStrokeArea;
+	public double GestureTotalStrokeAreaMinXMinY;
 	public double[] SpatialSamplingVector;
 	
 	public double GestureStartDirection;
@@ -163,6 +164,7 @@ public class GestureExtended extends Gesture {
 				
 				GestureTotalStrokeTimeInterval += tempStrokeExtended.StrokeTimeInterval;
 				GestureTotalStrokeArea += tempStrokeExtended.ShapeDataObj.ShapeArea;
+				GestureTotalStrokeAreaMinXMinY += tempStrokeExtended.ShapeDataObj.ShapeAreaMinXMinY;
 				
 				GestureMaxPressure = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxPressure, tempStrokeExtended.MaxPressure);
 				GestureMaxSurface = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxSurface, tempStrokeExtended.MaxSurface);	
@@ -379,7 +381,8 @@ public class GestureExtended extends Gesture {
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_LENGTH, GestureLengthMM);
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_NUM_EVENTS, ListGestureEventsExtended.size());
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, GestureTotalStrokeTimeInterval);
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, GestureTotalStrokeArea);		
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, GestureTotalStrokeArea);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, GestureTotalStrokeAreaMinXMinY);
 	}
 
 	protected void CalculateGestureTotalTimeWithPauses() {
@@ -457,6 +460,8 @@ public class GestureExtended extends Gesture {
 			StrokeExtended firstStroke = ListStrokesExtended.get(0);
 			int numOfSamples = firstStroke.StrokeEndEvent - firstStroke.StrokeStartEvent + 1;
 			int lastPoint = 0;
+			//an event is selected if the sum of the angle diff of four consequent events is greater than pi/2 
+			//and at least one diff angle is greater than 35 deg. If there is no such event, the last event is selected
 			for(int idxEvent = firstStroke.StrokeStartEvent; idxEvent < firstStroke.StrokeEndEvent - 2; ++idxEvent)
 			{
 				if(((firstStroke.ListEventsExtended.get(idxEvent).AngleDiff + 

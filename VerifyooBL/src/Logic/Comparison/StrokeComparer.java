@@ -121,6 +121,12 @@ public class StrokeComparer {
 		
 		double finalScore = mUtilsComparison.CompareNumericalValues(areaStored, areaAuth, 0.65);
 		AddDoubleParameter(ConstsParamNames.Stroke.STROKE_AREA, finalScore, ConstsParamWeights.HIGH, areaStored);
+
+		areaStored = mStrokeStoredExtended.ShapeDataObj.ShapeAreaMinXMinY;
+		areaAuth = mStrokeAuthExtended.ShapeDataObj.ShapeAreaMinXMinY;
+		
+		finalScore = mUtilsComparison.CompareNumericalValues(areaStored, areaAuth, 0.65);
+		AddDoubleParameter(ConstsParamNames.Stroke.STROKE_AREA_MINX_MINY, finalScore, ConstsParamWeights.HIGH, areaStored);
 	}	
 	
 	protected void CompareTimeInterval()

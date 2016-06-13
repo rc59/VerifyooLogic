@@ -63,7 +63,15 @@ public class NormMgr implements INormMgr {
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, ConstsInstructions.INSTRUCTION_LINES, 419, 162, 66);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, ConstsInstructions.INSTRUCTION_LETTER_R, 591, 218, 105);		
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, ConstsInstructions.INSTRUCTION_TRIANGLE, 734, 283, 118);
-		
+
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, ConstsInstructions.INSTRUCTION_LETTER_A, 497, 178, 95);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, ConstsInstructions.INSTRUCTION_EIGHT, 647, 211, 121);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, ConstsInstructions.INSTRUCTION_FIVE, 500, 196, 102);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, ConstsInstructions.INSTRUCTION_HEART, 837, 296, 129);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, ConstsInstructions.INSTRUCTION_LINES, 419, 162, 66);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, ConstsInstructions.INSTRUCTION_LETTER_R, 591, 218, 105);		
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, ConstsInstructions.INSTRUCTION_TRIANGLE, 734, 283, 118);
+
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.62, 0.0368, 0.0101);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_EIGHT, 0.6219, 0.0378, 0.0108);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_FIVE, 0.6241, 0.0382, 0.0112);

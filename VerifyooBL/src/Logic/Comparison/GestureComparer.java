@@ -160,6 +160,9 @@ public class GestureComparer {
 		if(IsNeedToRun("CompareGestureAreas")){
 			CompareGestureAreas();
 		}
+		if(IsNeedToRun("CompareGestureAreasMinXMinY")){
+			CompareGestureAreasMinXMinY();
+		}
 		if(IsNeedToRun("CompareGesturePressure")){
 			CompareGesturePressure();
 		}
@@ -288,6 +291,12 @@ public class GestureComparer {
 	{		
 		double areaAuth = mGestureAuth.GestureTotalStrokeArea;						
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, areaAuth);
+	}
+	
+	protected void CompareGestureAreasMinXMinY()
+	{		
+		double areaAuth = mGestureAuth.GestureTotalStrokeAreaMinXMinY;						
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, areaAuth);
 	}
 	
 	protected void CompareGestureTotalStrokesTime() {		

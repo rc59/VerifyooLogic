@@ -77,4 +77,8 @@ public class UtilsMath {
         eventAngle = eventAngle % (2 * ConstsMeasures.PI);
         return eventAngle;
     }
+	
+	public double CalculateTriangleArea(double x1, double y1, double x2, double y2, double x3, double y3){
+		return Math.abs(0.5 * (x1*(y3-y2) + x2*(y1-y3) + x3*(y2-y1)));
+	}
 }
