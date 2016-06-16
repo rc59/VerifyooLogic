@@ -277,6 +277,7 @@ public class GestureComparer {
 	
 	protected void CompareGesturePressure()
 	{								
+		
 		double avgPressure = mGestureAuth.GestureAvgPressure;
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, avgPressure);
 	}
@@ -397,7 +398,7 @@ public class GestureComparer {
                 }
                 return 0;
             }
-        });		
+        });
 		
 		int zLimit = 2;
 		double avgScore = 0;
@@ -406,18 +407,27 @@ public class GestureComparer {
 		double tempWeight;
 		double tempScore;
 				
+		int minNumParams = 6;
+		double minZScore = 1;
+		
+		boolean isCalculateParameter;
+		
 		for(int idx = 0; idx < mCompareResultsGesture.ListCompareResults.size(); idx++) {
 			tempWeight = Math.abs(mCompareResultsGesture.ListCompareResults.get(idx).GetWeight());
 			
-			if(tempWeight > zLimit) {
-				tempWeight = zLimit;
+			isCalculateParameter = ((idx <= minNumParams) || (idx > minNumParams && tempWeight >= minZScore)); 
+			
+			if(isCalculateParameter) {
+				if(tempWeight > zLimit) {
+					tempWeight = zLimit;
+				}
+				tempWeight = tempWeight * tempWeight;
+				
+				tempScore = mCompareResultsGesture.ListCompareResults.get(idx).GetValue();
+				
+				avgScore += tempScore * tempWeight;
+				totalWeights += tempWeight;	
 			}
-			tempWeight = tempWeight * tempWeight;
-			
-			tempScore = mCompareResultsGesture.ListCompareResults.get(idx).GetValue();
-			
-			avgScore += tempScore * tempWeight;
-			totalWeights += tempWeight;
 		}		
 		
 		mGestureScore = avgScore / totalWeights;
