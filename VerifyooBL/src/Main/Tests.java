@@ -13,7 +13,7 @@ public class Tests {
 			
 			//score = t.TestSelf("roy-STAM123", "dalal.roy@gmail.com");			
 			//score = t.TestSelf("roy-STAM2", "roy-STAM2");
-			score = t.TestSelf("stamKav2", "stamKav2");
+			score = t.TestSelf("stamStartPoint", "stamStartPoint");
 		}
 		catch(Exception exc) {
 			msg = exc.getMessage();
