@@ -5,4 +5,6 @@ public interface IFeatureMeanData {
 	public double GetMean();
 	public double GetInternalSd();
 	public double GetPopulationZScore();
+	public String GetParamName();
+	public String GetInstruction();
 }

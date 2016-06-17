@@ -109,7 +109,7 @@ public class GestureExtended extends Gesture {
 	protected UtilsSpatialSampling mUtilsSpatialSampling;
 	protected UtilsGeneral mUtilsGeneral;
 	
-	protected IStatEngine mStatEngine;	
+	protected IStatEngine mStatEngine;
 	
 	public GestureExtended(Gesture gesture, HashMap<String, IFeatureMeanData> hashFeatureMeans, int gestureIdx) {		
 		Id = gesture.Id;
@@ -596,22 +596,84 @@ public class GestureExtended extends Gesture {
 	}
 	
 	public String GetGestureStrength() {
-		String result = "";
-	
 		double currentPopZScore;
 		
 		double totalZScore = 0;
 		double countZScore = 0;
 		
+		double zLimit = 2.5;
+		
+		String instruction, param;	
+		
+		double tempWeight;
+		
 		for (IFeatureMeanData featureMeanData : mHashFeatureMeans.values()) {
-			currentPopZScore = featureMeanData.GetPopulationZScore();
-			
-			if(currentPopZScore > ConstsGeneral.GESTURE_SCORE_CALC_MIN_Z_SCORE) {
-				totalZScore += currentPopZScore;
-				countZScore++;
+			if(featureMeanData != null) {
+				instruction = featureMeanData.GetInstruction();
+				param = featureMeanData.GetParamName();
+				
+				try {
+					currentPopZScore = featureMeanData.GetPopulationZScore();
+					
+					tempWeight = 0;
+					if(currentPopZScore > 1.5) {
+						tempWeight = 1;
+					}
+					if(currentPopZScore > 1.8) {
+						tempWeight = 2;
+					}
+					if(currentPopZScore > 1.8) {
+						tempWeight = 3;
+					}
+					if(currentPopZScore > zLimit) {
+						currentPopZScore = zLimit;
+					}
+					
+					totalZScore += currentPopZScore * tempWeight;
+					countZScore += tempWeight;
+					
+//					if(currentPopZScore > ConstsGeneral.GESTURE_SCORE_CALC_MIN_Z_SCORE) {
+//						if(currentPopZScore > zLimit) {
+//							currentPopZScore = zLimit;
+//						}
+//						totalZScore += currentPopZScore;
+//						countZScore++;
+//					}		
+				}
+				catch(Exception exc) {
+					
+				}
 			}
 		}			
 		
-		return result;
+		double avgZScore = 0;
+		if(countZScore > 0) {
+			avgZScore = totalZScore / countZScore;	
+		}
+		
+		String strength = "Low";
+		
+		
+		if(ListStrokes.size() >= 2) {
+			if(avgZScore > 1.5) {
+				strength = "High";
+			}
+			if(avgZScore > 2 || ListStrokes.size() >= 3) {
+				strength = "Very High";
+			}	
+		}
+		else {
+			if(avgZScore > 1) {
+				strength = "Medium";
+			}
+			if(avgZScore > 1.5 && countZScore > 2) {
+				strength = "High";
+			}
+			if(avgZScore > 1.8 && countZScore > 3) {
+				strength = "Very High";
+			}
+		}
+		
+		return strength;
 	}
 }

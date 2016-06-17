@@ -14,11 +14,7 @@ public abstract class FeatureMeanDataAbstract implements IFeatureMeanData {
 	protected double mCount;
 	protected ArrayList<Double> mListValues;
 	protected INormMgr mNormMgr;
-	
-	public FeatureMeanDataAbstract() {
-		
-	}
-	
+
 	public FeatureMeanDataAbstract(String name, String instruction)
 	{
 		mNormMgr = NormMgr.GetInstance(); 		
@@ -47,5 +43,13 @@ public abstract class FeatureMeanDataAbstract implements IFeatureMeanData {
 		popZScore = (GetMean() - populationMean) / populationSd;
 		
 		return popZScore;
+	}
+	
+	public String GetParamName() {
+		return mName;
+	}
+	
+	public String GetInstruction() {
+		return mInstruction;
 	}
 }
