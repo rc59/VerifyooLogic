@@ -610,38 +610,40 @@ public class GestureExtended extends Gesture {
 		for (IFeatureMeanData featureMeanData : mHashFeatureMeans.values()) {
 			if(featureMeanData != null) {
 				instruction = featureMeanData.GetInstruction();
-				param = featureMeanData.GetParamName();
-				
-				try {
-					currentPopZScore = featureMeanData.GetPopulationZScore();
+				if(instruction == Instruction) {
+					param = featureMeanData.GetParamName();
 					
-					tempWeight = 0;
-					if(currentPopZScore > 1.5) {
-						tempWeight = 1;
+					try {
+						currentPopZScore = featureMeanData.GetPopulationZScore();
+						
+						tempWeight = 0;
+						if(currentPopZScore > 1.5) {
+							tempWeight = 1;
+						}
+						if(currentPopZScore > 1.8) {
+							tempWeight = 2;
+						}
+						if(currentPopZScore > 1.8) {
+							tempWeight = 3;
+						}
+						if(currentPopZScore > zLimit) {
+							currentPopZScore = zLimit;
+						}
+						
+						totalZScore += currentPopZScore * tempWeight;
+						countZScore += tempWeight;
+						
+//						if(currentPopZScore > ConstsGeneral.GESTURE_SCORE_CALC_MIN_Z_SCORE) {
+//							if(currentPopZScore > zLimit) {
+//								currentPopZScore = zLimit;
+//							}
+//							totalZScore += currentPopZScore;
+//							countZScore++;
+//						}		
 					}
-					if(currentPopZScore > 1.8) {
-						tempWeight = 2;
-					}
-					if(currentPopZScore > 1.8) {
-						tempWeight = 3;
-					}
-					if(currentPopZScore > zLimit) {
-						currentPopZScore = zLimit;
-					}
-					
-					totalZScore += currentPopZScore * tempWeight;
-					countZScore += tempWeight;
-					
-//					if(currentPopZScore > ConstsGeneral.GESTURE_SCORE_CALC_MIN_Z_SCORE) {
-//						if(currentPopZScore > zLimit) {
-//							currentPopZScore = zLimit;
-//						}
-//						totalZScore += currentPopZScore;
-//						countZScore++;
-//					}		
-				}
-				catch(Exception exc) {
-					
+					catch(Exception exc) {
+						
+					}	
 				}
 			}
 		}			
