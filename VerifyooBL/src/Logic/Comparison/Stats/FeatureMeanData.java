@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import Logic.Comparison.Stats.Abstract.FeatureMeanDataAbstract;
 
-public class FeatureMeanData extends FeatureMeanDataAbstract {				
-	public FeatureMeanData(String name) {
-		super(name);		
+public class FeatureMeanData extends FeatureMeanDataAbstract {					
+	public FeatureMeanData(String name, String instruction) {
+		super(name, instruction);		
 	}
 
 	public double GetMean()

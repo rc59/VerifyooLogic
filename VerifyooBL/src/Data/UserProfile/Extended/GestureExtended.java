@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import Consts.ConstsFeatures;
+import Consts.ConstsGeneral;
 import Consts.ConstsParamNames;
 import Data.MetaData.ParameterAvgPoint;
 import Data.MetaData.IndexValue;
@@ -576,14 +577,15 @@ public class GestureExtended extends Gesture {
 		}
 		else {
 			if(isAngle) {
-				tempFeatureMeanData = new FeatureMeanDataAngle(paramName);	
+				tempFeatureMeanData = new FeatureMeanDataAngle(paramName, Instruction);	
 			}
 			else {
-				tempFeatureMeanData = new FeatureMeanData(paramName);	
+				tempFeatureMeanData = new FeatureMeanData(paramName, Instruction);	
 			}
 					
 			mHashFeatureMeans.put(key, tempFeatureMeanData);
 		}
+		
 		
 		tempFeatureMeanData.AddValue(value);		
 	}
@@ -591,5 +593,25 @@ public class GestureExtended extends Gesture {
 	public HashMap<String, IFeatureMeanData> GetFeatureMeansHash() 
 	{
 		return mHashFeatureMeans;
+	}
+	
+	public String GetGestureStrength() {
+		String result = "";
+	
+		double currentPopZScore;
+		
+		double totalZScore = 0;
+		double countZScore = 0;
+		
+		for (IFeatureMeanData featureMeanData : mHashFeatureMeans.values()) {
+			currentPopZScore = featureMeanData.GetPopulationZScore();
+			
+			if(currentPopZScore > ConstsGeneral.GESTURE_SCORE_CALC_MIN_Z_SCORE) {
+				totalZScore += currentPopZScore;
+				countZScore++;
+			}
+		}			
+		
+		return result;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import Consts.ConstsGeneral;
 import Consts.ConstsParamNames;
 import Consts.ConstsParamWeights;
 import Consts.Enums.PointStatus;
@@ -407,15 +408,15 @@ public class GestureComparer {
 		double tempWeight;
 		double tempScore;
 				
-		int minNumParams = 6;
-		double minZScore = 1;
+		int minNumParams =  ConstsGeneral.GESTURE_SCORE_CALC_MIN_PARAMS;
+		double minZScore = ConstsGeneral.GESTURE_SCORE_CALC_MIN_Z_SCORE;
 		
 		boolean isCalculateParameter;
 		
 		for(int idx = 0; idx < mCompareResultsGesture.ListCompareResults.size(); idx++) {
 			tempWeight = Math.abs(mCompareResultsGesture.ListCompareResults.get(idx).GetWeight());
 			
-			isCalculateParameter = ((idx <= minNumParams) || (idx > minNumParams && tempWeight >= minZScore)); 
+			isCalculateParameter = ((idx <= minNumParams) || (idx > minNumParams && tempWeight >= minZScore));
 			
 			if(isCalculateParameter) {
 				if(tempWeight > zLimit) {

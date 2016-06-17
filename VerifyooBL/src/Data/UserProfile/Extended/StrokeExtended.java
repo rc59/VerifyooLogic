@@ -400,7 +400,7 @@ public class StrokeExtended extends Stroke {
 			tempFeatureMeanData = mHashFeatureMeans.get(key);
 		}
 		else {
-			tempFeatureMeanData = new FeatureMeanData(paramName);			
+			tempFeatureMeanData = new FeatureMeanData(paramName, instruction);			
 			mHashFeatureMeans.put(key, tempFeatureMeanData);
 		}
 		

@@ -20,7 +20,7 @@ public class InstructionFeatureMeanData {
 			tempMeanData = mHashFeatureMeans.get(paramName);
 		}
 		else {
-			tempMeanData = new FeatureMeanData(paramName);
+			tempMeanData = new FeatureMeanData(paramName, mInstruction);
 			mHashFeatureMeans.put(paramName, tempMeanData);
 		}
 		

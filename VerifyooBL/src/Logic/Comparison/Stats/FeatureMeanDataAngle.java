@@ -3,8 +3,8 @@ package Logic.Comparison.Stats;
 import Logic.Comparison.Stats.Abstract.FeatureMeanDataAbstract;
 
 public class FeatureMeanDataAngle extends FeatureMeanDataAbstract {
-	public FeatureMeanDataAngle(String name) {
-		super(name);		
+	public FeatureMeanDataAngle(String name, String instruction) {
+		super(name, instruction);		
 	}
 
 	@Override
