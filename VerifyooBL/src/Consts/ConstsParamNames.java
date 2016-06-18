@@ -14,6 +14,7 @@ public class ConstsParamNames {
 	{
 		public static final String GESTURE_NUM_EVENTS = "NumEvents";
 		public static final String GESTURE_AVERAGE_VELOCITY = "GestureAvgVelocity";
+		public static final String GESTURE_MAX_VELOCITY = "GestureMaxVelocity";
 		public static final String GESTURE_LENGTH = "GestureLength";
 		public static final String GESTURE_TOTAL_STROKES_TIME_INTERVAL = "GestureTotalStrokesTimeInterval";
 		public static final String GESTURE_TOTAL_TIME_INTERNVAL = "GestureTotalTimeInterval";
@@ -28,6 +29,10 @@ public class ConstsParamNames {
 		public static final String GESTURE_MAX_VELOCITY_DIRECTION = "GestureDirectionAtFirstStrokeMaxVelocity";
 		public static final String GESTURE_MID_OF_FIRST_STROKE_VELOCITY = "MidOfFirstStrokeVelocity";
 		public static final String GESTURE_MID_OF_FIRST_STROKE_ANGLE = "MidOfFirstStrokeAngle";		
+		
+		public static final String GESTURE_AVG_ACCELERATION = "GestureAverageAcceleration";
+		public static final String GESTURE_MAX_ACCELERATION = "GestureMaxAcceleration";
+		
 		public static final String GESTURE_AVG_START_ACCELERATION = "GestureAverageStartAcceleration";
 		public static final String GESTURE_VELOCITY_PEAK = "GestureVelocityPeak";
 		public static final String GESTURE_VELOCITY_PEAK_INTERVAL_PERCENTAGE = "GestureVelocityPeakIntervalPercentage";

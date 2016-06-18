@@ -327,6 +327,10 @@ public class GestureExtended extends Gesture {
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, GestureAvgPressure);
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, GestureAvgSurface);
 		
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_MAX_VELOCITY, GestureMaxVelocity);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_ACCELERATION, GestureAverageAcceleration);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_MAX_ACCELERATION, GestureMaxAcceleration);
+		
 		GestureAvgAccX = totalAccX / ListGestureEventsExtended.size(); 
 		GestureAvgAccY = totalAccY / ListGestureEventsExtended.size();
 		GestureAvgAccZ = totalAccZ / ListGestureEventsExtended.size();

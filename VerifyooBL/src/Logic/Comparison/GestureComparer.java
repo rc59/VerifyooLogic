@@ -202,8 +202,34 @@ public class GestureComparer {
 		if(IsNeedToRun("CompareGestureAccumulatedLengthSlope")){
 			CompareGestureAccumulatedLengthSlope();
 		}
+		
+		if(IsNeedToRun("CompareGestureMaxVelocity")){
+			CompareGestureMaxVelocity();
+		}
+//		if(IsNeedToRun("CompareGestureAvgAcceleration")){
+//			CompareGestureAvgAcceleration();
+//		}
+//		if(IsNeedToRun("CompareGestureMaxAcceleration")){
+//			CompareGestureMaxAcceleration();
+//		}
+		
 	}
 	
+	protected void CompareGestureMaxAcceleration() {
+		double maxAcceleration = mGestureAuth.GestureMaxAcceleration;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MAX_ACCELERATION, maxAcceleration);
+	}
+
+	protected void CompareGestureAvgAcceleration() {
+		double avgAcceleration = mGestureAuth.GestureAverageAcceleration;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_ACCELERATION, avgAcceleration);
+	}
+
+	protected void CompareGestureMaxVelocity() {
+		double maxVelocity = mGestureAuth.GestureMaxVelocity;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MAX_VELOCITY, maxVelocity);
+	}
+
 	protected void CompareGestureAccumulatedLengthRSqr()
 	{
 		double accumulatedLengthRSqr = mGestureAuth.GestureAccumulatedLengthLinearRegRSqr;
