@@ -216,6 +216,7 @@ public class NormMgr implements INormMgr {
 //		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_VELOCITY, ConstsInstructions.INSTRUCTION_LETTER_R, 2.1949, 1.2685, 0.3);		
 //		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_VELOCITY, ConstsInstructions.INSTRUCTION_TRIANGLE, 113, 38, 0.3);
 
+		//:TODO CALCULATE NORMS FOR PARAMETER
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_ANGLE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.069936322, 1.286465441, 0.496739832);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_ANGLE, ConstsInstructions.INSTRUCTION_EIGHT, 0.849805491, 1.129770489, 0.897860485);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_ANGLE, ConstsInstructions.INSTRUCTION_FIVE, 1.320432208, 0.96737028, 0.875625277);
