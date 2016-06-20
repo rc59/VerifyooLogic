@@ -272,7 +272,7 @@ public class GestureComparer {
 	protected void CompareMidOfFirstStrokeVelocity()
 	{
 		double midOfFirstStrokeVelocity = mGestureAuth.MidOfFirstStrokeVelocity;
-		CalcScoreWithoutDistribution(ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_VELOCITY, midOfFirstStrokeVelocity);		
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MID_OF_FIRST_STROKE_VELOCITY, midOfFirstStrokeVelocity);		
 	}
 
 	protected void CompareMidOfFirstStrokeAngle()

@@ -67,26 +67,34 @@ public class StatEngine implements IStatEngine {
 		
 		
 		double internalMean = hashFeatureMeans.get(key).GetMean();
-		double internalSd = normObj.GetInternalStandardDev(); //hashFeatureMeans.get(key).GetInternalSd();
+		double internalSd = hashFeatureMeans.get(key).GetInternalSd();
+		
+		double upperInternalSD = internalMean + 2 * internalSd;
+		double lowerInternalSD = internalMean - 2 * internalSd;
+		
+		double zScoreForUser = (internalMean - populationMean) / populationSd;
+		IStatEngineResult statResult;
+		
+		if(authValue > lowerInternalSD && authValue < upperInternalSD) {
+			statResult = new StatEngineResult(1, zScoreForUser);
+			return statResult;
+		}
 		
 		double upper = internalMean + (3 * populationInternalSd);
 		double lower = internalMean - (3 * populationInternalSd);
 		
 		double zScore = (authValue - populationMean) / populationSd;
-		double zScoreForUser = (internalMean - populationMean) / populationSd;
-		
-		IStatEngineResult statResult;
 		
 		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
 				
 		if(authValue > GetUpper(internalMean, populationInternalSd, 2) || authValue < GetLower(internalMean, populationInternalSd, 2)) {
-			score -= 0.3;
+			score -= 0.1;
 		}
 		if(authValue > GetUpper(internalMean, populationInternalSd, 3) || authValue < GetLower(internalMean, populationInternalSd, 3)) {
 			score -= 0.1;
 		}
 		if(authValue > GetUpper(internalMean, populationInternalSd, 4) || authValue < GetLower(internalMean, populationInternalSd, 4)) {
-			score -= 0.2;
+			score -= 0.1;
 		}
 		
 		if(score < 0) {
@@ -117,7 +125,7 @@ public class StatEngine implements IStatEngine {
 		else
 			score = 0;
 
-		double zScoreForUser = 3.0;
+		double zScoreForUser = 1;
 		statResult = new StatEngineResult(score, zScoreForUser);
 		return statResult;	
 	}
