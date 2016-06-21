@@ -69,19 +69,24 @@ public class StatEngine implements IStatEngine {
 		double internalMean = hashFeatureMeans.get(key).GetMean();
 		double internalSd = hashFeatureMeans.get(key).GetInternalSd();
 		
-		double upperInternalSD = internalMean + 2 * internalSd;
-		double lowerInternalSD = internalMean - 2 * internalSd;
+		double upperInternalSD = internalMean + 1.5 * populationInternalSd;
+		double lowerInternalSD = internalMean - 1.5 * populationInternalSd;
+		
+		double upperInternalSDUser = internalMean + internalSd;
+		double lowerInternalSDUser = internalMean - internalSd;
 		
 		double zScoreForUser = (internalMean - populationMean) / populationSd;
 		IStatEngineResult statResult;
 		
-		if(authValue > lowerInternalSD && authValue < upperInternalSD) {
+		if(authValue > lowerInternalSDUser && authValue < upperInternalSDUser) {
 			statResult = new StatEngineResult(1, zScoreForUser);
 			return statResult;
 		}
 		
-		double upper = internalMean + (3 * populationInternalSd);
-		double lower = internalMean - (3 * populationInternalSd);
+		if(authValue > lowerInternalSD && authValue < upperInternalSD) {
+			statResult = new StatEngineResult(0.95, zScoreForUser);
+			return statResult;
+		}		
 		
 		double zScore = (authValue - populationMean) / populationSd;
 		

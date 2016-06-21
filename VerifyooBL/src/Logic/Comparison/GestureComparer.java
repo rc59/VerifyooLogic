@@ -196,9 +196,10 @@ public class GestureComparer {
 			CompareMidOfFirstStrokeAngle();
 		}	
 
-		if(IsNeedToRun("CompareGestureAccumulatedLengthRSqr")){
-			CompareGestureAccumulatedLengthRSqr();
-		}
+		//TODO: check parameter
+//		if(IsNeedToRun("CompareGestureAccumulatedLengthRSqr")){
+//			CompareGestureAccumulatedLengthRSqr();
+//		}
 		if(IsNeedToRun("CompareGestureAccumulatedLengthSlope")){
 			CompareGestureAccumulatedLengthSlope();
 		}
@@ -211,8 +212,7 @@ public class GestureComparer {
 //		}
 //		if(IsNeedToRun("CompareGestureMaxAcceleration")){
 //			CompareGestureMaxAcceleration();
-//		}
-		
+//		}		
 	}
 	
 	protected void CompareGestureMaxAcceleration() {
