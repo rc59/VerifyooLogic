@@ -448,7 +448,7 @@ public class GestureComparer {
 				if(tempWeight > zLimit) {
 					tempWeight = zLimit;
 				}
-				tempWeight = tempWeight * tempWeight;
+				tempWeight = tempWeight;
 				
 				tempScore = mCompareResultsGesture.ListCompareResults.get(idx).GetValue();
 				

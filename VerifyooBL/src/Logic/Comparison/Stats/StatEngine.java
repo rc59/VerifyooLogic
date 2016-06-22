@@ -63,35 +63,36 @@ public class StatEngine implements IStatEngine {
 				
 		double populationMean = normObj.GetMean();
 		double populationSd = normObj.GetStandardDev();
-		double populationInternalSd = normObj.GetInternalStandardDev();
-		
+		double populationInternalSd = normObj.GetInternalStandardDev();		
 		
 		double internalMean = hashFeatureMeans.get(key).GetMean();
 		double internalSd = hashFeatureMeans.get(key).GetInternalSd();
 		
-		double upperInternalSD = internalMean + 1.5 * populationInternalSd;
-		double lowerInternalSD = internalMean - 1.5 * populationInternalSd;
-		
-		double upperInternalSDUser = internalMean + internalSd;
-		double lowerInternalSDUser = internalMean - internalSd;
+		double upperInternalSD = internalMean + populationInternalSd;
+		double lowerInternalSD = internalMean - populationInternalSd;		
 		
 		double zScoreForUser = (internalMean - populationMean) / populationSd;
 		IStatEngineResult statResult;
 		
-		if(authValue > lowerInternalSDUser && authValue < upperInternalSDUser) {
-			statResult = new StatEngineResult(1, zScoreForUser);
-			return statResult;
-		}
-		
-		if(authValue > lowerInternalSD && authValue < upperInternalSD) {
-			statResult = new StatEngineResult(0.95, zScoreForUser);
-			return statResult;
-		}		
-		
 		double zScore = (authValue - populationMean) / populationSd;
 		
 		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
-				
+		
+		if(internalSd < populationInternalSd) {
+			double upperInternalSDUser = internalMean + internalSd;
+			double lowerInternalSDUser = internalMean - internalSd;
+			
+			if(authValue > lowerInternalSDUser && authValue < upperInternalSDUser) {
+				statResult = new StatEngineResult(1, zScoreForUser);
+				return statResult;
+			}	
+		}
+		
+		if(authValue > lowerInternalSD && authValue < upperInternalSD) {
+			statResult = new StatEngineResult(0.90, zScoreForUser);
+			return statResult;
+		}
+		
 		if(authValue > GetUpper(internalMean, populationInternalSd, 2) || authValue < GetLower(internalMean, populationInternalSd, 2)) {
 			score -= 0.1;
 		}
