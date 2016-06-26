@@ -297,7 +297,7 @@ public class GestureComparer {
 		mMinCosineDistanceScore = 
 				mUtilsVectors.MinimumCosineDistanceScore(vectorStored, vectorAuth);
 		
-		if(mMinCosineDistanceScore > 1.5) {
+		if(mMinCosineDistanceScore > 1) {
 			mMinCosineDistanceValid = true;
 		}
 	}
