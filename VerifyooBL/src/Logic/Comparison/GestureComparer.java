@@ -401,10 +401,7 @@ public class GestureComparer {
 		if(!mIsGesturesIdentical) {
 			CalculateGestureScore();
 			mCompareResultsGesture.Score = mGestureScore; //(mGestureScore + mStrokesScore) / 2;
-			
-			if(!mMinCosineDistanceValid) {
-				mCompareResultsGesture.Score = 0;	
-			}
+			CheckStrokesCosineDistance();
 		}		
 		else 
 		{
@@ -412,6 +409,14 @@ public class GestureComparer {
 		}		
 	}
 	
+	protected void CheckStrokesCosineDistance() {		
+		for(int idxStrokeComparer = 0; idxStrokeComparer < mListStrokeComparers.size(); idxStrokeComparer++) {
+			if(mListStrokeComparers.get(idxStrokeComparer).GetMinCosineDistance() < 1) {
+				mCompareResultsGesture.Score = 0;
+			}
+		}		
+	}
+
 	protected void CalculateGestureScore() {
 				
 		Collections.sort(mCompareResultsGesture.ListCompareResults, new Comparator<ICompareResult>() {

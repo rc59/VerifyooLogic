@@ -32,7 +32,7 @@ public class StrokeComparer {
 	
 	protected StrokeExtended mStrokeStoredExtended;
 	protected StrokeExtended mStrokeAuthExtended;		
-	
+	protected double mMinCosineDistanceScore;
 	protected boolean mIsSimilarDevices;
 	
 	public StrokeComparer(boolean isSimilarDevices)
@@ -184,7 +184,9 @@ public class StrokeComparer {
 		
 		ICompareResult compareResult = 
 				(ICompareResult) new CompareResultParamVectors(ConstsParamNames.Stroke.MINIMUM_COSINE_DISTANCE, score, ConstsParamWeights.MEDIUM, minimumCosineDistanceScore, vectorStored, vectorAuth);
-		mCompareResult.ListCompareResults.add(compareResult);			
+		mCompareResult.ListCompareResults.add(compareResult);
+		
+		mMinCosineDistanceScore = score;
 	}
 	/****************************/
 	
@@ -196,6 +198,11 @@ public class StrokeComparer {
 		}
 		return mCompareResult.Score;
 	}	
+	
+	public double GetMinCosineDistance()
+	{
+		return mMinCosineDistanceScore;
+	}
 	
 	public CompareResultSummary GetResultsSummary()
 	{
