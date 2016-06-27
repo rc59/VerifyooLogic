@@ -186,7 +186,7 @@ public class StrokeComparer {
 				(ICompareResult) new CompareResultParamVectors(ConstsParamNames.Stroke.MINIMUM_COSINE_DISTANCE, score, ConstsParamWeights.MEDIUM, minimumCosineDistanceScore, vectorStored, vectorAuth);
 		mCompareResult.ListCompareResults.add(compareResult);
 		
-		mMinCosineDistanceScore = score;
+		mMinCosineDistanceScore = minimumCosineDistanceScore;
 	}
 	/****************************/
 	

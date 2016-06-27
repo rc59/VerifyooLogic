@@ -15,7 +15,9 @@ public class ConstsParamNames {
 		public static final String GESTURE_NUM_EVENTS = "NumEvents";
 		public static final String GESTURE_AVERAGE_VELOCITY = "GestureAvgVelocity";
 		public static final String GESTURE_MAX_VELOCITY = "GestureMaxVelocity";
-		public static final String GESTURE_LENGTH = "GestureLength";
+		public static final String GESTURE_LENGTH = "GestureLength";		
+		public static final String GESTURE_TOTAL_AREA = "GestureTotalArea";
+		public static final String GESTURE_TOTAL_AREA_MINX_MINY = "GestureTotalAreaMinXMinY";		
 		public static final String GESTURE_TOTAL_STROKES_TIME_INTERVAL = "GestureTotalStrokesTimeInterval";
 		public static final String GESTURE_TOTAL_TIME_INTERNVAL = "GestureTotalTimeInterval";
 		public static final String GESTURE_ACCUMULATED_DISTANCE_BY_TIME = "GestureAccumulatedDistanceByTime";

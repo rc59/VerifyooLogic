@@ -158,6 +158,12 @@ public class GestureComparer {
 		if(IsNeedToRun("CompareGestureTotalStrokesTime")){
 			CompareGestureTotalStrokesTime();
 		}
+		if(IsNeedToRun("CompareGestureStrokeAreas")){
+			CompareGestureStrokeAreas();
+		}
+		if(IsNeedToRun("CompareGestureAreasStrokeMinXMinY")){
+			CompareGestureStrokeAreasMinXMinY();
+		}		
 		if(IsNeedToRun("CompareGestureAreas")){
 			CompareGestureAreas();
 		}
@@ -173,9 +179,9 @@ public class GestureComparer {
 		if(IsNeedToRun("CompareGestureAverageStartAcceleration")){
 			CompareGestureAverageStartAcceleration();
 		}
-		if(IsNeedToRun("CompareGestureVelocityPeaks")){
-			CompareGestureVelocityPeaks();
-		}
+//		if(IsNeedToRun("CompareGestureVelocityPeaks")){
+//			CompareGestureVelocityPeaks();
+//		}
 //		if(IsNeedToRun("CompareGestureVelocityPeaksIntervalPercentage")){
 //			CompareGestureVelocityPeaksIntervalPercentage();
 //		}
@@ -317,11 +323,23 @@ public class GestureComparer {
 	
 	protected void CompareGestureAreas()
 	{		
+		double areaAuth = mGestureAuth.GestureTotalArea;						
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_AREA, areaAuth);
+	}
+
+	protected void CompareGestureAreasMinXMinY()
+	{		
+		double areaAuth = mGestureAuth.GestureTotalAreaMinXMinY;						
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_AREA_MINX_MINY, areaAuth);
+	}	
+	
+	protected void CompareGestureStrokeAreas()
+	{		
 		double areaAuth = mGestureAuth.GestureTotalStrokeArea;						
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, areaAuth);
-	}
+	}	
 	
-	protected void CompareGestureAreasMinXMinY()
+	protected void CompareGestureStrokeAreasMinXMinY()
 	{		
 		double areaAuth = mGestureAuth.GestureTotalStrokeAreaMinXMinY;						
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, areaAuth);

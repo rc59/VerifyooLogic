@@ -40,10 +40,10 @@ public class StrokeExtended extends Stroke {
 	private double mStrokeCenterXpixel;
 	private double mStrokeCenterYpixel;	
 
-	private double mPointMinXMM;
-	private double mPointMaxXMM;
-	private double mPointMinYMM;
-	private double mPointMaxYMM;
+	public double PointMinXMM;
+	public double PointMaxXMM;
+	public double PointMinYMM;
+	public double PointMaxYMM;
 
 	private HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	private double[] mVelocities;
@@ -248,8 +248,8 @@ public class StrokeExtended extends Stroke {
                 ShapeDataObj.ShapeArea += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
 
                 x1 = 0; y1 = 0;
-                x2 = ListEventsExtended.get(idxEvent - 1).Xmm - mPointMinXMM; y2 = ListEventsExtended.get(idxEvent - 1).Ymm - mPointMinYMM;
-                x3 = ListEventsExtended.get(idxEvent).Xmm - mPointMinXMM; y3 = ListEventsExtended.get(idxEvent).Ymm - mPointMinYMM;
+                x2 = ListEventsExtended.get(idxEvent - 1).Xmm - PointMinXMM; y2 = ListEventsExtended.get(idxEvent - 1).Ymm - PointMinYMM;
+                x3 = ListEventsExtended.get(idxEvent).Xmm - PointMinXMM; y3 = ListEventsExtended.get(idxEvent).Ymm - PointMinYMM;
                 ShapeDataObj.ShapeAreaMinXMinY += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
                 
                 if(CheckIfPressureExists(ListEventsExtended.get(idxEvent))) {
@@ -355,10 +355,10 @@ public class StrokeExtended extends Stroke {
 		mStrokeCenterXpixel = (mPointMinX.Xpixel + mPointMaxX.Xpixel) / 2;
         mStrokeCenterYpixel = (mPointMinY.Ypixel + mPointMaxY.Ypixel) / 2;
 
-        mPointMinXMM = (mPointMinX.Xpixel - mStrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
-        mPointMaxXMM = (mPointMaxX.Xpixel - mStrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
-        mPointMinYMM = (mPointMinY.Ypixel - mStrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
-        mPointMaxYMM = (mPointMinY.Ypixel - mStrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
+        PointMinXMM = (mPointMinX.Xpixel - mStrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
+        PointMaxXMM = (mPointMaxX.Xpixel - mStrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
+        PointMinYMM = (mPointMinY.Ypixel - mStrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
+        PointMaxYMM = (mPointMinY.Ypixel - mStrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
 	}
 	
 	protected void CalculateSpatialSamplingVector()
