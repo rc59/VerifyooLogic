@@ -2,6 +2,9 @@ package Main;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 
 import org.bson.types.ObjectId;
 
@@ -13,6 +16,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
+import Data.Comparison.Interfaces.ICompareResult;
+import Data.UserProfile.Extended.GestureExtended;
 import Data.UserProfile.Extended.TemplateExtended;
 import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.MotionEventCompact;
@@ -28,7 +33,7 @@ public class Tester {
 		MongoClient mongo;
 		try {
 			mongo = new MongoClient("localhost", 27017);
-			DB db = mongo.getDB("extserver-dev");
+			DB db = mongo.getDB("templates");
 						
 			DBCollection col = db.getCollection("templates");
 			DBObject query = BasicDBObjectBuilder.start().add("Name", userName).get();
@@ -170,7 +175,7 @@ public class Tester {
 		return score;
 	}
 	
-	public double TestByName(String name1, String name2)
+	public double CompareTemplates(String name1, String name2)
 	{		
 		Template template1 = GetFromDB(name1);		
 		Template template2 = GetFromDB(name2);
@@ -180,10 +185,57 @@ public class Tester {
 		TemplateExtended templateBase = new TemplateExtended(template1);
 		TemplateExtended templateAuth = new TemplateExtended(template2);
 		
+		HashMap<String, Boolean> hashInstructions = new HashMap<>();
+		for(int idxGestureAuth = 0; idxGestureAuth < templateAuth.ListGestureExtended.size(); idxGestureAuth++) {
+			if(!hashInstructions.containsKey(templateAuth.ListGestureExtended.get(idxGestureAuth).Instruction)) {
+				hashInstructions.put(templateAuth.ListGestureExtended.get(idxGestureAuth).Instruction, true);
+			}
+		}
+				
+		ArrayList<GestureExtended> tempListGestures = new ArrayList<>();
+		for(int idxGestureAuth = 0; idxGestureAuth < templateBase.ListGestureExtended.size(); idxGestureAuth++) {
+			if(hashInstructions.containsKey(templateBase.ListGestureExtended.get(idxGestureAuth).Instruction)) {
+				tempListGestures.add(templateBase.ListGestureExtended.get(idxGestureAuth));
+				hashInstructions.remove(templateBase.ListGestureExtended.get(idxGestureAuth).Instruction);
+			}			
+		}
+		templateBase.ListGestureExtended = tempListGestures;
+		
+		Collections.sort(templateBase.ListGestureExtended, new Comparator<GestureExtended>() {
+            @Override
+            public int compare(GestureExtended gesture1, GestureExtended gesture2) {
+                if (gesture1.Instruction.compareTo(gesture2.Instruction) > 0) {
+                    return 1;
+                }
+                if (gesture1.Instruction.compareTo(gesture2.Instruction) < 0) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+		
+		Collections.sort(templateAuth.ListGestureExtended, new Comparator<GestureExtended>() {
+            @Override
+            public int compare(GestureExtended gesture1, GestureExtended gesture2) {
+                if (gesture1.Instruction.compareTo(gesture2.Instruction) > 0) {
+                    return 1;
+                }
+                if (gesture1.Instruction.compareTo(gesture2.Instruction) < 0) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+		
 		comparer.CompareTemplates(templateBase, templateAuth);
 		
+		ArrayList<Double> listScores = new ArrayList<>();
+		for(int idxGestureScore = 0; idxGestureScore < comparer.GetGestureComparers().size(); idxGestureScore++) {
+			listScores.add(comparer.GetGestureComparers().get(idxGestureScore).GetResultsSummary().Score);
+		}
+		
 		boolean result = true;
-		double score = comparer.GetScore();
+		double score = GetFinalScore(listScores);
 		if(score < 0.9) {
 			result = false;
 		}
@@ -191,4 +243,20 @@ public class Tester {
 		
 		return score;
 	}
+	
+	private double GetFinalScore(ArrayList<Double> mListScores) {
+        Collections.sort(mListScores);
+
+        double scores = 0;
+        double weights = 0;
+        double tempWeight;
+        double finalScore = 0;
+        if (mListScores.get(0) > 0) {
+            mListScores.remove(0);
+            scores = mListScores.get(0) * 1 + mListScores.get(1) * 1.25 + mListScores.get(2) * 1.5;
+            finalScore = scores / 3.75;
+        }
+
+        return finalScore;
+    }
 }

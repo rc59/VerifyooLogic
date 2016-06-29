@@ -33,7 +33,7 @@ public class UtilsStat {
 		return zScore;
 	}
 	
-	protected double ConvertZToProbability(double z) {
+	public double ConvertZToProbability(double z) {
 		double y, x, w;
         double Z_MAX = 6;
 
