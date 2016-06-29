@@ -1,4 +1,4 @@
-	package Data.UserProfile.Extended;
+package Data.UserProfile.Extended;
 
 import java.util.ArrayList;
 import java.util.HashMap;

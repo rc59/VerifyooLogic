@@ -214,6 +214,7 @@ public class StrokeExtended extends Stroke {
 		StrokeMaxVelocity = new IndexValue();
 		StrokeMaxVelocity.Index = 0;
 		StrokeMaxVelocity.Value = 0;
+		StrokePropertiesObj.AccumulatedLength[0] = 0;
 		
 		double totalAcc = 0;		
 		double x1, y1, x2, y2, x3, y3;
@@ -227,7 +228,6 @@ public class StrokeExtended extends Stroke {
 				StrokeMaxVelocity.Index = idxEvent;
 			}
 			
-			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
 			mAccelerations[idxEvent] = ListEventsExtended.get(idxEvent).Acceleration;
 			
 			if(idxEvent > 0) {
@@ -241,6 +241,7 @@ public class StrokeExtended extends Stroke {
 				
                 StrokePropertiesObj.ListEventLength[idxEvent - 1] = mUtilsMath.CalcPitagoras(deltaX, deltaY);
                 StrokePropertiesObj.LengthMM += StrokePropertiesObj.ListEventLength[idxEvent - 1];                
+                StrokePropertiesObj.AccumulatedLength[idxEvent - 1] = StrokePropertiesObj.LengthMM;
                 
                 x1 = 0; y1 = 0;
                 x2 = ListEventsExtended.get(idxEvent - 1).Xmm; y2 = ListEventsExtended.get(idxEvent - 1).Ymm;
@@ -284,15 +285,17 @@ public class StrokeExtended extends Stroke {
 	
 	protected void CalculateStrokeVelocityPeaks()
 	{		
-		double totalVel = 0;
-		for(int idx = 0; idx < mVelocities.length; idx++) 
-		{
-			totalVel += mVelocities[idx];
-		}
-		
-		totalVel = totalVel / mVelocities.length;		
-		
 		StrokeVelocityPeakAvgPoint = mUtilsPeakCalc.CalculatePeaks(mVelocities, AverageVelocity);
+		int startIdx = StrokeVelocityPeakAvgPoint.IndexStart.Index - 1;
+		if(startIdx < 0) startIdx = 0;
+		int endIdx = StrokeVelocityPeakAvgPoint.IndexEnd.Index - 1;
+		if(endIdx >= StrokePropertiesObj.AccumulatedLength.length)
+		{
+			endIdx = StrokePropertiesObj.AccumulatedLength.length - 1;
+		}
+		if(endIdx < 0) endIdx = 0;
+		double length = StrokePropertiesObj.AccumulatedLength[endIdx] - StrokePropertiesObj.AccumulatedLength[startIdx];
+		StrokeVelocityPeakAvgPoint.PercentageOfLength = length / StrokePropertiesObj.LengthMM;
 	}
 
 	protected boolean CheckIfPressureExists(MotionEventExtended event) {
