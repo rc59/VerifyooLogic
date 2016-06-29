@@ -9,6 +9,7 @@ import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Comparison.Stats.Norms.NormMgr;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Comparison.Stats.Norms.Interfaces.INormMgr;
+import Logic.Utils.Utils;
 import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsStat;
 
@@ -55,6 +56,62 @@ public class StatEngine implements IStatEngine {
 		return statResult;
 	}
 	
+//	public IStatEngineResult CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
+//	{
+//		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
+//		
+//		String key = mUtilsGeneral.GenerateGestureFeatureMeanKey(instruction, paramName);
+//				
+//		double populationMean = normObj.GetMean();
+//		double populationSd = normObj.GetStandardDev();
+//		double populationInternalSd = normObj.GetInternalStandardDev();		
+//		
+//		double internalMean = hashFeatureMeans.get(key).GetMean();
+//		double internalSd = hashFeatureMeans.get(key).GetInternalSd();
+//		
+//		double upperInternalSD = internalMean + populationInternalSd;
+//		double lowerInternalSD = internalMean - populationInternalSd;		
+//		
+//		double zScoreForUser = (internalMean - populationMean) / populationSd;
+//		IStatEngineResult statResult;
+//		
+//		double zScore = (authValue - populationMean) / populationSd;
+//		
+//		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
+//		
+//		if(internalSd < populationInternalSd) {
+//			double upperInternalSDUser = internalMean + internalSd;
+//			double lowerInternalSDUser = internalMean - internalSd;
+//			
+//			if(authValue > lowerInternalSDUser && authValue < upperInternalSDUser) {
+//				statResult = new StatEngineResult(1, zScoreForUser);
+//				return statResult;
+//			}	
+//		}
+//		
+//		if(authValue > lowerInternalSD && authValue < upperInternalSD) {
+//			statResult = new StatEngineResult(0.90, zScoreForUser);
+//			return statResult;
+//		}
+//		
+//		if(authValue > GetUpper(internalMean, populationInternalSd, 2) || authValue < GetLower(internalMean, populationInternalSd, 2)) {
+//			score -= 0.1;
+//		}
+//		if(authValue > GetUpper(internalMean, populationInternalSd, 3) || authValue < GetLower(internalMean, populationInternalSd, 3)) {
+//			score -= 0.1;
+//		}
+//		if(authValue > GetUpper(internalMean, populationInternalSd, 4) || authValue < GetLower(internalMean, populationInternalSd, 4)) {
+//			score -= 0.1;
+//		}
+//		
+//		if(score < 0) {
+//			score = 0;
+//		}
+//		
+//		statResult = new StatEngineResult(score, zScoreForUser);
+//		return statResult;	
+//	}
+
 	public IStatEngineResult CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
 	{
 		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
@@ -68,47 +125,48 @@ public class StatEngine implements IStatEngine {
 		double internalMean = hashFeatureMeans.get(key).GetMean();
 		double internalSd = hashFeatureMeans.get(key).GetInternalSd();
 		
-		double upperInternalSD = internalMean + populationInternalSd;
-		double lowerInternalSD = internalMean - populationInternalSd;		
-		
 		double zScoreForUser = (internalMean - populationMean) / populationSd;
 		IStatEngineResult statResult;
-		
-		double zScore = (authValue - populationMean) / populationSd;
-		
-		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
-		
-		if(internalSd < populationInternalSd) {
-			double upperInternalSDUser = internalMean + internalSd;
-			double lowerInternalSDUser = internalMean - internalSd;
-			
-			if(authValue > lowerInternalSDUser && authValue < upperInternalSDUser) {
-				statResult = new StatEngineResult(1, zScoreForUser);
-				return statResult;
-			}	
+
+		//contribution of user uniqueness 
+		double uniquenessFactor = 1;
+//		if(zScoreForUser >= 2)
+//			uniquenessFactor = 1;
+//		else if(zScoreForUser >= 0.4){
+//			uniquenessFactor = 0.9;
+////			uniquenessFactor = Utils.GetInstance().GetUtilsStat().ConvertZToProbability(zScoreForUser);
+//		}
+//		else{
+//			uniquenessFactor = 0.8;
+//		}
+
+		double twoUpperPopulationInternalSD = (internalMean + 2 * populationInternalSd) * uniquenessFactor;
+		double twoLowerPopulationInternalSD = (internalMean - 2 * populationInternalSd) * uniquenessFactor;		
+		double threeUpperPopulationInternalSD = (internalMean + 2.5 * populationInternalSd) * uniquenessFactor;
+		double threeLowerPopulationInternalSD = (internalMean - 2.5 * populationInternalSd)  * uniquenessFactor;		
+		double pAttacker = 1-mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
+		double pUser;
+
+		if((authValue > twoLowerPopulationInternalSD) && (authValue < twoUpperPopulationInternalSD)) {
+			pUser = 1;
+		}
+		else if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)){
+			if(authValue > internalMean){
+				pUser = (threeUpperPopulationInternalSD - authValue) / populationInternalSd ;
+			}
+			else{
+				pUser = (authValue - threeLowerPopulationInternalSD) / populationInternalSd ;
+			}
+		}
+		else{
+			pUser = 0;
 		}
 		
-		if(authValue > lowerInternalSD && authValue < upperInternalSD) {
-			statResult = new StatEngineResult(0.90, zScoreForUser);
-			return statResult;
-		}
-		
-		if(authValue > GetUpper(internalMean, populationInternalSd, 2) || authValue < GetLower(internalMean, populationInternalSd, 2)) {
-			score -= 0.1;
-		}
-		if(authValue > GetUpper(internalMean, populationInternalSd, 3) || authValue < GetLower(internalMean, populationInternalSd, 3)) {
-			score -= 0.1;
-		}
-		if(authValue > GetUpper(internalMean, populationInternalSd, 4) || authValue < GetLower(internalMean, populationInternalSd, 4)) {
-			score -= 0.1;
-		}
-		
-		if(score < 0) {
-			score = 0;
-		}
-		
+		double score = pUser * (1-pAttacker);		
+
 		statResult = new StatEngineResult(score, zScoreForUser);
 		return statResult;	
+	
 	}
 
 	public IStatEngineResult CompareGestureScoreWithoutDistribution(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
