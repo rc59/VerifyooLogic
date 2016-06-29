@@ -457,7 +457,7 @@ public class GestureComparer {
 		double tempWeight;
 		double tempScore;
 				
-		int minNumParams =  ConstsGeneral.GESTURE_SCORE_CALC_MIN_PARAMS;
+		int minNumParams =  mCompareResultsGesture.ListCompareResults.size() - 2;
 		double minZScore = ConstsGeneral.GESTURE_SCORE_CALC_MIN_Z_SCORE;
 		
 		boolean isCalculateParameter;

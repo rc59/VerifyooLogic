@@ -129,40 +129,51 @@ public class StatEngine implements IStatEngine {
 		IStatEngineResult statResult;
 
 		//contribution of user uniqueness 
-		double uniquenessFactor = 0.5 * Math.abs(zScoreForUser) + 1;
+		double uniquenessFactor = 0.4 * Math.abs(zScoreForUser) + 1;
 		
 		if(uniquenessFactor > 2) {
 			uniquenessFactor = 2;
 		}
 
 		double twoUpperPopulationInternalSD = (internalMean + populationInternalSd * uniquenessFactor);
-		double twoLowerPopulationInternalSD = (internalMean - populationInternalSd * uniquenessFactor);		
-		double threeUpperPopulationInternalSD = (internalMean + 1.5 * populationInternalSd * uniquenessFactor);
-		double threeLowerPopulationInternalSD = (internalMean - 1.5 * populationInternalSd * uniquenessFactor);		
-		double pAttacker = 1-mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
+		double twoLowerPopulationInternalSD = (internalMean - populationInternalSd * uniquenessFactor);
+		
 		double pUser;
+		
+//		double threeUpperPopulationInternalSD = (internalMean + 1.5 * populationInternalSd * uniquenessFactor);
+//		double threeLowerPopulationInternalSD = (internalMean - 1.5 * populationInternalSd * uniquenessFactor);		
+//		double pAttacker = 1-mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
+//		
+//
+//		if((authValue > twoLowerPopulationInternalSD) && (authValue < twoUpperPopulationInternalSD)) {
+//			pUser = 1;
+//		}
+//		else if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)){
+//			if(authValue > internalMean){
+//				pUser = (threeUpperPopulationInternalSD - authValue) / populationInternalSd ;
+//			}
+//			else{
+//				pUser = (authValue - threeLowerPopulationInternalSD) / populationInternalSd ;
+//			}
+//		}
+//		else{
+//			pUser = 0;
+//		}
+//		
+//		double score = pUser;
+//		
+//		if(uniquenessFactor > 1) {
+//			score = score * (1-pAttacker);	
+//		}
 
+		double score;
 		if((authValue > twoLowerPopulationInternalSD) && (authValue < twoUpperPopulationInternalSD)) {
-			pUser = 1;
+			score = 1;
 		}
-		else if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)){
-			if(authValue > internalMean){
-				pUser = (threeUpperPopulationInternalSD - authValue) / populationInternalSd ;
-			}
-			else{
-				pUser = (authValue - threeLowerPopulationInternalSD) / populationInternalSd ;
-			}
+		else {
+			score = 0;	
 		}
-		else{
-			pUser = 0;
-		}
-		
-		double score = pUser;
-		
-		if(uniquenessFactor > 1) {
-			score = score * (1-pAttacker);	
-		}
-
+				
 		statResult = new StatEngineResult(score, zScoreForUser);
 		return statResult;	
 	
