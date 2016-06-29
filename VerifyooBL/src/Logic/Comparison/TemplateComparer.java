@@ -72,4 +72,8 @@ public class TemplateComparer {
 	{
 		return mCompareResultsTemplate;
 	}
+	
+	public ArrayList<GestureComparer> GetGestureComparers() {
+		return mListGestureComparers;
+	}
 }
