@@ -5,8 +5,8 @@ public class ParameterAvgPoint {
 	public IndexValue IndexEnd;
 	public IndexValue MaxValueInSection;
 	public double AverageValue;
-	public double PercentageOfNumOfEvent;
 	public double PercentageOfLength;
+	public double PercentageOfNumOfEvent;
 	
 	public ParameterAvgPoint(int indexStart, double velocityStart, double average) {
 		AverageValue = average;

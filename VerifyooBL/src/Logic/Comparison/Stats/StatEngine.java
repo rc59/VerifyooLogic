@@ -129,21 +129,16 @@ public class StatEngine implements IStatEngine {
 		IStatEngineResult statResult;
 
 		//contribution of user uniqueness 
-		double uniquenessFactor = 1;
-//		if(zScoreForUser >= 2)
-//			uniquenessFactor = 1;
-//		else if(zScoreForUser >= 0.4){
-//			uniquenessFactor = 0.9;
-////			uniquenessFactor = Utils.GetInstance().GetUtilsStat().ConvertZToProbability(zScoreForUser);
-//		}
-//		else{
-//			uniquenessFactor = 0.8;
-//		}
+		double uniquenessFactor = 0.5 * Math.abs(zScoreForUser) + 1;
+		
+		if(uniquenessFactor > 2) {
+			uniquenessFactor = 2;
+		}
 
-		double twoUpperPopulationInternalSD = (internalMean + 2 * populationInternalSd) * uniquenessFactor;
-		double twoLowerPopulationInternalSD = (internalMean - 2 * populationInternalSd) * uniquenessFactor;		
-		double threeUpperPopulationInternalSD = (internalMean + 2.5 * populationInternalSd) * uniquenessFactor;
-		double threeLowerPopulationInternalSD = (internalMean - 2.5 * populationInternalSd)  * uniquenessFactor;		
+		double twoUpperPopulationInternalSD = (internalMean + populationInternalSd * uniquenessFactor);
+		double twoLowerPopulationInternalSD = (internalMean - populationInternalSd * uniquenessFactor);		
+		double threeUpperPopulationInternalSD = (internalMean + 1.5 * populationInternalSd * uniquenessFactor);
+		double threeLowerPopulationInternalSD = (internalMean - 1.5 * populationInternalSd * uniquenessFactor);		
 		double pAttacker = 1-mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
 		double pUser;
 
@@ -162,7 +157,11 @@ public class StatEngine implements IStatEngine {
 			pUser = 0;
 		}
 		
-		double score = pUser * (1-pAttacker);		
+		double score = pUser;
+		
+		if(uniquenessFactor > 1) {
+			score = score * (1-pAttacker);	
+		}
 
 		statResult = new StatEngineResult(score, zScoreForUser);
 		return statResult;	

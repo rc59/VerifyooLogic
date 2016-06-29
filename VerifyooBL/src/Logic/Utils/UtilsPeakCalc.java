@@ -18,7 +18,7 @@ public class UtilsPeakCalc {
 		
 		double currMaxValue = 0;
 		int currMaxVelocityIdx = 0;
-
+		
 		for(int idxValue = 1; idxValue < values.length; idxValue++) {
 			valuePrev = values[idxValue - 1];
 			valueCurr = values[idxValue];
@@ -33,8 +33,7 @@ public class UtilsPeakCalc {
 				if(tempVelocityAvgPoint != null) {
 					tempVelocityAvgPoint.IndexEnd.Index = idxValue;
 					tempVelocityAvgPoint.IndexEnd.Value = valueCurr; 
-					tempVelocityAvgPoint.PercentageOfNumOfEvent = 
-							(double)(tempVelocityAvgPoint.IndexEnd.Index - tempVelocityAvgPoint.IndexStart.Index) / values.length; 
+					tempVelocityAvgPoint.PercentageOfNumOfEvent = ((double)(tempVelocityAvgPoint.IndexEnd.Index - tempVelocityAvgPoint.IndexStart.Index) / values.length); 
 							
 					currMaxValue = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxValue, valueCurr);
 					tempVelocityAvgPoint.MaxValueInSection = new IndexValue();
@@ -52,7 +51,7 @@ public class UtilsPeakCalc {
 					currMaxVelocityIdx = idxValue;
 				}
 			}
-		}		
+		}				
 		
 		ParameterAvgPoint avgPointMax = null;
 		if(listVelocityAvgPoints.size() > 0) {				
