@@ -19,39 +19,46 @@ public class UtilsPeakCalc {
 		double currMaxValue = 0;
 		int currMaxVelocityIdx = 0;
 		
-		for(int idxValue = 1; idxValue < values.length; idxValue++) {
-			valuePrev = values[idxValue - 1];
-			valueCurr = values[idxValue];
+		try {
+			for(int idxValue = 1; idxValue < values.length; idxValue++) {
+				valuePrev = values[idxValue - 1];
+				valueCurr = values[idxValue];
 
-			if(valuePrev < average && valueCurr > average) {
-				tempVelocityAvgPoint = new ParameterAvgPoint(idxValue, valueCurr, average);
-				tempVelocityAvgPoint.IndexStart.Index = idxValue;
-				currMaxValue = valueCurr;
-			}
-			
-			if((valuePrev > average && valueCurr < average) || (idxValue == values.length - 1)) {
-				if(tempVelocityAvgPoint != null) {
-					tempVelocityAvgPoint.IndexEnd.Index = idxValue;
-					tempVelocityAvgPoint.IndexEnd.Value = valueCurr; 
-					tempVelocityAvgPoint.PercentageOfNumOfEvent = ((double)(tempVelocityAvgPoint.IndexEnd.Index - tempVelocityAvgPoint.IndexStart.Index) / values.length); 
-							
-					currMaxValue = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxValue, valueCurr);
-					tempVelocityAvgPoint.MaxValueInSection = new IndexValue();
-					tempVelocityAvgPoint.MaxValueInSection.Value = currMaxValue;
-					tempVelocityAvgPoint.MaxValueInSection.Index = currMaxVelocityIdx;
-					listVelocityAvgPoints.add(tempVelocityAvgPoint);
-					tempVelocityAvgPoint = null;
-					currMaxValue = 0;
-				}				
-			}
-			
-			if(tempVelocityAvgPoint != null && tempVelocityAvgPoint.IndexEnd.Index == -1) {
-				currMaxValue = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxValue, valueCurr);
-				if(currMaxValue == valueCurr) {
-					currMaxVelocityIdx = idxValue;
+				if(valuePrev < average && valueCurr > average) {
+					tempVelocityAvgPoint = new ParameterAvgPoint(idxValue, valueCurr, average);
+					tempVelocityAvgPoint.IndexStart.Index = idxValue;
+					currMaxValue = valueCurr;
 				}
-			}
-		}				
+				
+				if((valuePrev > average && valueCurr < average) || (idxValue == values.length - 1)) {
+					if(tempVelocityAvgPoint != null) {
+						tempVelocityAvgPoint.IndexEnd.Index = idxValue;
+						tempVelocityAvgPoint.IndexEnd.Value = valueCurr; 
+						tempVelocityAvgPoint.PercentageOfNumOfEvent = ((double)(tempVelocityAvgPoint.IndexEnd.Index - tempVelocityAvgPoint.IndexStart.Index) / values.length); 
+								
+						currMaxValue = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxValue, valueCurr);
+						tempVelocityAvgPoint.MaxValueInSection = new IndexValue();
+						tempVelocityAvgPoint.MaxValueInSection.Value = currMaxValue;
+						tempVelocityAvgPoint.MaxValueInSection.Index = currMaxVelocityIdx;
+						listVelocityAvgPoints.add(tempVelocityAvgPoint);
+						tempVelocityAvgPoint = null;
+						currMaxValue = 0;
+					}				
+				}
+				
+				if(tempVelocityAvgPoint != null && tempVelocityAvgPoint.IndexEnd.Index == -1) {
+					currMaxValue = Utils.GetInstance().GetUtilsMath().GetMaxValue(currMaxValue, valueCurr);
+					if(currMaxValue == valueCurr) {
+						currMaxVelocityIdx = idxValue;
+					}
+				}
+			}		
+		}
+		catch(Exception exc)
+		{
+			String msg = exc.getMessage();
+		}
+				
 		
 		ParameterAvgPoint avgPointMax = null;
 		if(listVelocityAvgPoints.size() > 0) {				

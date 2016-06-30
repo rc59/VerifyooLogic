@@ -286,16 +286,18 @@ public class StrokeExtended extends Stroke {
 	protected void CalculateStrokeVelocityPeaks()
 	{		
 		StrokeVelocityPeakAvgPoint = mUtilsPeakCalc.CalculatePeaks(mVelocities, AverageVelocity);
-		int startIdx = StrokeVelocityPeakAvgPoint.IndexStart.Index - 1;
-		if(startIdx < 0) startIdx = 0;
-		int endIdx = StrokeVelocityPeakAvgPoint.IndexEnd.Index - 1;
-		if(endIdx >= StrokePropertiesObj.AccumulatedLength.length)
-		{
-			endIdx = StrokePropertiesObj.AccumulatedLength.length - 1;
+		if(StrokeVelocityPeakAvgPoint != null) {
+			int startIdx = StrokeVelocityPeakAvgPoint.IndexStart.Index - 1;
+			if(startIdx < 0) startIdx = 0;
+			int endIdx = StrokeVelocityPeakAvgPoint.IndexEnd.Index - 1;
+			if(endIdx >= StrokePropertiesObj.AccumulatedLength.length)
+			{
+				endIdx = StrokePropertiesObj.AccumulatedLength.length - 1;
+			}
+			if(endIdx < 0) endIdx = 0;
+			double length = StrokePropertiesObj.AccumulatedLength[endIdx] - StrokePropertiesObj.AccumulatedLength[startIdx];
+			StrokeVelocityPeakAvgPoint.PercentageOfLength = length / StrokePropertiesObj.LengthMM;	
 		}
-		if(endIdx < 0) endIdx = 0;
-		double length = StrokePropertiesObj.AccumulatedLength[endIdx] - StrokePropertiesObj.AccumulatedLength[startIdx];
-		StrokeVelocityPeakAvgPoint.PercentageOfLength = length / StrokePropertiesObj.LengthMM;
 	}
 
 	protected boolean CheckIfPressureExists(MotionEventExtended event) {

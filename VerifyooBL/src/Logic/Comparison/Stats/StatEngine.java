@@ -21,6 +21,8 @@ public class StatEngine implements IStatEngine {
 	protected static INormMgr mNormMgr;
 	protected static IStatEngine mInstance = null;	
 	
+	protected static HashMap<String, Boolean> mHashMapScaleParams;
+	
 	protected StatEngine()
 	{
 		
@@ -32,6 +34,16 @@ public class StatEngine implements IStatEngine {
 		  mNormMgr = NormMgr.GetInstance();
 		  mUtilsStat = new UtilsStat();
 		  mUtilsGeneral = new UtilsGeneral();
+		  
+		  mHashMapScaleParams = new HashMap<>();
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_LENGTH, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA_MINX_MINY, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_NUM_EVENTS, true);
       }
       return mInstance;
    }
@@ -129,19 +141,27 @@ public class StatEngine implements IStatEngine {
 		IStatEngineResult statResult;
 
 		//contribution of user uniqueness 
-		double uniquenessFactor = 0.4 * Math.abs(zScoreForUser) + 1;
+		double uniquenessFactor = 0.5 * Math.abs(zScoreForUser) + 1;
 		
 		if(uniquenessFactor > 2) {
 			uniquenessFactor = 2;
 		}
 
+		if(mHashMapScaleParams.containsKey(paramName)) {
+			double factor = internalMean / populationMean; 
+			if(factor < 1) {
+				factor = 1;
+			}
+			populationInternalSd = populationInternalSd * factor;			
+		}
+				
 		double twoUpperPopulationInternalSD = (internalMean + populationInternalSd * uniquenessFactor);
 		double twoLowerPopulationInternalSD = (internalMean - populationInternalSd * uniquenessFactor);
 		
 		double pUser;
 		
-//		double threeUpperPopulationInternalSD = (internalMean + 1.5 * populationInternalSd * uniquenessFactor);
-//		double threeLowerPopulationInternalSD = (internalMean - 1.5 * populationInternalSd * uniquenessFactor);		
+		double threeUpperPopulationInternalSD = (internalMean + 1.5 * populationInternalSd * uniquenessFactor);
+		double threeLowerPopulationInternalSD = (internalMean - 1.5 * populationInternalSd * uniquenessFactor);		
 //		double pAttacker = 1-mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
 //		
 //
@@ -171,7 +191,23 @@ public class StatEngine implements IStatEngine {
 			score = 1;
 		}
 		else {
-			score = 0;	
+			if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)) {
+				if(authValue > twoLowerPopulationInternalSD) {
+					double u = Math.abs(threeUpperPopulationInternalSD - authValue);
+					double d = Math.abs(threeUpperPopulationInternalSD - twoUpperPopulationInternalSD);
+					
+					score = u/d;					
+				}
+				else {
+					double u = Math.abs(threeLowerPopulationInternalSD - authValue);
+					double d = Math.abs(threeLowerPopulationInternalSD - twoLowerPopulationInternalSD);
+					
+					score = u/d;
+				}
+			}
+			else {
+				score = 0;
+			}
 		}
 				
 		statResult = new StatEngineResult(score, zScoreForUser);
