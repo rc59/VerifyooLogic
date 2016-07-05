@@ -7,6 +7,17 @@ public class Gesture {
 	public ArrayList<Stroke> ListStrokes;
 	public String Instruction;		
 	
+	public Gesture Clone() {
+		Gesture clonedGesture = new Gesture();
+		clonedGesture.ListStrokes = new ArrayList<>();
+		
+		for(int idxStroke = 0; idxStroke < ListStrokes.size(); idxStroke++) {
+			clonedGesture.ListStrokes.add(ListStrokes.get(idxStroke).Clone());
+		}
+		
+		return clonedGesture;
+	}
+	
 	public Gesture()
 	{
 		ListStrokes = new ArrayList<>();
