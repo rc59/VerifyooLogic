@@ -211,24 +211,36 @@ public class StrokeExtended extends Stroke {
 		
 		mVelocities = new double[ListEventsExtended.size()];
 		mAccelerations = new double[ListEventsExtended.size()];
+
+		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
+		{
+			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
+			mAccelerations[idxEvent] = ListEventsExtended.get(idxEvent).Acceleration;
+		}
+
+		if(ListEventsExtended.size() > 5)
+		{
+			Utils.GetInstance().GetUtilsVectors().MedianFilter(mVelocities);
+			Utils.GetInstance().GetUtilsVectors().MedianFilter(mAccelerations);
+		}
+
 		StrokeMaxVelocity = new IndexValue();
 		StrokeMaxVelocity.Index = 0;
 		StrokeMaxVelocity.Value = 0;
 		StrokePropertiesObj.AccumulatedLength[0] = 0;
+		
 		
 		double totalAcc = 0;		
 		double x1, y1, x2, y2, x3, y3;
 		double tmpArea = 0;
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
 		{
-			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
+
 			if(mVelocities[idxEvent] > StrokeMaxVelocity.Value)
 			{
 				StrokeMaxVelocity.Value = mVelocities[idxEvent];
 				StrokeMaxVelocity.Index = idxEvent;
 			}
-			
-			mAccelerations[idxEvent] = ListEventsExtended.get(idxEvent).Acceleration;
 			
 			if(idxEvent > 0) {
 				deltaX = ListEventsExtended.get(idxEvent).Xmm - ListEventsExtended.get(idxEvent - 1).Xmm;
@@ -273,7 +285,8 @@ public class StrokeExtended extends Stroke {
 		{
 			ListEventsExtended.get(idxEvent-1).AngleDiff = mUtilsMath.CalcAbsAngleDifference(ListEventsExtended.get(idxEvent).Angle, ListEventsExtended.get(idxEvent - 1).Angle);
 			totalAcc += mAccelerations[idxEvent];
-		}			
+		}
+		
 				
 		AverageAcceleration = totalAcc / ListEventsExtended.size();
 	}
@@ -425,4 +438,5 @@ public class StrokeExtended extends Stroke {
 	public String GetInstruction(){
 		return mInstruction;
 	}
+	
 }

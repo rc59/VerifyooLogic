@@ -52,4 +52,34 @@ public class UtilsVectors {
         }
         return squaredDistance / size;
     }
+	public void MedianFilter(double[] values){
+
+		double[] v = new double[5];
+		
+        for(int idx = 2; idx < values.length - 2; idx++){
+        	v[0] = values[idx-2];
+        	v[1] = values[idx-1];
+        	v[2] = values[idx];
+        	v[3] = values[idx+1];
+        	v[4] = values[idx+2];
+        	
+        	if(v[0] > v[1]) swap(v, 0, 1);
+        	if(v[2] > v[3]) swap(v, 2, 3);
+        	if(v[0] > v[2]) swap(v, 0, 2);
+        	if(v[1] > v[4]) swap(v, 1, 4);
+        	if(v[0] > v[1]) swap(v, 0, 1);
+        	if(v[2] > v[3]) swap(v, 2, 3);
+        	if(v[1] > v[2]) swap(v, 1, 2);
+        	if(v[3] > v[4]) swap(v, 3, 4);
+        	if(v[2] > v[3]) swap(v, 2, 3);
+        	
+        	values[idx] = v[2];
+        }
+	}
+	
+	public void swap (double[] a, int i, int j) {
+		double t = a[i];
+		a[i] = a[j];
+		a[j] = t;
+	}
 }

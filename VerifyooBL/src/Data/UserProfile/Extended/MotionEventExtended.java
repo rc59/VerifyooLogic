@@ -89,7 +89,7 @@ public class MotionEventExtended extends MotionEventCompact {
 	protected void CalculateAcceleration(MotionEventExtended motionEventPrev)
 	{
 		double eventTimeDiff = EventTime - motionEventPrev.EventTime;
-		double velocityDiff = motionEventPrev.Velocity - Velocity;
+		double velocityDiff = Velocity - motionEventPrev.Velocity;
 		
 		if(eventTimeDiff > 0) {
 			Acceleration = velocityDiff / eventTimeDiff;	
