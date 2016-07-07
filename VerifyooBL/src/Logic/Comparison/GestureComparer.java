@@ -213,12 +213,12 @@ public class GestureComparer {
 		if(IsNeedToRun("CompareGestureMaxVelocity")){
 			CompareGestureMaxVelocity();
 		}
-//		if(IsNeedToRun("CompareGestureAvgAcceleration")){
-//			CompareGestureAvgAcceleration();
-//		}
-//		if(IsNeedToRun("CompareGestureMaxAcceleration")){
-//			CompareGestureMaxAcceleration();
-//		}		
+		if(IsNeedToRun("CompareGestureAvgAcceleration")){
+			CompareGestureAvgAcceleration();
+		}
+		if(IsNeedToRun("CompareGestureMaxAcceleration")){
+			CompareGestureMaxAcceleration();
+		}		
 	}
 	
 	protected void CompareGestureMaxAcceleration() {

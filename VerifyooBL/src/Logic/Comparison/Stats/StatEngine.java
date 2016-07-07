@@ -141,7 +141,7 @@ public class StatEngine implements IStatEngine {
 		IStatEngineResult statResult;
 
 		//contribution of user uniqueness 
-		double uniquenessFactor = 0.5 * Math.abs(zScoreForUser) + 1;
+		double uniquenessFactor = 0.4 * Math.abs(zScoreForUser) + 1;
 		
 		if(uniquenessFactor > 2) {
 			uniquenessFactor = 2;

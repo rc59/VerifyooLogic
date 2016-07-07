@@ -228,8 +228,7 @@ public class StrokeExtended extends Stroke {
 		StrokeMaxVelocity.Index = 0;
 		StrokeMaxVelocity.Value = 0;
 		StrokePropertiesObj.AccumulatedLength[0] = 0;
-		
-		
+				
 		double totalAcc = 0;		
 		double x1, y1, x2, y2, x3, y3;
 		double tmpArea = 0;
@@ -423,6 +422,14 @@ public class StrokeExtended extends Stroke {
 		}
 		
 		tempFeatureMeanData.AddValue(value);		
+	}
+	
+	public double[] GetFilteredVelocities() {
+		return mVelocities;
+	}
+	
+	public double[] GetFilteredAccelerations() {
+		return mAccelerations;
 	}
 	
 	public HashMap<String, IFeatureMeanData> GetFeatureMeansHash() 
