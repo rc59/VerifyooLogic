@@ -9,8 +9,11 @@ public class Gesture {
 	
 	public Gesture Clone() {
 		Gesture clonedGesture = new Gesture();
-		clonedGesture.ListStrokes = new ArrayList<>();
 		
+		clonedGesture.Id = Id;		
+		clonedGesture.Instruction = Instruction;
+		
+		clonedGesture.ListStrokes = new ArrayList<>();
 		for(int idxStroke = 0; idxStroke < ListStrokes.size(); idxStroke++) {
 			clonedGesture.ListStrokes.add(ListStrokes.get(idxStroke).Clone());
 		}

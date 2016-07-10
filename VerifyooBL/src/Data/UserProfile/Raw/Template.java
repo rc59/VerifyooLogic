@@ -19,8 +19,11 @@ public class Template {
 	public Template Clone() {
 		Template clonedTemplate = new  Template();
 		
-		clonedTemplate.ListGestures = new ArrayList<>();		
+		clonedTemplate.Id = Id;			
+		clonedTemplate.Name = Name;		
+		clonedTemplate.ModelName = ModelName;
 		
+		clonedTemplate.ListGestures = new ArrayList<>();
 		for(int idxGesture = 0; idxGesture < ListGestures.size(); idxGesture++) {
 			clonedTemplate.ListGestures.add(ListGestures.get(idxGesture).Clone());
 		}
