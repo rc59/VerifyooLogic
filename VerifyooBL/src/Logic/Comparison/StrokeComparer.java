@@ -14,6 +14,7 @@ import Data.UserProfile.Raw.Stroke;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Utils.DTW;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsComparison;
 import Logic.Utils.UtilsGeneral;
@@ -80,6 +81,7 @@ public class StrokeComparer {
 			CheckIfStrokesAreIdentical();
 			
 			if(!mIsStrokesIdentical) {
+				TimeWarp();
 				CompareMinCosineDistance();
 				CompareStrokeAreas();
 				CompareTimeInterval();
@@ -96,6 +98,17 @@ public class StrokeComparer {
 			mCompareResult.Score = 0;
 		}		
 	}		
+
+	private void TimeWarp() {
+		DTW dtw = new DTW(mStrokeAuthExtended.GetFilteredVelocities(), mStrokeStoredExtended.GetFilteredVelocities());
+		double distanceVel = dtw.getDistance();
+		
+		dtw = new DTW(mStrokeAuthExtended.GetFilteredAccelerations(), mStrokeStoredExtended.GetFilteredAccelerations());
+		double distanceAcc = dtw.getDistance();
+		
+		dtw = new DTW(mStrokeAuthExtended.SpatialSamplingVector, mStrokeStoredExtended.SpatialSamplingVector);
+		double distanceSpatial = dtw.getDistance();		
+	}
 
 	/************** Feature Score Calculations **************/
 	protected void CheckIfStrokesAreIdentical()

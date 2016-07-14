@@ -1,12 +1,16 @@
 package Data.UserProfile.Extended;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import Consts.ConstsFeatures;
 import Consts.ConstsGeneral;
 import Consts.ConstsParamNames;
 import Data.MetaData.ParameterAvgPoint;
+import Data.MetaData.ValueFreq;
+import Data.Comparison.Interfaces.ICompareResult;
 import Data.MetaData.IndexValue;
 import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.MotionEventCompact;
@@ -82,12 +86,14 @@ public class GestureExtended extends Gesture {
 	
 	public double GestureMaxPressure;	
 	public double GestureAvgPressure;
+	public double GestureCommonPressure;
 	public double GestureAvgMiddlePressure;
 		
 	/*************** Surface Parameters ***************/
 	
 	public double GestureMaxSurface;
 	public double GestureAvgSurface;	
+	public double GestureCommonSurface;
 	public double GestureAvgMiddleSurface;
 	
 	/*************** Accelerometer Parameters ***************/ 
@@ -109,9 +115,7 @@ public class GestureExtended extends Gesture {
 	public ArrayList<MotionEventExtended> ListGestureEventsExtended;
 	public ArrayList<MotionEventCompact> ListGestureEvents;
 	
-	protected HashMap<String, IFeatureMeanData> mHashFeatureMeans;
-	
-	protected double[] mAccelerations;
+	protected HashMap<String, IFeatureMeanData> mHashFeatureMeans;	
 	
 	protected UtilsMath mUtilsMath;
 	protected UtilsLinearReg mUtilsLinearReg;
@@ -214,7 +218,7 @@ public class GestureExtended extends Gesture {
 		CalculateGestureVelocityPeaks();
 		CalculateGestureAccelerationPeaks();
 		CalculateAccumulatedDistanceByTime();
-		CalculateGestureStartMaxEndDirections();
+		//CalculateGestureStartMaxEndDirections();
 		CalculateAccumulatedDistanceLinearReg();		
 		CalculateAccelerations();
 	}
@@ -359,9 +363,32 @@ public class GestureExtended extends Gesture {
 		GestureTotalArea = 0;
 		GestureTotalAreaMinXMinY = 0;
 		
+		HashMap<Double, ValueFreq> hashPressureFreqs = new HashMap<>();
+		HashMap<Double, ValueFreq> hashSurfaceFreqs = new HashMap<>();
+		
+		double currentPressure;
+		double currentSurface;		
+		
 		for(int idxEvent = 0; idxEvent < ListGestureEventsExtended.size(); idxEvent++) {
-			totalPressure += ListGestureEventsExtended.get(idxEvent).Pressure;
-			totalSurface += ListGestureEventsExtended.get(idxEvent).TouchSurface;
+			currentPressure = ListGestureEventsExtended.get(idxEvent).Pressure;
+			currentSurface = ListGestureEventsExtended.get(idxEvent).TouchSurface;
+			
+			if(!hashPressureFreqs.containsKey(currentPressure)) {
+				hashPressureFreqs.put(currentPressure, new ValueFreq(currentPressure));
+			}
+			else {				
+				hashPressureFreqs.get(currentPressure).Increase();
+			}			
+			
+			if(!hashSurfaceFreqs.containsKey(currentSurface)) {
+				hashSurfaceFreqs.put(currentSurface, new ValueFreq(currentSurface));
+			}
+			else {				
+				hashSurfaceFreqs.get(currentSurface).Increase();
+			}
+			
+			totalPressure += currentPressure;
+			totalSurface += currentSurface;
 			
 			totalAccX += ListGestureEventsExtended.get(idxEvent).AccelerometerX;
 			totalAccY += ListGestureEventsExtended.get(idxEvent).AccelerometerY;
@@ -388,6 +415,9 @@ public class GestureExtended extends Gesture {
 				String msg = exc.getMessage();
 			}			
 		}
+		
+		GestureCommonPressure = GetCommonValue(hashPressureFreqs);
+		GestureCommonSurface = GetCommonValue(hashSurfaceFreqs);
 				
 		GestureAvgPressure = totalPressure / ListGestureEventsExtended.size();
 		GestureAvgSurface = totalSurface / ListGestureEventsExtended.size();
@@ -397,12 +427,41 @@ public class GestureExtended extends Gesture {
 		
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, GestureAvgPressure);
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, GestureAvgSurface);
+		
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, GestureCommonPressure);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, GestureCommonSurface);
 				
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, GestureMaxPressure);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, GestureMaxSurface);
+		
 		GestureAvgAccX = totalAccX / ListGestureEventsExtended.size(); 
 		GestureAvgAccY = totalAccY / ListGestureEventsExtended.size();
 		GestureAvgAccZ = totalAccZ / ListGestureEventsExtended.size();
 	}
 	
+	private double GetCommonValue(HashMap<Double, ValueFreq> hashValueFreqs) {
+		ArrayList<ValueFreq> listValueFreqs = new ArrayList<>();
+		
+		for(Double key : hashValueFreqs.keySet()) {
+			listValueFreqs.add(hashValueFreqs.get(key));
+		}
+		
+		Collections.sort(listValueFreqs, new Comparator<ValueFreq>() {
+            @Override
+            public int compare(ValueFreq valueFreq1, ValueFreq valueFreq2) {
+                if (Math.abs(valueFreq1.GetFreq()) > Math.abs(valueFreq2.GetFreq())) {
+                    return -1;
+                }
+                if (Math.abs(valueFreq1.GetFreq()) < Math.abs(valueFreq2.GetFreq())) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+		
+		return listValueFreqs.get(0).GetValue();
+	}
+
 	protected void CalculateAvgOfMiddlePressureAndSurface()
 	{
 		double totalMiddlePressure = 0;
@@ -414,7 +473,10 @@ public class GestureExtended extends Gesture {
 		}
 		
 		GestureAvgMiddlePressure = totalMiddlePressure / ListStrokesExtended.size();
-		GestureAvgMiddleSurface = totalMiddleSurface / ListStrokesExtended.size();		
+		GestureAvgMiddleSurface = totalMiddleSurface / ListStrokesExtended.size();
+		
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, GestureAvgMiddlePressure);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, GestureAvgMiddleSurface);		
 	}
 	
 	protected void CalculateGestureVelocityPeaks()

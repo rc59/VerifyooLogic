@@ -21,6 +21,7 @@ import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Comparison.Stats.Norms.NormMgr;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
+import Logic.Utils.DTW;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsComparison;
 import Logic.Utils.UtilsGeneral;
@@ -44,6 +45,7 @@ public class GestureComparer {
 	protected double mStrokesScore;
 	CompareResultSummary mCompareResultsGesture;		
 	
+	protected boolean mIsStrokeCosineDistanceValid;
 	protected boolean mMinCosineDistanceValid;	
 	
 	protected boolean mIsSimilarDevices;
@@ -168,7 +170,7 @@ public class GestureComparer {
 			CompareGestureAreas();
 		}
 		if(IsNeedToRun("CompareGestureAreasMinXMinY")){
-			CompareGestureAreasMinXMinY();
+			//CompareGestureAreasMinXMinY();
 		}
 		if(IsNeedToRun("CompareGesturePressure")){
 			CompareGesturePressure();
@@ -199,7 +201,7 @@ public class GestureComparer {
 		}	
 
 		if(IsNeedToRun("CompareMidOfFirstStrokeAngle")){
-			CompareMidOfFirstStrokeAngle();
+			//CompareMidOfFirstStrokeAngle();
 		}	
 
 		//TODO: check parameter
@@ -214,13 +216,34 @@ public class GestureComparer {
 			CompareGestureMaxVelocity();
 		}
 		if(IsNeedToRun("CompareGestureAvgAcceleration")){
-			CompareGestureAvgAcceleration();
+			//CompareGestureAvgAcceleration();
 		}
 		if(IsNeedToRun("CompareGestureMaxAcceleration")){
 			CompareGestureMaxAcceleration();
-		}		
+		}	
+		
+		if(IsNeedToRun("TimeWarp")){
+			RunTimeWarp();
+		}	
 	}
 	
+	private void RunTimeWarp() {
+		DTW dtw = new DTW(mGestureAuth.SpatialSamplingVector, mGestureStored.SpatialSamplingVector);
+		double distance = dtw.getDistance();
+		
+		dtw = new DTW(mGestureAuth.AccumulatedLength, mGestureStored.AccumulatedLength);
+		distance = dtw.getDistance();
+		
+		dtw = new DTW(mGestureAuth.AccumulatedLength, mGestureStored.AccumulatedLength);
+		distance = dtw.getDistance();
+				
+		
+		boolean isTrue = false;
+		if(distance > 2) {
+			isTrue = true;
+		}
+	}
+
 	protected void CompareGestureMaxAcceleration() {
 		double maxAcceleration = mGestureAuth.GestureMaxAcceleration;
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MAX_ACCELERATION, maxAcceleration);
@@ -309,16 +332,33 @@ public class GestureComparer {
 	}
 	
 	protected void CompareGesturePressure()
-	{								
-		
+	{										
 		double avgPressure = mGestureAuth.GestureAvgPressure;
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, avgPressure);
+		
+//		double maxPressure = mGestureAuth.GestureMaxPressure;
+//		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, maxPressure);
+//		
+//		double commonPressure = mGestureAuth.GestureCommonPressure;
+//		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, commonPressure);
+		
+		double middlePressure = mGestureAuth.GestureAvgMiddlePressure;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, middlePressure);
 	}
 	
 	protected void CompareGestureSurface()
 	{
 		double avgSurface = mGestureAuth.GestureAvgSurface;
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, avgSurface);
+		
+//		double maxSurface = mGestureAuth.GestureMaxSurface;
+//		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, maxSurface);
+//		
+//		double commonSurface = mGestureAuth.GestureCommonSurface;
+//		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, commonSurface);
+		
+		double middleSurface = mGestureAuth.GestureAvgMiddleSurface;
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, middleSurface);
 	}
 	
 	protected void CompareGestureAreas()
@@ -428,9 +468,11 @@ public class GestureComparer {
 	}
 	
 	protected void CheckStrokesCosineDistance() {		
+		mIsStrokeCosineDistanceValid = true;
 		for(int idxStrokeComparer = 0; idxStrokeComparer < mListStrokeComparers.size(); idxStrokeComparer++) {
 			if(mListStrokeComparers.get(idxStrokeComparer).GetMinCosineDistance() < 1) {
 				mCompareResultsGesture.Score = 0;
+				mIsStrokeCosineDistanceValid = false;
 			}
 		}		
 	}
@@ -525,5 +567,9 @@ public class GestureComparer {
 	public CompareResultSummary GetResultsSummary()
 	{
 		return mCompareResultsGesture;
+	}
+
+	public boolean IsStrokeCosineDistanceValid() {
+		return mIsStrokeCosineDistanceValid;
 	}
 }

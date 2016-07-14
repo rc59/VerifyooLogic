@@ -141,8 +141,7 @@ public class StrokeExtended extends Stroke {
 	}
 
 	protected void CalculateStartEndOfStroke()
-	{
-		IsPoint = true;
+	{		
 		StrokeStartEvent = StrokeEndEvent = 0;
 		double velocityTreshold = Consts.ConstsFeatures.MIN_VELOCITY_TRESHOLD * ConstsMeasures.INCH_TO_MM /(1/ Math.sqrt(1/(Xdpi*Xdpi) + 1/(Ydpi*Ydpi))) * Math.pow(10, -3); 
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
@@ -214,7 +213,7 @@ public class StrokeExtended extends Stroke {
 
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
 		{
-			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;
+			mVelocities[idxEvent] = ListEventsExtended.get(idxEvent).Velocity;			
 			mAccelerations[idxEvent] = ListEventsExtended.get(idxEvent).Acceleration;
 		}
 
@@ -223,7 +222,24 @@ public class StrokeExtended extends Stroke {
 			Utils.GetInstance().GetUtilsVectors().MedianFilter(mVelocities);
 			Utils.GetInstance().GetUtilsVectors().MedianFilter(mAccelerations);
 		}
-
+		
+		double velocityDiff;
+		double timeDiff;
+		
+		for(int idxEvent = 1; idxEvent < ListEventsExtended.size(); idxEvent++)
+		{
+			velocityDiff = mVelocities[idxEvent] - mVelocities[idxEvent - 1];
+			timeDiff = ListEventsExtended.get(idxEvent).EventTime - ListEventsExtended.get(idxEvent - 1).EventTime; 
+			
+			if(timeDiff > 0) {
+				mAccelerations[idxEvent] = velocityDiff / timeDiff;
+			}
+			else {
+				mAccelerations[idxEvent] = 0;
+			}
+		}
+		Utils.GetInstance().GetUtilsVectors().MedianFilter(mAccelerations);		
+		
 		StrokeMaxVelocity = new IndexValue();
 		StrokeMaxVelocity.Index = 0;
 		StrokeMaxVelocity.Value = 0;

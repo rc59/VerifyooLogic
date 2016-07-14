@@ -25,6 +25,11 @@ public class NormMgr implements INormMgr {
 	
 	public INormData GetNormDataByParamName(String name, String instruction) {
 		String key = CreateNormKey(name, instruction);
+		
+		if(!mHashNorms.containsKey(key)) {
+			key = CreateNormKey(name, ConstsInstructions.INSTRUCTION_LETTER_R);
+		}
+		
 		return mHashNorms.get(key);
 	}
 	
@@ -109,16 +114,16 @@ public class NormMgr implements INormMgr {
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, ConstsInstructions.INSTRUCTION_LETTER_G, 447.3779039, 186.7860089, 101.5870895);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, ConstsInstructions.INSTRUCTION_TRIANGLE, 1014.121918, 449.0458622, 193.5995278);
 
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.620009903, 0.036875256, 0.010105921);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.620009903, 0.036875256, 0.035);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_EIGHT, 0.621958476, 0.037844475, 0.010826172);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_FIVE, 0.624168725, 0.0382648, 0.011211337);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_TWO, 0.624168725, 0.0382648, 0.011211337);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_HEART, 0.623055193, 0.039986462, 0.008794648);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_LINES, 0.617327964, 0.03641646, 0.009096903);
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.625693651, 0.038718596, 0.008748056);
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_B, 0.625693651, 0.038718596, 0.008748056);
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_G, 0.625693651, 0.038718596, 0.008748056);
-		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.627445352, 0.037579713, 0.008625606);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.625693651, 0.038718596, 0.035);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_B, 0.625693651, 0.038718596, 0.035);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_G, 0.625693651, 0.038718596, 0.035);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.627445352, 0.037579713, 0.035);
 
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.316997979, 0.03977119, 0.014749792);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, ConstsInstructions.INSTRUCTION_EIGHT, 0.311879005, 0.041772009, 0.018233348);
@@ -131,6 +136,72 @@ public class NormMgr implements INormMgr {
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_G, 0.319950722, 0.042224694, 0.014304829);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.31902356, 0.041093077, 0.014299886);
 
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.625778125, 0.035159743, 0.010266882);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, ConstsInstructions.INSTRUCTION_EIGHT, 0.624432744, 0.03707377, 0.011136222);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, ConstsInstructions.INSTRUCTION_FIVE, 0.628840373, 0.037769304, 0.01186127);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, ConstsInstructions.INSTRUCTION_TWO, 0.628840373, 0.037769304, 0.01186127);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, ConstsInstructions.INSTRUCTION_HEART, 0.628102146, 0.039862696, 0.009785616);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, ConstsInstructions.INSTRUCTION_LINES, 0.626694288, 0.036891284, 0.009899756);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.629206839, 0.039501124, 0.009520085);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_B, 0.629206839, 0.039501124, 0.009520085);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_G, 0.629206839, 0.039501124, 0.009520085);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.630135555, 0.037021169, 0.009277729);
+
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.316733615, 0.041732056, 0.018515964);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, ConstsInstructions.INSTRUCTION_EIGHT, 0.310548877, 0.042750716, 0.01942507);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, ConstsInstructions.INSTRUCTION_FIVE, 0.318875517, 0.041564375, 0.021286847);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, ConstsInstructions.INSTRUCTION_TWO, 0.318875517, 0.041564375, 0.021286847);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, ConstsInstructions.INSTRUCTION_HEART, 0.312710042, 0.043437533, 0.018387242);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, ConstsInstructions.INSTRUCTION_LINES, 0.32074968, 0.039666299, 0.017382654);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.321017418, 0.044385197, 0.015302218);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_B, 0.321017418, 0.044385197, 0.015302218);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_G, 0.321017418, 0.044385197, 0.015302218);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.318447136, 0.041291609, 0.01590998);
+
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.63935744, 0.042555325, 0.011035416);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, ConstsInstructions.INSTRUCTION_EIGHT, 0.632203826, 0.040142418, 0.01090256);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, ConstsInstructions.INSTRUCTION_FIVE, 0.637349408, 0.041642248, 0.010977852);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, ConstsInstructions.INSTRUCTION_TWO, 0.637349408, 0.041642248, 0.010977852);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, ConstsInstructions.INSTRUCTION_HEART, 0.636250011, 0.042630468, 0.010235998);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, ConstsInstructions.INSTRUCTION_LINES, 0.635968886, 0.038110607, 0.009362937);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.638388565, 0.042320218, 0.010283347);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_B, 0.638388565, 0.042320218, 0.010283347);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_G, 0.638388565, 0.042320218, 0.010283347);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.638785152, 0.043398471, 0.010698494);
+
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.338286496, 0.041799813, 0.012855349);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, ConstsInstructions.INSTRUCTION_EIGHT, 0.324979935, 0.042645989, 0.021036891);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, ConstsInstructions.INSTRUCTION_FIVE, 0.331726923, 0.043142611, 0.017518392);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, ConstsInstructions.INSTRUCTION_TWO, 0.331726923, 0.043142611, 0.017518392);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, ConstsInstructions.INSTRUCTION_HEART, 0.323577251, 0.041989481, 0.015649718);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, ConstsInstructions.INSTRUCTION_LINES, 0.33487284, 0.038611418, 0.014988957);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.333895598, 0.045336373, 0.014732332);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_B, 0.333895598, 0.045336373, 0.014732332);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_G, 0.333895598, 0.045336373, 0.014732332);		
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.331325317, 0.043559785, 0.015381936);
+		
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.627497502, 0.036586671, 0.035);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, ConstsInstructions.INSTRUCTION_EIGHT, 0.623418687, 0.037396351, 0.012282458);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, ConstsInstructions.INSTRUCTION_FIVE, 0.63012886, 0.039808835, 0.012422994);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, ConstsInstructions.INSTRUCTION_TWO, 0.63012886, 0.039808835, 0.012422994);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, ConstsInstructions.INSTRUCTION_HEART, 0.628532363, 0.03949107, 0.010162123);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, ConstsInstructions.INSTRUCTION_LINES, 0.627389569, 0.036188391, 0.008173112);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.629450313, 0.040538899, 0.035);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_B, 0.629450313, 0.040538899, 0.035);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, ConstsInstructions.INSTRUCTION_LETTER_G, 0.629450313, 0.040538899, 0.035);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.629362461, 0.038393136, 0.035);
+
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_A, 0.321720229, 0.040483894, 0.020054049);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, ConstsInstructions.INSTRUCTION_EIGHT, 0.310481942, 0.042630744, 0.019916935);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, ConstsInstructions.INSTRUCTION_FIVE, 0.321575205, 0.042574364, 0.020054049);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, ConstsInstructions.INSTRUCTION_TWO, 0.321575205, 0.042574364, 0.020054049);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, ConstsInstructions.INSTRUCTION_HEART, 0.313441749, 0.044167387, 0.017249448);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, ConstsInstructions.INSTRUCTION_LINES, 0.323105771, 0.038123625, 0.015153362);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_R, 0.321057579, 0.044352519, 0.020054049);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_B, 0.321057579, 0.044352519, 0.020054049);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, ConstsInstructions.INSTRUCTION_LETTER_G, 0.321057579, 0.044352519, 0.020054049);
+		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, ConstsInstructions.INSTRUCTION_TRIANGLE, 0.318728261, 0.04213617, 0.015487542);
+		
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVERAGE_VELOCITY, ConstsInstructions.INSTRUCTION_LETTER_A, 0.157833278, 0.048076821, 0.023630953);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVERAGE_VELOCITY, ConstsInstructions.INSTRUCTION_EIGHT, 0.138361672, 0.039397399, 0.01915832);
 		CreateDoubleNorm(Consts.ConstsParamNames.Gesture.GESTURE_AVERAGE_VELOCITY, ConstsInstructions.INSTRUCTION_FIVE, 0.116192202, 0.033246841, 0.018498927);
