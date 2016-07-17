@@ -23,14 +23,10 @@ public class ConstsParamNames {
 		public static final String GESTURE_ACCUMULATED_DISTANCE_BY_TIME = "GestureAccumulatedDistanceByTime";
 		public static final String GESTURE_TOTAL_STROKE_AREA= "GestureTotalStrokeArea";	
 		public static final String GESTURE_TOTAL_STROKE_AREA_MINX_MINY = "GestureTotalStrokeAreaMinXMinY";
-		public static final String GESTURE_AVG_PRESSURE = "GestureAvgPressure";
-		public static final String GESTURE_AVG_SURFACE = "GestureAvgSurface";		
-		public static final String GESTURE_COMMON_PRESSURE = "GestureCommonPressure";
-		public static final String GESTURE_COMMON_SURFACE = "GestureCommonSurface";
-		public static final String GESTURE_MAX_PRESSURE = "GestureMaxPressure";
-		public static final String GESTURE_MAX_SURFACE = "GestureMaxSurface";
+
 		public static final String GESTURE_MIDDLE_PRESSURE = "GestureMiddlePressure";
 		public static final String GESTURE_MIDDLE_SURFACE = "GestureMiddleSurface";				
+
 		public static final String GESTURE_AVG_START_DIRECTION = "GestureAvgStartDirection";
 		public static final String GESTURE_AVG_MAX_DIRECTION = "GestureAvgMaxDirection";
 		public static final String GESTURE_AVG_END_DIRECTION = "GestureAvgEndDirection";

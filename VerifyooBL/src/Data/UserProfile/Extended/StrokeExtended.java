@@ -67,9 +67,6 @@ public class StrokeExtended extends Stroke {
 	public double AverageAcceleration;
 	public double AverageAccelerationNegative;
 				
-	public double MaxPressure;
-	public double MaxSurface;
-	
 	public double MiddlePressure;
 	public double MiddleSurface;
 	
@@ -282,11 +279,9 @@ public class StrokeExtended extends Stroke {
                 
                 if(CheckIfPressureExists(ListEventsExtended.get(idxEvent))) {
                 	IsHasPressure = true;
-                	MaxPressure = mUtilsMath.GetMaxValue(MaxPressure, ListEventsExtended.get(idxEvent).Pressure);	
                 }
             	if(CheckIfSurfaceExists(ListEventsExtended.get(idxEvent))) {
             		IsHasTouchSurface = true;
-            		MaxSurface = mUtilsMath.GetMaxValue(MaxSurface, ListEventsExtended.get(idxEvent).TouchSurface);
                 }
             	
             	TimeIntervals[idxEvent - 1] = ListEventsExtended.get(idxEvent).EventTime - ListEventsExtended.get(idxEvent - 1).EventTime;
