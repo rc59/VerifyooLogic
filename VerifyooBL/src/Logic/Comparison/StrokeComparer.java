@@ -14,11 +14,11 @@ import Data.UserProfile.Raw.Stroke;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
-import Logic.Utils.DTW;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsComparison;
 import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsVectors;
+import Logic.Utils.DTW.UtilsDTW;
 
 public class StrokeComparer {
 	protected boolean mIsStrokesIdentical;
@@ -100,14 +100,14 @@ public class StrokeComparer {
 	}		
 
 	private void TimeWarp() {
-		DTW dtw = new DTW(mStrokeAuthExtended.GetFilteredVelocities(), mStrokeStoredExtended.GetFilteredVelocities());
-		double distanceVel = dtw.getDistance();
-		
-		dtw = new DTW(mStrokeAuthExtended.GetFilteredAccelerations(), mStrokeStoredExtended.GetFilteredAccelerations());
-		double distanceAcc = dtw.getDistance();
-		
-		dtw = new DTW(mStrokeAuthExtended.SpatialSamplingVector, mStrokeStoredExtended.SpatialSamplingVector);
-		double distanceSpatial = dtw.getDistance();		
+//		UtilsDTW dtw = new UtilsDTW(mStrokeAuthExtended.GetFilteredVelocities(), mStrokeStoredExtended.GetFilteredVelocities());
+//		double distanceVel = dtw.getDistance();
+//		
+//		dtw = new UtilsDTW(mStrokeAuthExtended.GetFilteredAccelerations(), mStrokeStoredExtended.GetFilteredAccelerations());
+//		double distanceAcc = dtw.getDistance();
+//		
+//		dtw = new UtilsDTW(mStrokeAuthExtended.SpatialSamplingVector, mStrokeStoredExtended.SpatialSamplingVector);
+//		double distanceSpatial = dtw.getDistance();		
 	}
 
 	/************** Feature Score Calculations **************/

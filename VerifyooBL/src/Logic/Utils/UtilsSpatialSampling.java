@@ -16,6 +16,7 @@ public class UtilsSpatialSampling {
 	
 	public double[] PrepareDataSpatialSampling(ArrayList<MotionEventCompact> eventsList, double length) {
         float[] pts = ConvertToVector(eventsList, length);
+        double[] ptsTime = ConvertToVectorByTime(eventsList);
         float[] center = ComputeCentroid(pts);
         float orientation = (float) Math.atan2(pts[1] - center[1], pts[0] - center[0]);
 
@@ -39,6 +40,118 @@ public class UtilsSpatialSampling {
         }
         
         return ptsDouble;
+    }
+	
+	private double[] ConvertToVectorByTime(ArrayList<MotionEventCompact> eventsList) {
+        double timeInterval = eventsList.get(eventsList.size() - 1).EventTime - eventsList.get(0).EventTime; 
+		
+		int minValue = -9999999;
+        int numPoints = NUM_TEMPORAL_SAMPLING_POINTS;
+        int vectorLength = numPoints;
+        double[] vector = new double[vectorLength];
+
+        ArrayList<MotionEventCompact> listEventsSpatial = new ArrayList<>();
+        listEventsSpatial.add(eventsList.get(0));
+        
+        try
+        {
+        final double increment = timeInterval / (numPoints - 1);
+
+        float timeSoFar = 0;
+
+        double[] pts = new double[eventsList.size()];
+        for (int idx = 0; idx < eventsList.size(); idx++)
+        {
+            pts[idx] = eventsList.get(idx).EventTime;            
+        }
+
+        double lstPointTime = pts[0];       
+        
+        int index = 0;
+        double currentPointTime = minValue;
+        
+        vector[index] = lstPointTime;
+        index++;
+        
+        int i = 0;        
+        MotionEventCompact tempEventSpatial;
+        
+        int count = pts.length;
+            while (i < count) {
+                if (currentPointTime == minValue) {
+                    i++;
+                    if (i >= count) {
+                        break;
+                    }
+                    currentPointTime = pts[i];                    
+                }
+                
+                double timeDiff = currentPointTime - lstPointTime;
+                if (timeSoFar + timeDiff >= increment) {
+                	double ratio = (increment - timeSoFar) / timeDiff;
+                	double nt = lstPointTime + ratio * timeDiff;
+                    
+                    vector[index] = nt;
+                    index++;
+                                       
+                    tempEventSpatial = CreateNewEvent(eventsList.get(i + 1), eventsList.get(i), ratio);                                        
+                    listEventsSpatial.add(tempEventSpatial);
+                    
+                    lstPointTime = nt;
+                    timeSoFar = 0;
+                } else {
+                    lstPointTime = currentPointTime;                    
+                    currentPointTime = minValue;                    
+                    timeSoFar += timeDiff;
+                }
+            }
+
+            for (i = index; i < vectorLength; i++) {
+                vector[i] = lstPointTime;                
+            }
+        } catch (Exception exc) {
+            String msg = exc.getMessage();
+        }
+
+        MotionEventCompact tempEvent;
+        int idxTempVector = 0;
+        
+        double totalDistanceX = 0;
+        double totalDistanceY = 0;
+        double totalGyroX = 0;
+        double totalVelocityX = 0;
+        double totalVelocityY = 0;
+        double totalPressure = 0;
+        double totalSurface = 0;        
+        
+        for(int idx = 0; idx < listEventsSpatial.size(); idx++) {
+        	tempEvent = new MotionEventCompact();
+        	
+        	listEventsSpatial.get(idx).EventTime = vector[idxTempVector];
+        	idxTempVector++; 
+        	
+        	totalDistanceX += listEventsSpatial.get(idx).Xpixel; 
+        	totalDistanceY += listEventsSpatial.get(idx).Ypixel;
+        	totalGyroX += listEventsSpatial.get(idx).GyroX;
+        	totalVelocityX += listEventsSpatial.get(idx).VelocityX;
+        	totalVelocityY += listEventsSpatial.get(idx).VelocityY;
+        	totalPressure += listEventsSpatial.get(idx).Pressure;
+        	totalSurface += listEventsSpatial.get(idx).TouchSurface;        	
+        }       
+        
+        totalDistanceX = totalDistanceX / listEventsSpatial.size();
+        totalDistanceY = totalDistanceY / listEventsSpatial.size();
+        totalGyroX = totalGyroX / listEventsSpatial.size();
+        totalVelocityX = totalVelocityX / listEventsSpatial.size();
+        totalVelocityY = totalVelocityY / listEventsSpatial.size();
+        totalPressure = totalPressure / listEventsSpatial.size();
+        totalSurface = totalSurface / listEventsSpatial.size();                
+        
+        double timeDiff = listEventsSpatial.get(listEventsSpatial.size() - 1).EventTime - listEventsSpatial.get(0).EventTime;
+        double avgVelX = totalDistanceX / timeDiff;
+        double avgVelY = totalDistanceY / timeDiff;
+                        
+        return vector;
     }
 	
 	private float[] ConvertToVector(ArrayList<MotionEventCompact> eventsList, double length) {
@@ -125,6 +238,14 @@ public class UtilsSpatialSampling {
         MotionEventCompact tempEvent;
         int idxTempVector = 0;
         
+        double totalDistanceX = 0;
+        double totalDistanceY = 0;
+        double totalGyroX = 0;
+        double totalVelocityX = 0;
+        double totalVelocityY = 0;
+        double totalPressure = 0;
+        double totalSurface = 0;       
+        
         for(int idx = 0; idx < listEventsSpatial.size(); idx++) {
         	tempEvent = new MotionEventCompact();
         	
@@ -132,12 +253,32 @@ public class UtilsSpatialSampling {
         	idxTempVector++;
         	listEventsSpatial.get(idx).Ypixel = vector[idxTempVector];
         	idxTempVector++;
+        	
+        	totalDistanceX += listEventsSpatial.get(idx).Xpixel; 
+        	totalDistanceY += listEventsSpatial.get(idx).Ypixel;
+        	totalGyroX += listEventsSpatial.get(idx).GyroX;
+        	totalVelocityX += listEventsSpatial.get(idx).VelocityX;
+        	totalVelocityY += listEventsSpatial.get(idx).VelocityY;
+        	totalPressure += listEventsSpatial.get(idx).Pressure;
+        	totalSurface += listEventsSpatial.get(idx).TouchSurface;   
         }
-                        
+        
+        totalDistanceX = totalDistanceX / listEventsSpatial.size();
+        totalDistanceY = totalDistanceY / listEventsSpatial.size();
+        totalGyroX = totalGyroX / listEventsSpatial.size();
+        totalVelocityX = totalVelocityX / listEventsSpatial.size();
+        totalVelocityY = totalVelocityY / listEventsSpatial.size();
+        totalPressure = totalPressure / listEventsSpatial.size();
+        totalSurface = totalSurface / listEventsSpatial.size();
+                     
+        double timeDiff = listEventsSpatial.get(listEventsSpatial.size() - 1).EventTime - listEventsSpatial.get(0).EventTime;
+        double avgVelX = totalDistanceX / timeDiff;
+        double avgVelY = totalDistanceY / timeDiff;
+        
         return vector;
     }
 	
-	private MotionEventCompact CreateNewEvent(MotionEventCompact eventNext, MotionEventCompact eventPrev, float ratio) {
+	private MotionEventCompact CreateNewEvent(MotionEventCompact eventNext, MotionEventCompact eventPrev, double ratio) {
 		MotionEventCompact tempEvent = new MotionEventCompact(); 
 
 		tempEvent.EventTime = GetSpatialValue(eventNext.EventTime, eventPrev.EventTime, ratio);
@@ -160,7 +301,7 @@ public class UtilsSpatialSampling {
 		return tempEvent;
 	}
 
-	private double GetSpatialValue(double valueNext, double valuePrev, float ratio) {
+	private double GetSpatialValue(double valueNext, double valuePrev, double ratio) {
 		double value = ratio * (valueNext - valuePrev) + valuePrev;		
 		return value;
 	}
