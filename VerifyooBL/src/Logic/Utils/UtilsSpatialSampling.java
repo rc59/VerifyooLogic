@@ -47,10 +47,8 @@ public class UtilsSpatialSampling {
         int vectorLength = numPoints * 2;
         float[] vector = new float[vectorLength];
 
-        ArrayList<MotionEventCompact> listEventsSpatial = new ArrayList<>();         
-        
-        ArrayList<Double> listTimes = new ArrayList<>();
-        listTimes.add(eventsList.get(0).EventTime);
+        ArrayList<MotionEventCompact> listEventsSpatial = new ArrayList<>();
+        listEventsSpatial.add(eventsList.get(0));
         
         try
         {
@@ -77,6 +75,7 @@ public class UtilsSpatialSampling {
         index++;
         int i = 0;
         double newTime;
+        MotionEventCompact tempEventSpatial;
         
         int count = pts.length / 2;
             while (i < count) {
@@ -98,9 +97,9 @@ public class UtilsSpatialSampling {
                     vector[index] = nx;
                     index++;
                     vector[index] = ny;
-                    
-                    newTime = ratio * (eventsList.get(i + 1).EventTime - eventsList.get(i).EventTime) + eventsList.get(i).EventTime;
-                    listTimes.add(newTime);
+                                       
+                    tempEventSpatial = CreateNewEvent(eventsList.get(i + 1), eventsList.get(i), ratio);                                        
+                    listEventsSpatial.add(tempEventSpatial);
                     
                     index++;
                     lstPointX = nx;
@@ -124,18 +123,48 @@ public class UtilsSpatialSampling {
         }
 
         MotionEventCompact tempEvent;
+        int idxTempVector = 0;
         
-        for(int idx = 0; idx < vector.length; idx += 2) {
+        for(int idx = 0; idx < listEventsSpatial.size(); idx++) {
         	tempEvent = new MotionEventCompact();
-        	tempEvent.Xpixel = vector[idx];
-        	tempEvent.Ypixel = vector[idx + 1];
-        	tempEvent.EventTime = listTimes.get(idx / 2);
-        	listEventsSpatial.add(tempEvent);
+        	
+        	listEventsSpatial.get(idx).Xpixel = vector[idxTempVector];
+        	idxTempVector++;
+        	listEventsSpatial.get(idx).Ypixel = vector[idxTempVector];
+        	idxTempVector++;
         }
                         
         return vector;
     }
 	
+	private MotionEventCompact CreateNewEvent(MotionEventCompact eventNext, MotionEventCompact eventPrev, float ratio) {
+		MotionEventCompact tempEvent = new MotionEventCompact(); 
+
+		tempEvent.EventTime = GetSpatialValue(eventNext.EventTime, eventPrev.EventTime, ratio);
+		
+		tempEvent.AccelerometerX = GetSpatialValue(eventNext.AccelerometerX, eventPrev.AccelerometerX, ratio);
+		tempEvent.AccelerometerY = GetSpatialValue(eventNext.AccelerometerY, eventPrev.AccelerometerY, ratio);
+		tempEvent.AccelerometerZ = GetSpatialValue(eventNext.AccelerometerZ, eventPrev.AccelerometerZ, ratio);
+		
+		tempEvent.GyroX = GetSpatialValue(eventNext.GyroX, eventPrev.GyroX, ratio);
+		tempEvent.GyroY = GetSpatialValue(eventNext.GyroY, eventPrev.GyroY, ratio);
+		tempEvent.GyroZ = GetSpatialValue(eventNext.GyroZ, eventPrev.GyroZ, ratio);
+		
+		tempEvent.Pressure = GetSpatialValue(eventNext.Pressure, eventPrev.Pressure, ratio);
+		
+		tempEvent.TouchSurface = GetSpatialValue(eventNext.TouchSurface, eventPrev.TouchSurface, ratio);
+		
+		tempEvent.VelocityX = GetSpatialValue(eventNext.VelocityX, eventPrev.VelocityX, ratio);
+		tempEvent.VelocityY = GetSpatialValue(eventNext.VelocityY, eventPrev.VelocityY, ratio);		
+		
+		return tempEvent;
+	}
+
+	private double GetSpatialValue(double valueNext, double valuePrev, float ratio) {
+		double value = ratio * (valueNext - valuePrev) + valuePrev;		
+		return value;
+	}
+
 	private float[] Normalize(float[] vector) {
         float[] sample = vector;
         float sum = 0;
