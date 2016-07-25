@@ -6,26 +6,24 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import Consts.ConstsFeatures;
-import Consts.ConstsGeneral;
 import Consts.ConstsParamNames;
+import Data.MetaData.IndexValue;
 import Data.MetaData.ParameterAvgPoint;
 import Data.MetaData.ValueFreq;
-import Data.Comparison.Interfaces.ICompareResult;
-import Data.MetaData.IndexValue;
 import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
-import Logic.Utils.Utils;
-import Logic.Utils.UtilsGeneral;
-import Logic.Utils.UtilsLinearReg;
-import Logic.Utils.UtilsSpatialSampling;
-import Logic.Utils.UtilsLinearReg.LinearRegression;
-import Logic.Utils.UtilsMath;
 import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.FeatureMeanDataAngle;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Utils.Utils;
+import Logic.Utils.UtilsGeneral;
+import Logic.Utils.UtilsLinearReg;
+import Logic.Utils.UtilsLinearReg.LinearRegression;
+import Logic.Utils.UtilsMath;
+import Logic.Utils.UtilsSpatialSampling;
 
 public class GestureExtended extends Gesture {
 	
@@ -84,16 +82,10 @@ public class GestureExtended extends Gesture {
 	
 	/*************** Pressure Parameters ***************/ 
 	
-	public double GestureMaxPressure;	
-	public double GestureAvgPressure;
-	public double GestureCommonPressure;
 	public double GestureAvgMiddlePressure;
 		
 	/*************** Surface Parameters ***************/
 	
-	public double GestureMaxSurface;
-	public double GestureAvgSurface;	
-	public double GestureCommonSurface;
 	public double GestureAvgMiddleSurface;
 	
 	/*************** Accelerometer Parameters ***************/ 
@@ -179,9 +171,6 @@ public class GestureExtended extends Gesture {
 				GestureTotalStrokeTimeInterval += tempStrokeExtended.StrokeTimeInterval;
 				GestureTotalStrokeArea += tempStrokeExtended.ShapeDataObj.ShapeArea;
 				GestureTotalStrokeAreaMinXMinY += tempStrokeExtended.ShapeDataObj.ShapeAreaMinXMinY;
-				
-				GestureMaxPressure = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxPressure, tempStrokeExtended.MaxPressure);
-				GestureMaxSurface = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxSurface, tempStrokeExtended.MaxSurface);	
 				
 				ListGestureEvents.addAll(tempStroke.ListEvents);
 				ListGestureEventsExtended.addAll(tempStrokeExtended.ListEventsExtended);	
@@ -353,8 +342,6 @@ public class GestureExtended extends Gesture {
 	
 	protected void CalculateListGestureEventsFeatures()
 	{
-		double totalPressure = 0;
-		double totalSurface = 0;
 		double totalAccX = 0;
 		double totalAccY = 0;
 		double totalAccZ = 0;
@@ -387,9 +374,7 @@ public class GestureExtended extends Gesture {
 				hashSurfaceFreqs.get(currentSurface).Increase();
 			}
 			
-			totalPressure += currentPressure;
-			totalSurface += currentSurface;
-			
+		
 			totalAccX += ListGestureEventsExtended.get(idxEvent).AccelerometerX;
 			totalAccY += ListGestureEventsExtended.get(idxEvent).AccelerometerY;
 			totalAccZ += ListGestureEventsExtended.get(idxEvent).AccelerometerZ;
@@ -416,24 +401,9 @@ public class GestureExtended extends Gesture {
 			}			
 		}
 		
-		GestureCommonPressure = GetCommonValue(hashPressureFreqs);
-		GestureCommonSurface = GetCommonValue(hashSurfaceFreqs);
-				
-		GestureAvgPressure = totalPressure / ListGestureEventsExtended.size();
-		GestureAvgSurface = totalSurface / ListGestureEventsExtended.size();
-		
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_AREA, GestureTotalArea);
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_AREA_MINX_MINY, GestureTotalAreaMinXMinY);
-		
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, GestureAvgPressure);
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, GestureAvgSurface);
-		
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, GestureCommonPressure);
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, GestureCommonSurface);
-				
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, GestureMaxPressure);
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, GestureMaxSurface);
-		
+	
 		GestureAvgAccX = totalAccX / ListGestureEventsExtended.size(); 
 		GestureAvgAccY = totalAccY / ListGestureEventsExtended.size();
 		GestureAvgAccZ = totalAccZ / ListGestureEventsExtended.size();

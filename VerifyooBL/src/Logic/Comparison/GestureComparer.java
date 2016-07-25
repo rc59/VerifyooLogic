@@ -333,30 +333,12 @@ public class GestureComparer {
 	
 	protected void CompareGesturePressure()
 	{										
-		double avgPressure = mGestureAuth.GestureAvgPressure;
-		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_PRESSURE, avgPressure);
-		
-//		double maxPressure = mGestureAuth.GestureMaxPressure;
-//		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MAX_PRESSURE, maxPressure);
-//		
-//		double commonPressure = mGestureAuth.GestureCommonPressure;
-//		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_COMMON_PRESSURE, commonPressure);
-		
 		double middlePressure = mGestureAuth.GestureAvgMiddlePressure;
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MIDDLE_PRESSURE, middlePressure);
 	}
 	
 	protected void CompareGestureSurface()
 	{
-		double avgSurface = mGestureAuth.GestureAvgSurface;
-		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_AVG_SURFACE, avgSurface);
-		
-//		double maxSurface = mGestureAuth.GestureMaxSurface;
-//		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MAX_SURFACE, maxSurface);
-//		
-//		double commonSurface = mGestureAuth.GestureCommonSurface;
-//		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_COMMON_SURFACE, commonSurface);
-		
 		double middleSurface = mGestureAuth.GestureAvgMiddleSurface;
 		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_MIDDLE_SURFACE, middleSurface);
 	}
