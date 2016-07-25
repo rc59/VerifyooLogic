@@ -47,12 +47,14 @@ public class UtilsSpatialSampling {
         int vectorLength = numPoints * 2;
         float[] vector = new float[vectorLength];
 
+        ArrayList<MotionEventCompact> listEventsSpatial = new ArrayList<>();         
+        
+        ArrayList<Double> listTimes = new ArrayList<>();
+        listTimes.add(eventsList.get(0).EventTime);
+        
         try
         {
         final float increment = (float) length / (numPoints - 1);
-
-        float[] vectorX = new float[vectorLength / 2];
-        float[] vectorY = new float[vectorLength / 2];
 
         float distanceSoFar = 0;
 
@@ -65,6 +67,7 @@ public class UtilsSpatialSampling {
 
         float lstPointX = pts[0];
         float lstPointY = pts[1];
+        
         int index = 0;
         float currentPointX = minValue;
         float currentPointY = minValue;
@@ -73,6 +76,8 @@ public class UtilsSpatialSampling {
         vector[index] = lstPointY;
         index++;
         int i = 0;
+        double newTime;
+        
         int count = pts.length / 2;
             while (i < count) {
                 if (currentPointX == minValue) {
@@ -93,6 +98,10 @@ public class UtilsSpatialSampling {
                     vector[index] = nx;
                     index++;
                     vector[index] = ny;
+                    
+                    newTime = ratio * (eventsList.get(i + 1).EventTime - eventsList.get(i).EventTime) + eventsList.get(i).EventTime;
+                    listTimes.add(newTime);
+                    
                     index++;
                     lstPointX = nx;
                     lstPointY = ny;
@@ -114,6 +123,16 @@ public class UtilsSpatialSampling {
             String msg = exc.getMessage();
         }
 
+        MotionEventCompact tempEvent;
+        
+        for(int idx = 0; idx < vector.length; idx += 2) {
+        	tempEvent = new MotionEventCompact();
+        	tempEvent.Xpixel = vector[idx];
+        	tempEvent.Ypixel = vector[idx + 1];
+        	tempEvent.EventTime = listTimes.get(idx / 2);
+        	listEventsSpatial.add(tempEvent);
+        }
+                        
         return vector;
     }
 	

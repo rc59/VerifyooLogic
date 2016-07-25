@@ -1,8 +1,10 @@
-package Logic.Utils;
+package Logic.Utils.DTW;
 
-public class DTW {
-	protected float[] seq1;
-	protected float[] seq2;
+import java.util.ArrayList;
+
+public class UtilsDTW {
+	protected IDTWObj[] seq1;
+	protected IDTWObj[] seq2;
 	protected int[][] warpingPath;
 	
 	protected int n;
@@ -18,26 +20,41 @@ public class DTW {
 	 * @param template	
 	 */
 	
-	public DTW(double[] sample, double[] template) {
-		float[] sampleFloat = new float[sample.length];
-		float[] templateFloat = new float[template.length];
+	public UtilsDTW(ArrayList<IDTWObj> sample, ArrayList<IDTWObj> template) {
+		IDTWObj[] sampleList = new IDTWObj[sample.size()]; 
+		IDTWObj[] templateList = new IDTWObj[template.size()];
+		
+		for(int idx = 0; idx < sample.size(); idx++) {
+			sampleList[idx] = sample.get(idx);
+		}
+		
+		for(int idx = 0; idx < template.size(); idx++) {
+			templateList[idx] = template.get(idx);
+		}
+		
+		init(sampleList, templateList);
+	}
+	
+	protected void init(IDTWObj[] sample, IDTWObj[] template) {
+		IDTWObj[] sampleFloat = new IDTWObj[sample.length];
+		IDTWObj[] templateFloat = new IDTWObj[template.length];
 		
 		for(int idxSample = 0; idxSample < sample.length; idxSample++) {
-			sampleFloat[idxSample] = (float) sample[idxSample];
+			sampleFloat[idxSample] = sample[idxSample];
 		}
 		
 		for(int idxTemplate = 0; idxTemplate < template.length; idxTemplate++) {
-			templateFloat[idxTemplate] = (float) template[idxTemplate];
+			templateFloat[idxTemplate] = template[idxTemplate];
 		}
 		
 		run(sampleFloat, templateFloat);
 	}
 	
-	public DTW(float[] sample, float[] template) {
-		run(sample, template);
+	public UtilsDTW(IDTWObj[] sample, IDTWObj[] template) {
+		init(sample, template);
 	}
 	
-	protected void run(float[] sample, float[] template) {
+	protected void run(IDTWObj[] sample, IDTWObj[] template) {
 		seq1 = sample;
 		seq2 = template;
 		
@@ -146,8 +163,8 @@ public class DTW {
 	 * @param p2	the point 2
 	 * @return		the distance between two points
 	 */
-	protected double distanceBetween(double p1, double p2) {
-		return (p1 - p2) * (p1 - p2);
+	protected double distanceBetween(IDTWObj p1, IDTWObj p2) {
+		return p1.CompareTo(p2);
 	}
 
 	/**
