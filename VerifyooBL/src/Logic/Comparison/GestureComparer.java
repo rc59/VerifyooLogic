@@ -141,7 +141,7 @@ public class GestureComparer {
 	{		
 		mMinCosineDistanceValid = true;
 		if(IsNeedToRun("CompareGestureMinCosineDistance")){
-			//CompareGestureMinCosineDistance();
+			CompareGestureMinCosineDistance();
 		}
 		
 		if(IsNeedToRun("CompareGestureLengths")){

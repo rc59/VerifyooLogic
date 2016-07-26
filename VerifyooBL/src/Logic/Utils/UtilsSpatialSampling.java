@@ -56,7 +56,6 @@ public class UtilsSpatialSampling {
         double[] vectorOriginalY = new double[eventsList.size()];
                 
         ArrayList<MotionEventCompact> listEventsSpatial = new ArrayList<>();
-        listEventsSpatial.add(eventsList.get(0));
         
         try
         {
@@ -78,6 +77,7 @@ public class UtilsSpatialSampling {
         double currentPointTime = minValue;
         
         vector[index] = lstPointTime;
+        listEventsSpatial.add(eventsList.get(0));
         index++;
         
         int i = 0;        
@@ -118,7 +118,9 @@ public class UtilsSpatialSampling {
             }
 
             for (i = index; i < vectorLength; i++) {
-                vector[i] = lstPointTime;                
+                vector[i] = lstPointTime;
+                tempEventSpatial = eventsList.get(eventsList.size() - 1).Clone();
+            	listEventsSpatial.add(tempEventSpatial);
             }
         } catch (Exception exc) {
             msg = exc.getMessage();
@@ -178,8 +180,7 @@ public class UtilsSpatialSampling {
         int vectorLength = numPoints * 2;
         float[] vector = new float[vectorLength];
         String msg;
-        ArrayList<MotionEventCompact> listEventsSpatial = new ArrayList<>();
-        listEventsSpatial.add(eventsList.get(0));        
+        ArrayList<MotionEventCompact> listEventsSpatial = new ArrayList<>();               
         
         double[] vectorX = new double[numPoints];
         double[] vectorY = new double[numPoints];
@@ -207,6 +208,9 @@ public class UtilsSpatialSampling {
         index++;
         vector[index] = lstPointY;
         index++;
+        
+        listEventsSpatial.add(eventsList.get(0));
+        
         int i = 0;
         double newTime;
         MotionEventCompact tempEventSpatial;
@@ -256,7 +260,9 @@ public class UtilsSpatialSampling {
             }
 
             for (i = index; i < vectorLength; i += 2) {
-                vector[i] = lstPointX;
+            	tempEventSpatial = eventsList.get(eventsList.size() - 1).Clone();
+            	listEventsSpatial.add(tempEventSpatial);     
+            	vector[i] = lstPointX;
                 vector[i + 1] = lstPointY;
             }
         } catch (Exception exc) {

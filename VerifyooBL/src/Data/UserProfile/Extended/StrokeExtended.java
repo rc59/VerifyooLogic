@@ -81,6 +81,9 @@ public class StrokeExtended extends Stroke {
 	public double[] TimeIntervals;
 	public double[] AccumulatedTimeIntervals;
 	
+	public ArrayList<MotionEventCompact> ListEventsSpatialByDistance;
+	public ArrayList<MotionEventCompact> ListEventsSpatialByTime;
+	
 	public double LengthPixel;
 	/****************************************/
 	
@@ -90,12 +93,20 @@ public class StrokeExtended extends Stroke {
 			IsPoint = true;	
 		}
 		else {
+			InitUtils();
+			
 			Id = stroke.Id;
 			mHashFeatureMeans = hashFeatureMeans;
 			mStrokeIdx = strokeIdx;
 			mInstruction = instruction;
 			LengthPixel = stroke.Length;
-			ListEvents = stroke.ListEvents;		
+			
+			ListEvents = stroke.ListEvents;
+			
+			ListEventsSpatialByDistance = mUtilsSpatialSampling.ConvertToVectorByDistance(stroke.ListEvents, LengthPixel);
+			ListEventsSpatialByTime = mUtilsSpatialSampling.ConvertToVectorByTime(stroke.ListEvents);	
+			ListEvents = stroke.ListEvents;
+			
 			Xdpi = stroke.Xdpi;		
 			Ydpi = stroke.Ydpi;
 			
@@ -109,8 +120,7 @@ public class StrokeExtended extends Stroke {
 			
 			IsHasPressure = false;
 			IsHasTouchSurface = false;		
-			
-			InitUtils();
+						
 			InitFeatures();		
 		}
 	}
