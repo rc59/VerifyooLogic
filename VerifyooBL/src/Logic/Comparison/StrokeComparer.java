@@ -80,8 +80,7 @@ public class StrokeComparer {
 			
 			CheckIfStrokesAreIdentical();
 			
-			if(!mIsStrokesIdentical) {
-				TimeWarp();
+			if(!mIsStrokesIdentical) {				
 				CompareMinCosineDistance();
 				CompareStrokeAreas();
 				CompareTimeInterval();

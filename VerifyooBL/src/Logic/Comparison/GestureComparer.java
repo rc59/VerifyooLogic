@@ -21,7 +21,6 @@ import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
 import Logic.Comparison.Stats.Norms.NormMgr;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
-import Logic.Utils.DTW;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsComparison;
 import Logic.Utils.UtilsGeneral;
@@ -142,7 +141,7 @@ public class GestureComparer {
 	{		
 		mMinCosineDistanceValid = true;
 		if(IsNeedToRun("CompareGestureMinCosineDistance")){
-			CompareGestureMinCosineDistance();
+			//CompareGestureMinCosineDistance();
 		}
 		
 		if(IsNeedToRun("CompareGestureLengths")){
@@ -228,20 +227,7 @@ public class GestureComparer {
 	}
 	
 	private void RunTimeWarp() {
-		DTW dtw = new DTW(mGestureAuth.SpatialSamplingVector, mGestureStored.SpatialSamplingVector);
-		double distance = dtw.getDistance();
 		
-		dtw = new DTW(mGestureAuth.AccumulatedLength, mGestureStored.AccumulatedLength);
-		distance = dtw.getDistance();
-		
-		dtw = new DTW(mGestureAuth.AccumulatedLength, mGestureStored.AccumulatedLength);
-		distance = dtw.getDistance();
-				
-		
-		boolean isTrue = false;
-		if(distance > 2) {
-			isTrue = true;
-		}
 	}
 
 	protected void CompareGestureMaxAcceleration() {
