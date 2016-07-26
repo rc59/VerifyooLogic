@@ -15,8 +15,7 @@ public class UtilsSpatialSampling {
 	    };
 	
 	public double[] PrepareDataSpatialSampling(ArrayList<MotionEventCompact> eventsList, double length) {
-        float[] pts = ConvertToVector(eventsList, length);
-        double[] ptsTime = ConvertToVectorByTime(eventsList);
+        float[] pts = GetPoints(ConvertToVectorByDistance(eventsList, length));        
         float[] center = ComputeCentroid(pts);
         float orientation = (float) Math.atan2(pts[1] - center[1], pts[0] - center[0]);
 
@@ -42,7 +41,7 @@ public class UtilsSpatialSampling {
         return ptsDouble;
     }
 	
-	private double[] ConvertToVectorByTime(ArrayList<MotionEventCompact> eventsList) {
+	public ArrayList<MotionEventCompact> ConvertToVectorByTime(ArrayList<MotionEventCompact> eventsList) {
         double timeInterval = eventsList.get(eventsList.size() - 1).EventTime - eventsList.get(0).EventTime; 
         String msg;
 		int minValue = -9999999;
@@ -170,10 +169,10 @@ public class UtilsSpatialSampling {
         double avgVelX = totalDistanceX / timeDiff;
         double avgVelY = totalDistanceY / timeDiff;
                         
-        return vector;
+        return listEventsSpatial;
     }
 	
-	private float[] ConvertToVector(ArrayList<MotionEventCompact> eventsList, double length) {
+	public ArrayList<MotionEventCompact> ConvertToVectorByDistance(ArrayList<MotionEventCompact> eventsList, double length) {
         int minValue = -9999999;
         int numPoints = NUM_TEMPORAL_SAMPLING_POINTS;
         int vectorLength = numPoints * 2;
@@ -313,8 +312,21 @@ public class UtilsSpatialSampling {
         double avgVelX = totalDistanceX / timeDiff;
         double avgVelY = totalDistanceY / timeDiff;
         
-        return vector;
+        return listEventsSpatial;
     }
+	
+	private float[] GetPoints(ArrayList<MotionEventCompact> listEvents) {
+		float[] pts = new float[listEvents.size() * 2];
+		
+		int idxPts = 0;
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			pts[idxPts] = (float)listEvents.get(idx).Xpixel;
+			idxPts++;
+			pts[idxPts] = (float)listEvents.get(idx).Ypixel;
+			idxPts++;
+		}
+		return pts;
+	}	
 	
 	private MotionEventCompact CreateNewEvent(MotionEventCompact eventNext, MotionEventCompact eventPrev, double ratio) {
 		MotionEventCompact tempEvent = new MotionEventCompact(); 
