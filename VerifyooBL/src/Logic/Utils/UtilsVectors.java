@@ -46,6 +46,26 @@ public class UtilsVectors {
 		return vectorY;
 	}
 	
+	public double[] GetVectorVel(ArrayList<MotionEventExtended> listEvents) {
+		double[] vectorVel = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vectorVel[idx] = listEvents.get(idx).Velocity;
+		}
+		
+		return vectorVel;
+	}
+	
+	public double[] GetVectorAcc(ArrayList<MotionEventExtended> listEvents) {
+		double[] vectorAcc = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vectorAcc[idx] = listEvents.get(idx).Acceleration;
+		}
+		
+		return vectorAcc;
+	}
+	
 	public double[] GetVectorXnormalized(ArrayList<MotionEventExtended> listEvents) {
 		double[] vectorX = new double[listEvents.size()];
 		

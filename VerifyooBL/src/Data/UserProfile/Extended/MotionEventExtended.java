@@ -29,6 +29,46 @@ public class MotionEventExtended extends MotionEventCompact {
 	public boolean IsStartOfStroke;
 	public boolean IsEndOfStroke;
 	
+	protected MotionEventExtended() {
+		
+	}
+	
+	public MotionEventExtended Clone()
+	{
+		MotionEventExtended tempEvent = new MotionEventExtended();
+		
+		tempEvent.Id = Id;
+		tempEvent.EventTime = EventTime;
+		tempEvent.Xpixel = Xpixel;
+		tempEvent.Ypixel = Ypixel;
+		tempEvent.Pressure = Pressure;
+		tempEvent.TouchSurface = TouchSurface;
+		
+		tempEvent.AccelerometerX = AccelerometerX;
+		tempEvent.AccelerometerY = AccelerometerY;
+		tempEvent.AccelerometerZ = AccelerometerZ;
+		
+		tempEvent.GyroX = GyroX;
+		tempEvent.GyroY = GyroY;
+		tempEvent.GyroZ = GyroZ;
+		
+		tempEvent.Index = Index;
+		tempEvent.Xmm = Xmm;
+		tempEvent.Ymm = Ymm;
+		tempEvent.Xnormalized = Xnormalized;
+		tempEvent.Ynormalized = Ynormalized;
+		tempEvent.VelocityX = VelocityX;
+		tempEvent.VelocityY = VelocityY;
+		tempEvent.Velocity = Velocity;
+		tempEvent.Angle = Angle;
+		tempEvent.AngleDiff = AngleDiff;
+		tempEvent.Acceleration = Acceleration;
+		tempEvent.IsStartOfStroke = IsStartOfStroke;
+		tempEvent.IsEndOfStroke = IsEndOfStroke;
+		
+		return tempEvent;
+	}
+	
 	public MotionEventExtended(MotionEventCompact motionEvent, double xdpi, double ydpi, MotionEventExtended motionEventPrev, int index)
 	{
 		Id = motionEvent.Id;

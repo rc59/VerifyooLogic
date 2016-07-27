@@ -14,7 +14,7 @@ public class UtilsSignalProcessing {
 	                (-Math.PI * 3 / 4), -Math.PI
 	    };
 	
-	public double[] PrepareDataSpatialSampling(ArrayList<MotionEventCompact> eventsList, double length) {
+	public double[] PrepareDataSpatialSampling(ArrayList<MotionEventExtended> eventsList, double length) {
         float[] pts = GetPoints(ConvertToVectorByDistance(eventsList, length));        
         float[] center = ComputeCentroid(pts);
         float orientation = (float) Math.atan2(pts[1] - center[1], pts[0] - center[0]);
@@ -41,8 +41,8 @@ public class UtilsSignalProcessing {
         return ptsDouble;
     }
 	
-	public ArrayList<MotionEventCompact> ConvertToVectorByTime(ArrayList<MotionEventCompact> eventsList) {
-        double timeInterval = eventsList.get(eventsList.size() - 1).EventTime - eventsList.get(0).EventTime; 
+	public ArrayList<MotionEventExtended> ConvertToVectorByTime(ArrayList<MotionEventExtended> listEvents) {
+        double timeInterval = listEvents.get(listEvents.size() - 1).EventTime - listEvents.get(0).EventTime; 
         String msg;
 		int minValue = -9999999;
         int numPoints = NUM_TEMPORAL_SAMPLING_POINTS;
@@ -52,10 +52,10 @@ public class UtilsSignalProcessing {
         double[] vectorX = new double[numPoints];
         double[] vectorY = new double[numPoints];
         
-        double[] vectorOriginalX = new double[eventsList.size()];
-        double[] vectorOriginalY = new double[eventsList.size()];
+        double[] vectorOriginalX = new double[listEvents.size()];
+        double[] vectorOriginalY = new double[listEvents.size()];
                 
-        ArrayList<MotionEventCompact> listEventsSpatial = new ArrayList<>();
+        ArrayList<MotionEventExtended> listEventsSpatial = new ArrayList<>();
         
         try
         {
@@ -63,12 +63,12 @@ public class UtilsSignalProcessing {
 
         float timeSoFar = 0;
 
-        double[] pts = new double[eventsList.size()];
-        for (int idx = 0; idx < eventsList.size(); idx++)
+        double[] pts = new double[listEvents.size()];
+        for (int idx = 0; idx < listEvents.size(); idx++)
         {
-            pts[idx] = eventsList.get(idx).EventTime;     
-            vectorOriginalX[idx] = eventsList.get(idx).Xpixel;
-            vectorOriginalY[idx] = eventsList.get(idx).Ypixel;
+            pts[idx] = listEvents.get(idx).EventTime;     
+            vectorOriginalX[idx] = listEvents.get(idx).Xpixel;
+            vectorOriginalY[idx] = listEvents.get(idx).Ypixel;
         }
 
         double lstPointTime = pts[0];       
@@ -77,11 +77,11 @@ public class UtilsSignalProcessing {
         double currentPointTime = minValue;
         
         vector[index] = lstPointTime;
-        listEventsSpatial.add(eventsList.get(0));
+        listEventsSpatial.add(listEvents.get(0));
         index++;
         
         int i = 0;        
-        MotionEventCompact tempEventSpatial;
+        MotionEventExtended tempEventSpatial;
         
         int count = pts.length;
             while (i < count) {
@@ -103,11 +103,11 @@ public class UtilsSignalProcessing {
                     lstPointTime = nt;
                     timeSoFar = 0;
                     
-                    if(i + 1 < eventsList.size()) {
-                    	tempEventSpatial = CreateNewEvent(eventsList.get(i + 1), eventsList.get(i), ratio);
+                    if(i + 1 < listEvents.size()) {
+                    	tempEventSpatial = CreateNewEvent(listEvents.get(i + 1), listEvents.get(i), ratio);
                     }
                     else {
-                    	tempEventSpatial = eventsList.get(i).Clone();
+                    	tempEventSpatial = listEvents.get(i).Clone();
                     }
                     listEventsSpatial.add(tempEventSpatial);                                       
                 } else {
@@ -119,7 +119,7 @@ public class UtilsSignalProcessing {
 
             for (i = index; i < vectorLength; i++) {
                 vector[i] = lstPointTime;
-                tempEventSpatial = eventsList.get(eventsList.size() - 1).Clone();
+                tempEventSpatial = listEvents.get(listEvents.size() - 1).Clone();
             	listEventsSpatial.add(tempEventSpatial);
             }
         } catch (Exception exc) {
@@ -174,13 +174,13 @@ public class UtilsSignalProcessing {
         return listEventsSpatial;
     }
 	
-	public ArrayList<MotionEventCompact> ConvertToVectorByDistance(ArrayList<MotionEventCompact> eventsList, double length) {
+	public ArrayList<MotionEventExtended> ConvertToVectorByDistance(ArrayList<MotionEventExtended> listEvents, double length) {
         int minValue = -9999999;
         int numPoints = NUM_TEMPORAL_SAMPLING_POINTS;
         int vectorLength = numPoints * 2;
         float[] vector = new float[vectorLength];
         String msg;
-        ArrayList<MotionEventCompact> listEventsSpatial = new ArrayList<>();               
+        ArrayList<MotionEventExtended> listEventsSpatial = new ArrayList<>();               
         
         double[] vectorX = new double[numPoints];
         double[] vectorY = new double[numPoints];
@@ -191,11 +191,11 @@ public class UtilsSignalProcessing {
 
         float distanceSoFar = 0;
 
-        float[] pts = new float[eventsList.size() * 2];
-        for (int idx = 0; idx < eventsList.size(); idx++)
+        float[] pts = new float[listEvents.size() * 2];
+        for (int idx = 0; idx < listEvents.size(); idx++)
         {
-            pts[idx * 2] = (float) eventsList.get(idx).Xpixel;            
-            pts[idx * 2 + 1] = (float) eventsList.get(idx).Ypixel;        
+            pts[idx * 2] = (float) listEvents.get(idx).Xpixel;            
+            pts[idx * 2 + 1] = (float) listEvents.get(idx).Ypixel;        
         }
 
         float lstPointX = pts[0];
@@ -209,11 +209,11 @@ public class UtilsSignalProcessing {
         vector[index] = lstPointY;
         index++;
         
-        listEventsSpatial.add(eventsList.get(0));
+        listEventsSpatial.add(listEvents.get(0));
         
         int i = 0;
         double newTime;
-        MotionEventCompact tempEventSpatial;
+        MotionEventExtended tempEventSpatial;
         
         int count = pts.length / 2;
             while (i < count) {
@@ -242,11 +242,11 @@ public class UtilsSignalProcessing {
                     lstPointY = ny;                    
                     distanceSoFar = 0;
                     
-                    if(i + 1 < eventsList.size()) {
-                    	tempEventSpatial = CreateNewEvent(eventsList.get(i + 1), eventsList.get(i), ratio);	
+                    if(i + 1 < listEvents.size()) {
+                    	tempEventSpatial = CreateNewEvent(listEvents.get(i + 1), listEvents.get(i), ratio);	
                     }
                     else {
-                    	tempEventSpatial = eventsList.get(i).Clone();                    	
+                    	tempEventSpatial = listEvents.get(i).Clone();                    	
                     }
                                                             
                     listEventsSpatial.add(tempEventSpatial);                                                         
@@ -260,7 +260,7 @@ public class UtilsSignalProcessing {
             }
 
             for (i = index; i < vectorLength; i += 2) {
-            	tempEventSpatial = eventsList.get(eventsList.size() - 1).Clone();
+            	tempEventSpatial = listEvents.get(listEvents.size() - 1).Clone();
             	listEventsSpatial.add(tempEventSpatial);     
             	vector[i] = lstPointX;
                 vector[i + 1] = lstPointY;
@@ -321,7 +321,7 @@ public class UtilsSignalProcessing {
         return listEventsSpatial;
     }
 	
-	private float[] GetPoints(ArrayList<MotionEventCompact> listEvents) {
+	private float[] GetPoints(ArrayList<MotionEventExtended> listEvents) {
 		float[] pts = new float[listEvents.size() * 2];
 		
 		int idxPts = 0;
@@ -334,28 +334,34 @@ public class UtilsSignalProcessing {
 		return pts;
 	}	
 	
-	private MotionEventCompact CreateNewEvent(MotionEventCompact eventNext, MotionEventCompact eventPrev, double ratio) {
-		MotionEventCompact tempEvent = new MotionEventCompact(); 
+	private MotionEventExtended CreateNewEvent(MotionEventExtended eventNext, MotionEventExtended eventCurrent, double ratio) {
+		MotionEventExtended tempEvent = eventCurrent.Clone();
 
-		tempEvent.Xpixel = GetSpatialValue(eventNext.Xpixel, eventPrev.Xpixel, ratio);
-		tempEvent.Ypixel = GetSpatialValue(eventNext.Ypixel, eventPrev.Ypixel, ratio);
+		tempEvent.Xpixel = GetSpatialValue(eventNext.Xpixel, eventCurrent.Xpixel, ratio);
+		tempEvent.Ypixel = GetSpatialValue(eventNext.Ypixel, eventCurrent.Ypixel, ratio);
 		
-		tempEvent.EventTime = GetSpatialValue(eventNext.EventTime, eventPrev.EventTime, ratio);
+		tempEvent.Xmm = GetSpatialValue(eventNext.Xmm, eventCurrent.Xmm, ratio);
+		tempEvent.Ymm = GetSpatialValue(eventNext.Ymm, eventCurrent.Ymm, ratio);
 		
-		tempEvent.AccelerometerX = GetSpatialValue(eventNext.AccelerometerX, eventPrev.AccelerometerX, ratio);
-		tempEvent.AccelerometerY = GetSpatialValue(eventNext.AccelerometerY, eventPrev.AccelerometerY, ratio);
-		tempEvent.AccelerometerZ = GetSpatialValue(eventNext.AccelerometerZ, eventPrev.AccelerometerZ, ratio);
+		tempEvent.EventTime = GetSpatialValue(eventNext.EventTime, eventCurrent.EventTime, ratio);
 		
-		tempEvent.GyroX = GetSpatialValue(eventNext.GyroX, eventPrev.GyroX, ratio);
-		tempEvent.GyroY = GetSpatialValue(eventNext.GyroY, eventPrev.GyroY, ratio);
-		tempEvent.GyroZ = GetSpatialValue(eventNext.GyroZ, eventPrev.GyroZ, ratio);
+		tempEvent.AccelerometerX = GetSpatialValue(eventNext.AccelerometerX, eventCurrent.AccelerometerX, ratio);
+		tempEvent.AccelerometerY = GetSpatialValue(eventNext.AccelerometerY, eventCurrent.AccelerometerY, ratio);
+		tempEvent.AccelerometerZ = GetSpatialValue(eventNext.AccelerometerZ, eventCurrent.AccelerometerZ, ratio);
 		
-		tempEvent.Pressure = GetSpatialValue(eventNext.Pressure, eventPrev.Pressure, ratio);
+		tempEvent.GyroX = GetSpatialValue(eventNext.GyroX, eventCurrent.GyroX, ratio);
+		tempEvent.GyroY = GetSpatialValue(eventNext.GyroY, eventCurrent.GyroY, ratio);
+		tempEvent.GyroZ = GetSpatialValue(eventNext.GyroZ, eventCurrent.GyroZ, ratio);
 		
-		tempEvent.TouchSurface = GetSpatialValue(eventNext.TouchSurface, eventPrev.TouchSurface, ratio);
+		tempEvent.Pressure = GetSpatialValue(eventNext.Pressure, eventCurrent.Pressure, ratio);
 		
-		tempEvent.VelocityX = GetSpatialValue(eventNext.VelocityX, eventPrev.VelocityX, ratio);
-		tempEvent.VelocityY = GetSpatialValue(eventNext.VelocityY, eventPrev.VelocityY, ratio);		
+		tempEvent.TouchSurface = GetSpatialValue(eventNext.TouchSurface, eventCurrent.TouchSurface, ratio);
+		
+		tempEvent.VelocityX = GetSpatialValue(eventNext.VelocityX, eventCurrent.VelocityX, ratio);
+		tempEvent.VelocityY = GetSpatialValue(eventNext.VelocityY, eventCurrent.VelocityY, ratio);
+		tempEvent.Velocity = GetSpatialValue(eventNext.Velocity, eventCurrent.Velocity, ratio);		
+		
+		tempEvent.Acceleration = GetSpatialValue(eventNext.Acceleration, eventCurrent.Acceleration, ratio);
 		
 		return tempEvent;
 	}

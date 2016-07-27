@@ -143,23 +143,88 @@ public class StrokeExtended extends Stroke {
 	protected void PreCalculations()
 	{
 		CenterAndRotate();
-		SpatialSampling();	
-		ConvertToMotionEventExtended();
+		ListEventsExtended = ListEventsCompactToExtended(ListEvents);		
+		SpatialSampling();
+		MedianFilters();
+		CalculateAccelerations();
+				
 		Normalize();
 		
 		CalculateStartEndOfStroke();
 		PrepareData();		
 	}
 	
+	private void CalculateAccelerations() {
+		ListEventsExtended = CalculateAccelerationsForEventsList(ListEventsExtended);
+		ListEventsSpatialByDistanceExtended = CalculateAccelerationsForEventsList(ListEventsSpatialByDistanceExtended);
+		ListEventsSpatialByTimeExtended = CalculateAccelerationsForEventsList(ListEventsSpatialByTimeExtended);
+		
+		double[] vectorAcc = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsExtended);
+		double[] vectorAccDistance = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsSpatialByDistanceExtended);
+		double[] vectorAccTime = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsSpatialByTimeExtended);
+		
+		int size = vectorAccTime.length;
+	}
+	
+	private ArrayList<MotionEventExtended> CalculateAccelerationsForEventsList(ArrayList<MotionEventExtended> listEvents) {
+		
+		double timeDiff, velocityDiff;
+		
+		listEvents.get(0).Acceleration = 0;
+		for(int idx = 1; idx < listEvents.size(); idx++) {
+			timeDiff = listEvents.get(idx).EventTime - listEvents.get(idx - 1).EventTime; 
+			velocityDiff = listEvents.get(idx).Velocity - listEvents.get(idx - 1).Velocity;
+			listEvents.get(idx).Acceleration = velocityDiff / timeDiff;			
+		}
+		
+		return listEvents;
+	}
+
+	private void MedianFilters() {
+		ListEventsExtended = VelocityMedianFilter(ListEventsExtended);
+		ListEventsSpatialByDistanceExtended = VelocityMedianFilter(ListEventsSpatialByDistanceExtended);
+		ListEventsSpatialByTimeExtended = VelocityMedianFilter(ListEventsSpatialByTimeExtended);
+		
+		double[] vectorVel = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsExtended);
+		double[] vectorVelDistance = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsSpatialByDistanceExtended);				
+		double[] vectorVelTime = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsSpatialByTimeExtended);	
+		
+		int size = vectorVelTime.length;
+	}
+	
+	private ArrayList<MotionEventExtended> VelocityMedianFilter(ArrayList<MotionEventExtended> listEvents) {
+
+		double[] velocities = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			velocities[idx] = listEvents.get(idx).Velocity;
+		}
+		
+		Utils.GetInstance().GetUtilsVectors().MedianFilter(velocities);
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			listEvents.get(idx).Velocity = velocities[idx];
+		}
+		
+		return listEvents;
+	}
+
 	private void SpatialSampling() {
-		ListEventsSpatialByDistance = mUtilsSpatialSampling.ConvertToVectorByDistance(ListEvents, LengthPixel);
-		ListEventsSpatialByTime = mUtilsSpatialSampling.ConvertToVectorByTime(ListEvents);
+		ListEventsSpatialByDistanceExtended = mUtilsSpatialSampling.ConvertToVectorByDistance(ListEventsExtended, LengthPixel);
+		ListEventsSpatialByTimeExtended = mUtilsSpatialSampling.ConvertToVectorByTime(ListEventsExtended);
 		
-		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXpixel(ListEventsSpatialByDistance);
-		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYpixel(ListEventsSpatialByDistance);
+		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsExtended);
+		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsExtended);
 		
-		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXpixel(ListEventsSpatialByTime);
-		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYpixel(ListEventsSpatialByTime);
+		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByDistanceExtended);
+		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByDistanceExtended);
+		
+		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByTimeExtended);
+		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByTimeExtended);
+		
+		double[] vectorVel = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsExtended);
+		double[] vectorVelDistance = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsSpatialByDistanceExtended);				
+		double[] vectorVelTime = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsSpatialByTimeExtended);		
 		
 		int size = vectorXDistance.length;
 	}
@@ -227,13 +292,9 @@ public class StrokeExtended extends Stroke {
 	}
 	
 	protected void ConvertToMotionEventExtended()
-	{
-		ListEventsExtended = ConvertToMotionEventExtended(ListEvents);
-		ListEventsSpatialByDistanceExtended = ConvertToMotionEventExtended(ListEventsSpatialByDistance);
-		ListEventsSpatialByTimeExtended = ConvertToMotionEventExtended(ListEventsSpatialByTime);
-		
-		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsExtended);
-		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsExtended);		
+	{	
+		ListEventsSpatialByDistanceExtended = ListEventsCompactToExtended(ListEventsSpatialByDistance);
+		ListEventsSpatialByTimeExtended = ListEventsCompactToExtended(ListEventsSpatialByTime);
 		
 		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByDistanceExtended);
 		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByDistanceExtended);
@@ -241,10 +302,10 @@ public class StrokeExtended extends Stroke {
 		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByTimeExtended);
 		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByTimeExtended);
 		
-		int size = vectorX.length;
+		int size = vectorXTime.length;
 	}
 	
-	protected ArrayList<MotionEventExtended> ConvertToMotionEventExtended(ArrayList<MotionEventCompact> listEventsCompact)
+	protected ArrayList<MotionEventExtended> ListEventsCompactToExtended(ArrayList<MotionEventCompact> listEventsCompact)
 	{
 		ArrayList<MotionEventExtended> listEventsExtended = new ArrayList<>();
 		
@@ -465,7 +526,7 @@ public class StrokeExtended extends Stroke {
 	
 	protected void CalculateSpatialSamplingVector()
 	{
-		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListEvents, LengthPixel);
+		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListEventsExtended, LengthPixel);
 	}
 	
 	protected MotionEventCompact GetMaxXpixel(MotionEventCompact pointA, MotionEventCompact pointB){

@@ -286,7 +286,7 @@ public class GestureExtended extends Gesture {
 	
 	protected void CalculateSpatialSamplingVector()
 	{
-		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListGestureEvents, GestureLengthPixel);
+		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListGestureEventsExtended, GestureLengthPixel);
 	}
 	
 	protected void CalculateAccelerationAtStart()
