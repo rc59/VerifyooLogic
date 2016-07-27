@@ -20,14 +20,14 @@ import Logic.Utils.Utils;
 import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsMath;
 import Logic.Utils.UtilsPeakCalc;
-import Logic.Utils.UtilsSpatialSampling;
+import Logic.Utils.UtilsSignalProcessing;
 
 public class StrokeExtended extends Stroke {
 	/************** Private Members **************/
 	private String mInstruction;
 	private int mStrokeIdx;
 	
-	private UtilsSpatialSampling mUtilsSpatialSampling;
+	private UtilsSignalProcessing mUtilsSpatialSampling;
 	private UtilsMath mUtilsMath;
 	protected UtilsGeneral mUtilsGeneral;
 	protected UtilsPeakCalc mUtilsPeakCalc;
@@ -82,7 +82,10 @@ public class StrokeExtended extends Stroke {
 	public double[] AccumulatedTimeIntervals;
 	
 	public ArrayList<MotionEventCompact> ListEventsSpatialByDistance;
-	public ArrayList<MotionEventCompact> ListEventsSpatialByTime;
+	public ArrayList<MotionEventCompact> ListEventsSpatialByTime;	
+	
+	public ArrayList<MotionEventExtended> ListEventsSpatialByDistanceExtended;
+	public ArrayList<MotionEventExtended> ListEventsSpatialByTimeExtended;	
 	
 	public double LengthPixel;
 	/****************************************/
@@ -99,13 +102,11 @@ public class StrokeExtended extends Stroke {
 			mHashFeatureMeans = hashFeatureMeans;
 			mStrokeIdx = strokeIdx;
 			mInstruction = instruction;
-			LengthPixel = stroke.Length;
+			LengthPixel = stroke.Length;								
+			ListEvents = stroke.ListEvents;		
 			
-			ListEvents = stroke.ListEvents;
-			
-			ListEventsSpatialByDistance = mUtilsSpatialSampling.ConvertToVectorByDistance(stroke.ListEvents, LengthPixel);
-			ListEventsSpatialByTime = mUtilsSpatialSampling.ConvertToVectorByTime(stroke.ListEvents);	
-			ListEvents = stroke.ListEvents;
+			double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXpixel(ListEvents);
+			double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYpixel(ListEvents);
 			
 			Xdpi = stroke.Xdpi;		
 			Ydpi = stroke.Ydpi;
@@ -141,12 +142,54 @@ public class StrokeExtended extends Stroke {
 	
 	protected void PreCalculations()
 	{
-		CalculateStrokeCenter();
+		CenterAndRotate();
+		SpatialSampling();	
 		ConvertToMotionEventExtended();
+		Normalize();
+		
 		CalculateStartEndOfStroke();
 		PrepareData();		
 	}
+	
+	private void SpatialSampling() {
+		ListEventsSpatialByDistance = mUtilsSpatialSampling.ConvertToVectorByDistance(ListEvents, LengthPixel);
+		ListEventsSpatialByTime = mUtilsSpatialSampling.ConvertToVectorByTime(ListEvents);
+		
+		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXpixel(ListEventsSpatialByDistance);
+		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYpixel(ListEventsSpatialByDistance);
+		
+		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXpixel(ListEventsSpatialByTime);
+		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYpixel(ListEventsSpatialByTime);
+		
+		int size = vectorXDistance.length;
+	}
 
+	private void CenterAndRotate() {
+		ListEvents = mUtilsSpatialSampling.CenterAndRotate(ListEvents);
+
+		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXpixel(ListEvents);
+		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYpixel(ListEvents);
+		
+		int size = vectorX.length;
+	}
+
+	private void Normalize() {
+		ListEventsExtended = mUtilsSpatialSampling.Normalize(ListEventsExtended);
+		ListEventsSpatialByDistanceExtended = mUtilsSpatialSampling.Normalize(ListEventsSpatialByDistanceExtended);
+		ListEventsSpatialByTimeExtended = mUtilsSpatialSampling.Normalize(ListEventsSpatialByTimeExtended);
+		
+		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsExtended);
+		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsExtended);
+		
+		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsSpatialByDistanceExtended);
+		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByDistanceExtended);
+		
+		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsSpatialByTimeExtended);
+		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByTimeExtended);
+		
+		int size = vectorX.length;
+	}	
+	
 	protected void CalculateStartEndOfStroke()
 	{		
 		StrokeStartEvent = StrokeEndEvent = 0;
@@ -185,30 +228,51 @@ public class StrokeExtended extends Stroke {
 	
 	protected void ConvertToMotionEventExtended()
 	{
+		ListEventsExtended = ConvertToMotionEventExtended(ListEvents);
+		ListEventsSpatialByDistanceExtended = ConvertToMotionEventExtended(ListEventsSpatialByDistance);
+		ListEventsSpatialByTimeExtended = ConvertToMotionEventExtended(ListEventsSpatialByTime);
+		
+		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsExtended);
+		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsExtended);		
+		
+		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByDistanceExtended);
+		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByDistanceExtended);
+		
+		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByTimeExtended);
+		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByTimeExtended);
+		
+		int size = vectorX.length;
+	}
+	
+	protected ArrayList<MotionEventExtended> ConvertToMotionEventExtended(ArrayList<MotionEventCompact> listEventsCompact)
+	{
+		ArrayList<MotionEventExtended> listEventsExtended = new ArrayList<>();
+		
 		MotionEventExtended tempEvent;
 		MotionEventExtended tempEventPrev;
 		
-		for(int idxEvent = 0; idxEvent < ListEvents.size(); idxEvent++)
+		for(int idxEvent = 0; idxEvent < listEventsCompact.size(); idxEvent++)
 		{
 			if(idxEvent > 0) {
-				tempEventPrev = ListEventsExtended.get(idxEvent - 1);
-				
+				tempEventPrev = listEventsExtended.get(idxEvent - 1);				
 			}
 			else {
 				tempEventPrev = null;
 			}
 			
-			tempEvent = new MotionEventExtended(ListEvents.get(idxEvent), mStrokeCenterXpixel, mStrokeCenterYpixel, Xdpi, Ydpi, tempEventPrev, idxEvent);
+			tempEvent = new MotionEventExtended(listEventsCompact.get(idxEvent), Xdpi, Ydpi, tempEventPrev, idxEvent);
 			
 			if(idxEvent == 0) {
 				tempEvent.IsStartOfStroke = true;
 			}
-			if(idxEvent == ListEvents.size() - 1) {
+			if(idxEvent == listEventsCompact.size() - 1) {
 				tempEvent.IsEndOfStroke = true;
 			}
 			
-			ListEventsExtended.add(tempEvent);
+			listEventsExtended.add(tempEvent);
 		}
+		
+		return listEventsExtended;
 	}
 	
 	protected void PrepareData()

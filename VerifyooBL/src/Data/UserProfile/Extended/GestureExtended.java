@@ -23,7 +23,7 @@ import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsLinearReg;
 import Logic.Utils.UtilsLinearReg.LinearRegression;
 import Logic.Utils.UtilsMath;
-import Logic.Utils.UtilsSpatialSampling;
+import Logic.Utils.UtilsSignalProcessing;
 
 public class GestureExtended extends Gesture {
 	
@@ -111,7 +111,7 @@ public class GestureExtended extends Gesture {
 	
 	protected UtilsMath mUtilsMath;
 	protected UtilsLinearReg mUtilsLinearReg;
-	protected UtilsSpatialSampling mUtilsSpatialSampling;
+	protected UtilsSignalProcessing mUtilsSpatialSampling;
 	protected UtilsGeneral mUtilsGeneral;
 	
 	protected IStatEngine mStatEngine;

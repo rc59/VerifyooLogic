@@ -42,7 +42,7 @@ public class GestureComparer {
 	protected double mGestureScore;
 	protected double mMinCosineDistanceScore;
 	protected double mStrokesScore;
-	CompareResultSummary mCompareResultsGesture;		
+	CompareResultSummary mCompareResultsGesture;
 	
 	protected boolean mIsStrokeCosineDistanceValid;
 	protected boolean mMinCosineDistanceValid;	
@@ -169,7 +169,7 @@ public class GestureComparer {
 			CompareGestureAreas();
 		}
 		if(IsNeedToRun("CompareGestureAreasMinXMinY")){
-			//CompareGestureAreasMinXMinY();
+			CompareGestureAreasMinXMinY();
 		}
 		if(IsNeedToRun("CompareGesturePressure")){
 			CompareGesturePressure();

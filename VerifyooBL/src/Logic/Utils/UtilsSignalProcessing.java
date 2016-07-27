@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Raw.MotionEventCompact;
 
-public class UtilsSpatialSampling {
+public class UtilsSignalProcessing {
 	final private int NUM_TEMPORAL_SAMPLING_POINTS = 32;
 	
 	private double[] mOrientations = new double[] {
@@ -396,7 +396,7 @@ public class UtilsSpatialSampling {
         }
         return points;
     }
-
+       
     private float[] Translate(float[] points, float dx, float dy) {
         int size = points.length;
         for (int i = 0; i < size; i += 2) {
@@ -420,5 +420,91 @@ public class UtilsSpatialSampling {
         center[1] = 2 * centerY / count;
 
         return center;
+    }    
+    
+    /***********************************************************************************************/
+    
+    public ArrayList<MotionEventCompact> CenterAndRotate(ArrayList<MotionEventCompact> listEvents) {
+    	ArrayList<MotionEventCompact> listEventsProcessed;
+    	
+    	double[] center = ComputeCentroid(listEvents);
+    	
+    	float orientation = (float) Math.atan2(listEvents.get(0).Ypixel - center[1], listEvents.get(0).Xpixel - center[0]);
+
+        float adjustment = -orientation;
+        int count = mOrientations.length;
+        for (int i = 0; i < count; i++) {
+            float delta = (float) mOrientations[i] - orientation;
+            if (Math.abs(delta) < Math.abs(adjustment)) {
+                adjustment = delta;
+            }
+        }    	       
+        
+    	listEventsProcessed = Translate(listEvents, -center[0], -center[1]);
+    	
+    	
+    	listEventsProcessed = Rotate(listEventsProcessed, adjustment);
+    	
+    	return listEventsProcessed;
     }
+    
+    private double[] ComputeCentroid(ArrayList<MotionEventCompact> listEvents) {
+    	double centerX = 0;
+        double centerY = 0;
+        int count = listEvents.size();
+        for (int i = 0; i < count; i++) {
+            centerX += listEvents.get(i).Xpixel;            
+            centerY += listEvents.get(i).Ypixel;
+        }
+        double[] center = new double[2];
+        center[0] = centerX / count;
+        center[1] = centerY / count;
+
+        return center;
+    }
+    
+    private ArrayList<MotionEventCompact> Translate(ArrayList<MotionEventCompact> points, double dx, double dy) {
+        int size = points.size();
+        for (int i = 0; i < size; i++) {
+            points.get(i).Xpixel += dx;
+            points.get(i).Ypixel += dy;
+        }
+        return points;
+    }            
+    
+    private ArrayList<MotionEventCompact> Rotate(ArrayList<MotionEventCompact> listEvents, double angle) {
+    	ArrayList<MotionEventCompact> listEventsProcessed = listEvents;    	
+    	
+    	double cos = Math.cos(angle);
+    	double sin = Math.sin(angle);
+        int size = listEventsProcessed.size();
+        for (int i = 0; i < size; i++) {
+        	double x = listEventsProcessed.get(i).Xpixel * cos - listEventsProcessed.get(i).Ypixel * sin;
+        	double y = listEventsProcessed.get(i).Xpixel * sin + listEventsProcessed.get(i).Ypixel * cos;
+            
+            listEventsProcessed.get(i).Xpixel = x;
+            listEventsProcessed.get(i).Ypixel = y;            
+        }
+        return listEventsProcessed;
+    }
+
+    public ArrayList<MotionEventExtended> Normalize(ArrayList<MotionEventExtended> listEvents) {        
+        double sum = 0;
+
+        int size = listEvents.size();
+        for (int i = 0; i < size; i++)
+        {
+            sum += listEvents.get(i).Xpixel * listEvents.get(i).Xpixel;
+            sum += listEvents.get(i).Ypixel * listEvents.get(i).Ypixel;
+        }
+
+        float magnitude = (float) Math.sqrt(sum);
+        for (int i = 0; i < size; i++)
+        {
+        	listEvents.get(i).Xnormalized = listEvents.get(i).Xpixel / magnitude;
+        	listEvents.get(i).Ynormalized = listEvents.get(i).Ypixel / magnitude;        	          
+        }
+
+        return listEvents;
+    }    
 }

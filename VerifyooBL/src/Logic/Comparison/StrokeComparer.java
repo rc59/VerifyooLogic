@@ -85,7 +85,7 @@ public class StrokeComparer {
 				CompareStrokeAreas();
 				CompareTimeInterval();
 				CompareAvgVelocity();
-				
+				CompareVectors();
 				CalculateFinalScore();	
 			}
 		}
@@ -97,6 +97,49 @@ public class StrokeComparer {
 			mCompareResult.Score = 0;
 		}		
 	}		
+
+	private void CompareVectors() {
+		double[] vectorStoredVelocities = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+		double[] vectorAuthVelocities = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+		
+		double[] vectorStoredAcceleration = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+		double[] vectorAuthAcceleration = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+		
+		double[] vectorStoredPressure = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+		double[] vectorAuthPressure = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+		
+		double[] vectorStoredSurface = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+		double[] vectorAuthSurface = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+				
+		double[] vectorStoredVelocitiesX = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+		double[] vectorAuthVelocitiesX = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+		
+		double[] vectorStoredVelocitiesY = new double[mStrokeStoredExtended.ListEventsExtended.size()];
+		double[] vectorAuthVelocitiesY = new double[mStrokeStoredExtended.ListEventsExtended.size()];		
+				
+		for(int idx = 0; idx < mStrokeStoredExtended.ListEventsExtended.size(); idx++) {
+			vectorStoredVelocities[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).Velocity;
+			vectorAuthVelocities[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).Velocity;
+						
+			vectorStoredAcceleration[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).Acceleration;
+			vectorAuthAcceleration[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).Acceleration;
+			
+			vectorStoredPressure[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).Pressure;
+			vectorAuthPressure[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).Pressure;
+			
+			vectorStoredSurface[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).TouchSurface;
+			vectorAuthSurface[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).TouchSurface;
+			
+			vectorStoredVelocitiesX[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).VelocityX;
+			vectorAuthVelocitiesX[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).VelocityX;
+			
+			vectorStoredVelocitiesY[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).VelocityY;
+			vectorAuthVelocitiesY[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).VelocityY;
+		}
+		
+		double x = 1;
+		x++;
+	}
 
 	private void TimeWarp() {
 //		UtilsDTW dtw = new UtilsDTW(mStrokeAuthExtended.GetFilteredVelocities(), mStrokeStoredExtended.GetFilteredVelocities());

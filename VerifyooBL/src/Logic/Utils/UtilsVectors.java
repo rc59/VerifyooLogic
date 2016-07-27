@@ -1,6 +1,71 @@
 package Logic.Utils;
 
+import java.util.ArrayList;
+
+import Data.UserProfile.Extended.MotionEventExtended;
+import Data.UserProfile.Raw.MotionEventCompact;
+
 public class UtilsVectors {
+	public double[] GetVectorXpixel(ArrayList<MotionEventCompact> listEvents) {
+		double[] vectorX = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vectorX[idx] = listEvents.get(idx).Xpixel;
+		}
+		
+		return vectorX;
+	}
+	
+	public double[] GetVectorYpixel(ArrayList<MotionEventCompact> listEvents) {
+		double[] vectorY = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vectorY[idx] = listEvents.get(idx).Ypixel;
+		}
+		
+		return vectorY;
+	}
+	
+	public double[] GetVectorXmm(ArrayList<MotionEventExtended> listEvents) {
+		double[] vectorX = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vectorX[idx] = listEvents.get(idx).Xmm;
+		}
+		
+		return vectorX;
+	}
+	
+	public double[] GetVectorYmm(ArrayList<MotionEventExtended> listEvents) {
+		double[] vectorY = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vectorY[idx] = listEvents.get(idx).Ymm;
+		}
+		
+		return vectorY;
+	}
+	
+	public double[] GetVectorXnormalized(ArrayList<MotionEventExtended> listEvents) {
+		double[] vectorX = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vectorX[idx] = listEvents.get(idx).Xnormalized;
+		}
+		
+		return vectorX;
+	}
+	
+	public double[] GetVectorYnormalized(ArrayList<MotionEventExtended> listEvents) {
+		double[] vectorY = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vectorY[idx] = listEvents.get(idx).Ynormalized;
+		}
+		
+		return vectorY;
+	}
+	
 	public double MinimumCosineDistanceScore(double[] vector1, double[] vector2)
 	{
 		double distance = MinimumCosineDistance(vector1, vector2, 2);

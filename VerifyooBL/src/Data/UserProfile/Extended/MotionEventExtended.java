@@ -14,6 +14,9 @@ public class MotionEventExtended extends MotionEventCompact {
 	public double Xmm;
 	public double Ymm;
 	
+	public double Xnormalized;
+	public double Ynormalized;	
+	
 	public double VelocityX;
 	public double VelocityY;
 	public double Velocity;
@@ -26,7 +29,7 @@ public class MotionEventExtended extends MotionEventCompact {
 	public boolean IsStartOfStroke;
 	public boolean IsEndOfStroke;
 	
-	public MotionEventExtended(MotionEventCompact motionEvent, double strokeCenterXpixel, double strokeCenterYpixel, double xdpi, double ydpi, MotionEventExtended motionEventPrev, int index)
+	public MotionEventExtended(MotionEventCompact motionEvent, double xdpi, double ydpi, MotionEventExtended motionEventPrev, int index)
 	{
 		Id = motionEvent.Id;
 		mUtilsMath = Utils.GetInstance().GetUtilsMath();
@@ -48,8 +51,8 @@ public class MotionEventExtended extends MotionEventCompact {
 		GyroY = motionEvent.GyroY;
 		GyroZ = motionEvent.GyroZ;
 		
-		Xmm = (Xpixel - strokeCenterXpixel) / xdpi * ConstsMeasures.INCH_TO_MM;
-        Ymm = (Ypixel - strokeCenterYpixel) / ydpi * ConstsMeasures.INCH_TO_MM;
+		Xmm = Xpixel / xdpi * ConstsMeasures.INCH_TO_MM;
+        Ymm = Ypixel / ydpi * ConstsMeasures.INCH_TO_MM;
         
         IsStartOfStroke = false;
         IsEndOfStroke = false;
