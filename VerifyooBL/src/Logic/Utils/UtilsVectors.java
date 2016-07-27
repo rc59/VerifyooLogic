@@ -66,6 +66,26 @@ public class UtilsVectors {
 		return vectorAcc;
 	}
 	
+	public double[] GetVectorPressure(ArrayList<MotionEventExtended> listEvents) {
+		double[] vector = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vector[idx] = listEvents.get(idx).Pressure;
+		}
+		
+		return vector;
+	}
+	
+	public double[] GetVectorSurface(ArrayList<MotionEventExtended> listEvents) {
+		double[] vector = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vector[idx] = listEvents.get(idx).TouchSurface;
+		}
+		
+		return vector;
+	}
+	
 	public double[] GetVectorXnormalized(ArrayList<MotionEventExtended> listEvents) {
 		double[] vectorX = new double[listEvents.size()];
 		
