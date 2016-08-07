@@ -81,11 +81,12 @@ public class StrokeComparer {
 			CheckIfStrokesAreIdentical();
 			
 			if(!mIsStrokesIdentical) {				
+				CompareSpatial();
 				CompareMinCosineDistance();
 				CompareStrokeAreas();
 				CompareTimeInterval();
 				CompareAvgVelocity();
-				CompareVectors();
+				//CompareVectors();
 				CalculateFinalScore();	
 			}
 		}
@@ -97,6 +98,20 @@ public class StrokeComparer {
 			mCompareResult.Score = 0;
 		}		
 	}		
+
+	private void CompareSpatial() {
+		
+		double[] velocitiesAuthDistance = mUtilsVectors.GetVectorVel(mStrokeAuthExtended.ListEventsSpatialByDistanceExtended);
+		double[] velocitiesStoredDistance = mUtilsVectors.GetVectorVel(mStrokeStoredExtended.ListEventsSpatialByDistanceExtended);
+		
+		double[] velocitiesAuthTime = mUtilsVectors.GetVectorVel(mStrokeAuthExtended.ListEventsSpatialByTimeExtended);
+		double[] velocitiesStoredTime = mUtilsVectors.GetVectorVel(mStrokeStoredExtended.ListEventsSpatialByTimeExtended);
+		
+		double score1 = mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), mStrokeAuthExtended.ListEventsSpatialByDistanceExtended, mStrokeStoredExtended.ListEventsSpatialByDistanceExtended);
+		double score2 = mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), mStrokeAuthExtended.ListEventsSpatialByTimeExtended, mStrokeStoredExtended.ListEventsSpatialByTimeExtended);
+		
+		double total = (score1 + score2 / 2);
+	}
 
 	private void CompareVectors() {
 		double[] vectorStoredVelocities = new double[mStrokeStoredExtended.ListEventsExtended.size()];

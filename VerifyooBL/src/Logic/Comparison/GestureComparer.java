@@ -360,7 +360,7 @@ public class GestureComparer {
 
 	protected void CompareGestureTotalTimeInterval() {		
 		double totalTimeAuth = mGestureAuth.GestureTotalTimeInterval;
-		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, totalTimeAuth);
+		CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERVAL, totalTimeAuth);
 	}
 
 	protected void CompareGestureAvgVelocity() {		

@@ -1,6 +1,12 @@
 package Consts;
 
 public class ConstsParamNames {
+	public class StrokeSpatial
+	{
+		public static final String VELOCITIES = "SpatialVelocities";
+		public static final String ACCELERATIONS = "SpatialAccelerations";
+	}
+	
 	public class Stroke
 	{
 		public static final String MINIMUM_COSINE_DISTANCE = "StrokeMinimumCosineDistance";
@@ -19,7 +25,7 @@ public class ConstsParamNames {
 		public static final String GESTURE_TOTAL_AREA = "GestureTotalArea";
 		public static final String GESTURE_TOTAL_AREA_MINX_MINY = "GestureTotalAreaMinXMinY";		
 		public static final String GESTURE_TOTAL_STROKES_TIME_INTERVAL = "GestureTotalStrokesTimeInterval";
-		public static final String GESTURE_TOTAL_TIME_INTERNVAL = "GestureTotalTimeInterval";
+		public static final String GESTURE_TOTAL_TIME_INTERVAL = "GestureTotalTimeInterval";
 		public static final String GESTURE_ACCUMULATED_DISTANCE_BY_TIME = "GestureAccumulatedDistanceByTime";
 		public static final String GESTURE_TOTAL_STROKE_AREA= "GestureTotalStrokeArea";	
 		public static final String GESTURE_TOTAL_STROKE_AREA_MINX_MINY = "GestureTotalStrokeAreaMinXMinY";

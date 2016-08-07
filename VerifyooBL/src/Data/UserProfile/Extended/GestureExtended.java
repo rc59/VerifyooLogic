@@ -501,7 +501,7 @@ public class GestureExtended extends Gesture {
 		double gestureEndTime = eventLast.EventTime;
 		
 		GestureTotalTimeInterval = gestureEndTime - gestureStartTime;
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, GestureTotalTimeInterval);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERVAL, GestureTotalTimeInterval);
 	}
 	
 	protected void CalculateGestureAvgVelocity()

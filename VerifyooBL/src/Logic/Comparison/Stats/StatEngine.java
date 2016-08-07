@@ -1,7 +1,11 @@
 package Logic.Comparison.Stats;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import Consts.ConstsParamNames;
+import Data.UserProfile.Extended.MotionEventExtended;
+import Data.UserProfile.Raw.MotionEventCompact;
 import Logic.Comparison.Stats.Data.StatEngineResult;
 import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
@@ -11,6 +15,7 @@ import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Comparison.Stats.Norms.Interfaces.INormMgr;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsGeneral;
+import Logic.Utils.UtilsMath;
 import Logic.Utils.UtilsStat;
 
 public class StatEngine implements IStatEngine {
@@ -37,7 +42,7 @@ public class StatEngine implements IStatEngine {
 		  
 		  mHashMapScaleParams = new HashMap<>();
 		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_LENGTH, true);
-		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERNVAL, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERVAL, true);
 		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, true);
 		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA, true);
 		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA_MINX_MINY, true);
@@ -46,7 +51,66 @@ public class StatEngine implements IStatEngine {
 		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_NUM_EVENTS, true);
       }
       return mInstance;
-   }
+    }
+	
+	public double CompareStrokeSpatial(String instruction, ArrayList<MotionEventExtended> listAuth, ArrayList<MotionEventExtended> listStored) {
+		
+		NormMgr normMgr = (NormMgr) NormMgr.GetInstance();
+		
+		double[] popM, popSd, internalSd;
+		
+		UtilsMath utilsMath = new UtilsMath();
+		
+		double totalValues = 0;
+		double tempValue;
+		
+		double[] percentages = new double[Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE];
+		
+		double numValues = 0;
+		
+		for(int idx = 1; idx < Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE; idx++) {
+			//tempValue = GetDistance(list1.get(idx), list2.get(idx));
+			
+			tempValue = GetScore(
+					normMgr.NormContainerMgr.GetSpatialPopMean(instruction, ConstsParamNames.StrokeSpatial.VELOCITIES, 0, idx), 
+					normMgr.NormContainerMgr.GetSpatialPopSd(instruction, ConstsParamNames.StrokeSpatial.VELOCITIES, 0, idx), 
+					normMgr.NormContainerMgr.GetSpatialInternalSd(instruction, ConstsParamNames.StrokeSpatial.VELOCITIES, 0, idx), 
+					listAuth.get(idx).Velocity, listStored.get(idx).Velocity);
+			
+			totalValues += tempValue;
+			numValues++;
+			
+			tempValue = GetScore(
+					normMgr.NormContainerMgr.GetSpatialPopMean(instruction, ConstsParamNames.StrokeSpatial.ACCELERATIONS, 0, idx), 
+					normMgr.NormContainerMgr.GetSpatialPopSd(instruction, ConstsParamNames.StrokeSpatial.ACCELERATIONS, 0, idx), 
+					normMgr.NormContainerMgr.GetSpatialInternalSd(instruction, ConstsParamNames.StrokeSpatial.ACCELERATIONS, 0, idx), 
+					listAuth.get(idx).Velocity, listStored.get(idx).Acceleration);
+			
+			totalValues += tempValue;
+			numValues++;
+			
+			percentages[idx] = tempValue;
+		}
+		
+		double avg = totalValues / (Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE - 1);		
+		
+		return avg;
+	}
+	
+	private double GetDistance(MotionEventExtended event1, MotionEventExtended event2) {
+		UtilsMath utilsMath = new UtilsMath();
+		
+		double totalScore = 0;
+		
+		totalScore += utilsMath.GetPercentageDiff(event1.Velocity, event2.Velocity);
+		totalScore += utilsMath.GetPercentageDiff(event1.Pressure, event2.Pressure);
+		totalScore += utilsMath.GetPercentageDiff(event1.TouchSurface, event2.TouchSurface);
+		totalScore += utilsMath.GetPercentageDiff(event1.Acceleration, event2.Acceleration);
+//		totalScore += utilsMath.GetPercentageDiff(event1.Xnormalized, event2.Xnormalized);
+//		totalScore += utilsMath.GetPercentageDiff(event1.Ynormalized, event2.Ynormalized);		
+		
+		return totalScore / 4;
+	}
 	
 	public IStatEngineResult CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
 	{		
@@ -123,6 +187,59 @@ public class StatEngine implements IStatEngine {
 //		statResult = new StatEngineResult(score, zScoreForUser);
 //		return statResult;	
 //	}
+	
+	public double GetScore(double popMean, double popSd, double internalSd, double authValue, double storedValue) {
+		double populationMean = popMean;
+		double populationSd = popSd;
+		double populationInternalSd = internalSd;		
+		
+		double internalMean = storedValue;		
+		
+		double zScoreForUser = (internalMean - populationMean) / populationSd;
+		IStatEngineResult statResult;
+
+		//contribution of user uniqueness 
+		double uniquenessFactor = 0.4 * Math.abs(zScoreForUser) + 1;
+		
+		if(uniquenessFactor > 2) {
+			uniquenessFactor = 2;
+		}
+				
+		double twoUpperPopulationInternalSD = (internalMean + populationInternalSd * uniquenessFactor);
+		double twoLowerPopulationInternalSD = (internalMean - populationInternalSd * uniquenessFactor);
+		
+		double pUser;
+		
+		double threeUpperPopulationInternalSD = (internalMean + 1.5 * populationInternalSd * uniquenessFactor);
+		double threeLowerPopulationInternalSD = (internalMean - 1.5 * populationInternalSd * uniquenessFactor);		
+
+		double score;
+		if((authValue > twoLowerPopulationInternalSD) && (authValue < twoUpperPopulationInternalSD)) {
+			score = 1;
+		}
+		else {
+			if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)) {
+				if(authValue > twoLowerPopulationInternalSD) {
+					double u = Math.abs(threeUpperPopulationInternalSD - authValue);
+					double d = Math.abs(threeUpperPopulationInternalSD - twoUpperPopulationInternalSD);
+					
+					score = u/d;					
+				}
+				else {
+					double u = Math.abs(threeLowerPopulationInternalSD - authValue);
+					double d = Math.abs(threeLowerPopulationInternalSD - twoLowerPopulationInternalSD);
+					
+					score = u/d;
+				}
+			}
+			else {
+				score = 0;
+			}
+		}
+				
+		//statResult = new StatEngineResult(score, zScoreForUser);
+		return score;	
+	}
 
 	public IStatEngineResult CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
 	{

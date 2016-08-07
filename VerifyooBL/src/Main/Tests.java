@@ -7,13 +7,22 @@ public class Tests {
 	{
 		String msg;
 		double score = 0;
+		
+		int fn = 0;
 		try
 		{
 			Tester t = new Tester();		
 			
-			//score = t.TestSelf("roy-STAM123", "dalal.roy@gmail.com");			
-			//score = t.TestSelf("roy-STAM2", "roy-STAM2");
-			score = t.CompareTemplates("rafi_r1", "rafi_a1_slow");
+			double minScore = 0.80;
+						
+			score = t.CompareTemplates("Roy0308", "Roy0308-Auth1");
+			score = t.CompareTemplates("Roy0308", "Roy0308-Auth2");	
+			score = t.CompareTemplates("Roy0308", "Roy0308-Auth3");	
+			score = t.CompareTemplates("Roy0308", "Roy0308-Auth4");	
+			score = t.CompareTemplates("Roy0308", "Roy0308-Rafi1");			
+			if(score < minScore) {
+				fn++;
+			}			
 		}
 		catch(Exception exc) {
 			msg = exc.getMessage();

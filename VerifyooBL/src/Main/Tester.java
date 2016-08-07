@@ -33,9 +33,9 @@ public class Tester {
 		MongoClient mongo;
 		try {
 			mongo = new MongoClient("localhost", 27017);
-			DB db = mongo.getDB("templates");
+			DB db = mongo.getDB("extserver-dev");
 						
-			DBCollection col = db.getCollection("templates");
+			DBCollection col = db.getCollection("templatedemos");
 			DBObject query = BasicDBObjectBuilder.start().add("Name", userName).get();
 	        DBCursor cursor = col.find(query);
 	        
@@ -175,7 +175,7 @@ public class Tester {
 		return score;
 	}
 	
-	public double CompareTemplates(String name1, String name2)
+	public double CompareTemplatesOld(String name1, String name2)
 	{		
 		Template template1 = GetFromDB(name1);		
 		Template template2 = GetFromDB(name2);
@@ -238,8 +238,28 @@ public class Tester {
 		double score = GetFinalScore(listScores);
 		if(score < 0.9) {
 			result = false;
-		}
-			
+		}		
+		
+		return 0;
+	}
+	
+	public double CompareTemplates(String name1, String name2)
+	{		
+		Template template1 = GetFromDB(name1);		
+		Template template2 = GetFromDB(name2);
+		
+		TemplateComparer comparer = new TemplateComparer();			
+		
+		TemplateExtended templateBase = new TemplateExtended(template1);
+		TemplateExtended templateAuth = new TemplateExtended(template2);
+		
+		comparer.CompareTemplates(templateBase, templateAuth);
+		double score = comparer.GetScore();
+		boolean result = true;
+		//double score = GetFinalScore(listScores);
+		if(score < 0.9) {
+			result = false;
+		}		
 		
 		return score;
 	}
@@ -251,10 +271,10 @@ public class Tester {
         double weights = 0;
         double tempWeight;
         double finalScore = 0;
-        if (mListScores.get(0) > 0) {
-            mListScores.remove(0);
-            scores = mListScores.get(0) * 1 + mListScores.get(1) * 1.25 + mListScores.get(2) * 1.5;
-            finalScore = scores / 3.75;
+        if (mListScores.get(0) > 0) {           
+        	mListScores.remove(0);
+            scores = mListScores.get(0) * 1 + mListScores.get(1) * 1 + mListScores.get(2) * 1;
+            finalScore = scores / 3;
         }
 
         return finalScore;

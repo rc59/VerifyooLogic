@@ -103,10 +103,7 @@ public class StrokeExtended extends Stroke {
 			mStrokeIdx = strokeIdx;
 			mInstruction = instruction;
 			LengthPixel = stroke.Length;								
-			ListEvents = stroke.ListEvents;		
-			
-			double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXpixel(ListEvents);
-			double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYpixel(ListEvents);
+			ListEvents = stroke.ListEvents;			
 			
 			Xdpi = stroke.Xdpi;		
 			Ydpi = stroke.Ydpi;
@@ -142,6 +139,7 @@ public class StrokeExtended extends Stroke {
 	
 	protected void PreCalculations()
 	{
+		CalculateStrokeCenter();
 		CenterAndRotate();
 		ListEventsExtended = ListEventsCompactToExtended(ListEvents);		
 		MedianFilters();
