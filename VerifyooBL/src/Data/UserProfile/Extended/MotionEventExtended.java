@@ -1,7 +1,9 @@
 package Data.UserProfile.Extended;
 
 import Consts.ConstsMeasures;
+import Consts.ConstsParamNames;
 import Data.UserProfile.Raw.MotionEventCompact;
+import Logic.Utils.Complex;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsMath;
 
@@ -20,6 +22,15 @@ public class MotionEventExtended extends MotionEventCompact {
 	public double VelocityX;
 	public double VelocityY;
 	public double Velocity;
+	
+	public double RadialVelocity;
+	public double RadialAcceleration;
+	
+	public double Radius;
+	public double Teta;
+	public double DeltaTeta;
+	
+	public double AccumulatedNormalizedArea;
 
 	public double Angle;
 	public double AngleDiff;
@@ -66,7 +77,42 @@ public class MotionEventExtended extends MotionEventCompact {
 		tempEvent.IsStartOfStroke = IsStartOfStroke;
 		tempEvent.IsEndOfStroke = IsEndOfStroke;
 		
+		tempEvent.RadialVelocity = RadialVelocity;
+		
 		return tempEvent;
+	}
+	
+	public double GetParamByName(String param) {
+		double value = 0;
+		
+		switch (param) {
+		case ConstsParamNames.StrokeSpatial.VELOCITIES:
+			value = Velocity;
+			break;
+		case ConstsParamNames.StrokeSpatial.ACCELERATIONS:
+			value = Acceleration;
+			break;
+		case ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES:
+			value = RadialVelocity;
+			break;
+		case ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION:
+			value = RadialAcceleration;
+			break;
+		case ConstsParamNames.StrokeSpatial.RADIUS:
+			value = Radius;
+			break;
+		case ConstsParamNames.StrokeSpatial.TETA:
+			value = Teta;
+			break;
+		case ConstsParamNames.StrokeSpatial.DELTA_TETA:
+			value = DeltaTeta;
+			break;
+		case ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA:
+			value = AccumulatedNormalizedArea;
+			break;
+		}
+			
+		return value;
 	}
 	
 	public MotionEventExtended(MotionEventCompact motionEvent, double xdpi, double ydpi, MotionEventExtended motionEventPrev, int index)

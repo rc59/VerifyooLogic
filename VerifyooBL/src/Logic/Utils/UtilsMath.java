@@ -1,6 +1,7 @@
 package Logic.Utils;
 
 import Consts.ConstsMeasures;
+import Data.UserProfile.Extended.MotionEventExtended;
 
 public class UtilsMath {
 //calculate alpha-beta
@@ -22,6 +23,15 @@ public class UtilsMath {
 		avg = avg / values.length;
 		return avg;
 	}
+	
+	public double CalcDistanceInPixels(MotionEventExtended eventCurr, MotionEventExtended eventNext) {
+        double deltaX = eventCurr.Xpixel - eventNext.Xpixel;
+        double deltaY = eventCurr.Ypixel - eventNext.Ypixel;
+		
+        double distance = CalcPitagoras(deltaX, deltaY);
+
+        return distance;
+    }
 	
 	public double CalcPitagoras(double value1, double value2) {
         double value = value1 * value1 + value2 * value2;

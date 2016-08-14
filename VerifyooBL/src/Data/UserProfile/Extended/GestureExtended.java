@@ -107,7 +107,7 @@ public class GestureExtended extends Gesture {
 	public ArrayList<MotionEventExtended> ListGestureEventsExtended;
 	public ArrayList<MotionEventCompact> ListGestureEvents;
 	
-	protected HashMap<String, IFeatureMeanData> mHashFeatureMeans;	
+	protected HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	
 	protected UtilsMath mUtilsMath;
 	protected UtilsLinearReg mUtilsLinearReg;
@@ -281,12 +281,23 @@ public class GestureExtended extends Gesture {
 //			timeCurr = 
 //			
 //			tempAcc = 
-//		}	
+//		}
 	}
 	
 	protected void CalculateSpatialSamplingVector()
 	{
-		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListGestureEventsExtended, GestureLengthPixel);
+		double length = 0;
+		
+		MotionEventExtended eventCurr, eventNext;		
+		
+		for(int idx = 0; idx < ListGestureEventsExtended.size() - 1; idx++) {
+			eventCurr = ListGestureEventsExtended.get(idx);
+			eventNext = ListGestureEventsExtended.get(idx + 1);
+			
+			length += Utils.GetInstance().GetUtilsMath().CalcDistanceInPixels(eventCurr, eventNext);
+		}
+		
+		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListGestureEventsExtended, length);
 	}
 	
 	protected void CalculateAccelerationAtStart()

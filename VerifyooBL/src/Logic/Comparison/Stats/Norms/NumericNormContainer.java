@@ -2,6 +2,7 @@ package Logic.Comparison.Stats.Norms;
 
 import java.util.HashMap;
 
+import Logic.Utils.Utils;
 import Logic.Utils.UtilsAccumulator;
 
 public class NumericNormContainer {
@@ -12,7 +13,7 @@ public class NumericNormContainer {
 	}
 	
 	public void AddValue(double value, String instruction, int idxStroke) {
-		String key = GenerateKey(instruction, idxStroke);
+		String key = Utils.GetInstance().GetUtilsGeneral().GenerateContainerKey(instruction, idxStroke);
 		
 		if(HashNorms.containsKey(key)) {
 			HashNorms.get(key).AddDataValue(value);
@@ -36,12 +37,12 @@ public class NumericNormContainer {
 	}
 	
 	public double GetMean(String instruction, int idxStroke) {
-		String key = GenerateKey(instruction, idxStroke);		
+		String key = Utils.GetInstance().GetUtilsGeneral().GenerateContainerKeySafe(instruction, idxStroke, HashNorms);
 		return HashNorms.get(key).Mean();		
 	}
 	
 	public double GetStd(String instruction, int idxStroke) {
-		String key = GenerateKey(instruction, idxStroke);		
+		String key = Utils.GetInstance().GetUtilsGeneral().GenerateContainerKeySafe(instruction, idxStroke, HashNorms);
 		return HashNorms.get(key).Stddev();
 	}
 	
@@ -51,9 +52,5 @@ public class NumericNormContainer {
 	
 	public double GetStd(String instruction) {		
 		return HashNorms.get(instruction).Stddev();
-	}
-	
-	protected String GenerateKey(String instruction, int idxStroke) {
-		return String.format("%s-%s", instruction, Integer.toString(idxStroke));
 	}
 }

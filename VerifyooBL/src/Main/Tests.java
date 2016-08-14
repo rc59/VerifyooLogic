@@ -1,6 +1,12 @@
 package Main;
 
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+
 import Data.Gestures.GestureStore;
+import Logic.Comparison.Stats.Norms.NormContainerMgr;
+import Logic.Comparison.Stats.Norms.NormMgr;
+import flexjson.JSONDeserializer;
 
 public class Tests {			
 	private static void RunTests() 
@@ -10,7 +16,7 @@ public class Tests {
 		
 		int fn = 0;
 		try
-		{
+		{	
 			Tester t = new Tester();		
 			
 			double minScore = 0.80;

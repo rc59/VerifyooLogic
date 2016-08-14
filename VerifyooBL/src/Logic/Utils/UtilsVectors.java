@@ -75,6 +75,16 @@ public class UtilsVectors {
 		
 		return vector;
 	}
+		
+	public double[] GetVectorRadialVelocity(ArrayList<MotionEventExtended> listEvents) {
+		double[] vector = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vector[idx] = listEvents.get(idx).RadialVelocity;
+		}
+		
+		return vector;
+	}
 	
 	public double[] GetVectorSurface(ArrayList<MotionEventExtended> listEvents) {
 		double[] vector = new double[listEvents.size()];

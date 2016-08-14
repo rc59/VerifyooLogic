@@ -1,9 +1,12 @@
 package Logic.Comparison.Stats;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import Consts.ConstsParamNames;
+import Data.Comparison.Interfaces.ICompareResult;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Logic.Comparison.Stats.Data.StatEngineResult;
@@ -53,48 +56,79 @@ public class StatEngine implements IStatEngine {
       return mInstance;
     }
 	
-	public double CompareStrokeSpatial(String instruction, ArrayList<MotionEventExtended> listAuth, ArrayList<MotionEventExtended> listStored) {
+	public ArrayList<IStatEngineResult> CompareStrokeSpatial(String instruction, String paramName, int idxStroke, ArrayList<MotionEventExtended> listAuth, ArrayList<MotionEventExtended> listStored) {
 		
 		NormMgr normMgr = (NormMgr) NormMgr.GetInstance();
 		
-		double[] popM, popSd, internalSd;
-		
-		UtilsMath utilsMath = new UtilsMath();
-		
 		double totalValues = 0;
 		double tempValue;
+		double tempValuePercentage;
+		
+		double popMean, popSd, internalSd;
 		
 		double[] percentages = new double[Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE];
+		double[] scores = new double[Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE];
+		double[] listWeights = new double[Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE];
 		
-		double numValues = 0;
+		double weights = 0;
+		double currWeight;
 		
-		for(int idx = 1; idx < Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE; idx++) {
-			//tempValue = GetDistance(list1.get(idx), list2.get(idx));
+		double valueAuth, valueStored;
+		
+		ArrayList<IStatEngineResult> listResults = new ArrayList<>();
+		
+		for(int idx = 1; idx < Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE; idx++) {			
 			
-			tempValue = GetScore(
-					normMgr.NormContainerMgr.GetSpatialPopMean(instruction, ConstsParamNames.StrokeSpatial.VELOCITIES, 0, idx), 
-					normMgr.NormContainerMgr.GetSpatialPopSd(instruction, ConstsParamNames.StrokeSpatial.VELOCITIES, 0, idx), 
-					normMgr.NormContainerMgr.GetSpatialInternalSd(instruction, ConstsParamNames.StrokeSpatial.VELOCITIES, 0, idx), 
-					listAuth.get(idx).Velocity, listStored.get(idx).Velocity);
+			popMean = normMgr.NormContainerMgr.GetSpatialPopMean(instruction, paramName, idxStroke, idx);
+			popSd = normMgr.NormContainerMgr.GetSpatialPopSd(instruction, paramName, idxStroke, idx);
+			internalSd = popSd / 4;//normMgr.NormContainerMgr.GetSpatialInternalSd(instruction, paramName, idxStroke, idx);
 			
-			totalValues += tempValue;
-			numValues++;
+			valueAuth = listAuth.get(idx).GetParamByName(paramName);
+			valueStored = listStored.get(idx).GetParamByName(paramName);
 			
-			tempValue = GetScore(
-					normMgr.NormContainerMgr.GetSpatialPopMean(instruction, ConstsParamNames.StrokeSpatial.ACCELERATIONS, 0, idx), 
-					normMgr.NormContainerMgr.GetSpatialPopSd(instruction, ConstsParamNames.StrokeSpatial.ACCELERATIONS, 0, idx), 
-					normMgr.NormContainerMgr.GetSpatialInternalSd(instruction, ConstsParamNames.StrokeSpatial.ACCELERATIONS, 0, idx), 
-					listAuth.get(idx).Velocity, listStored.get(idx).Acceleration);
+			currWeight = Math.abs((listAuth.get(idx).GetParamByName(paramName) - popMean) / popSd);
+			if(currWeight > 2) {
+				currWeight = 2;
+			}
 			
-			totalValues += tempValue;
-			numValues++;
+			tempValue = GetScoreSpatial(popMean, popSd, internalSd, valueAuth, valueStored);			
+			tempValuePercentage = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(valueAuth, valueStored);
+						
+			totalValues += (tempValue * currWeight);
+			weights += currWeight;
 			
-			percentages[idx] = tempValue;
+			listResults.add(new StatEngineResult(tempValue, currWeight));
+//			listResults.add(new StatEngineResult(tempValuePercentage, currWeight));
+			
+			scores[idx] = tempValue;
+			percentages[idx] = tempValuePercentage;
+			listWeights[idx] = currWeight;
 		}
 		
-		double avg = totalValues / (Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE - 1);		
-		
-		return avg;
+//		Collections.sort(listResults, new Comparator<IStatEngineResult>() {
+//            public int compare(IStatEngineResult score1, IStatEngineResult score2) {
+//                if (Math.abs(score1.GetZScore()) > Math.abs(score2.GetZScore())) {
+//                    return -1;
+//                }
+//                if (Math.abs(score1.GetZScore()) < Math.abs(score2.GetZScore())) {
+//                    return 1;
+//                }
+//                return 0;
+//            }
+//        });
+//				
+//		int limit = 5;
+//		double result = 0;
+//		double totalWeights = 0;
+//		for(int idx = 0; idx < 5; idx++) {
+//			totalWeights += listResults.get(idx).GetZScore();
+//			result += listResults.get(idx).GetScore() * listResults.get(idx).GetZScore(); 
+//		}
+//		
+//		double avg = totalValues / weights;
+//		
+//		result = result / totalWeights;
+		return listResults;
 	}
 	
 	private double GetDistance(MotionEventExtended event1, MotionEventExtended event2) {
@@ -187,6 +221,57 @@ public class StatEngine implements IStatEngine {
 //		statResult = new StatEngineResult(score, zScoreForUser);
 //		return statResult;	
 //	}
+	
+	public double GetScoreSpatial(double popMean, double popSd, double internalSd, double authValue, double storedValue) {
+		double populationMean = popMean;
+		double populationSd = popSd;
+		double populationInternalSd = internalSd;		
+		
+		double internalMean = storedValue;		
+		
+		double zScoreForUser = (internalMean - populationMean) / populationSd;
+		IStatEngineResult statResult;
+
+		//contribution of user uniqueness 
+		double uniquenessFactor = 0.4 * Math.abs(zScoreForUser);
+		
+		if(uniquenessFactor > 2) {
+			uniquenessFactor = 2;
+		}
+				
+		double twoUpperPopulationInternalSD = (internalMean + populationInternalSd * uniquenessFactor);
+		double twoLowerPopulationInternalSD = (internalMean - populationInternalSd * uniquenessFactor);
+		
+		double threeUpperPopulationInternalSD = (internalMean + 1.5 * populationInternalSd * uniquenessFactor);
+		double threeLowerPopulationInternalSD = (internalMean - 1.5 * populationInternalSd * uniquenessFactor);	
+
+		double score;
+		if((authValue > twoLowerPopulationInternalSD) && (authValue < twoUpperPopulationInternalSD)) {
+			score = 1;
+		}
+		else {
+			if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)) {
+				if(authValue > twoLowerPopulationInternalSD) {
+					double u = Math.abs(threeUpperPopulationInternalSD - authValue);
+					double d = Math.abs(threeUpperPopulationInternalSD - twoUpperPopulationInternalSD);
+					
+					score = u/d;					
+				}
+				else {
+					double u = Math.abs(threeLowerPopulationInternalSD - authValue);
+					double d = Math.abs(threeLowerPopulationInternalSD - twoLowerPopulationInternalSD);
+					
+					score = u/d;
+				}
+			}
+			else {
+				score = 0;
+			}
+		}
+				
+		//statResult = new StatEngineResult(score, zScoreForUser);
+		return score;	
+	}
 	
 	public double GetScore(double popMean, double popSd, double internalSd, double authValue, double storedValue) {
 		double populationMean = popMean;

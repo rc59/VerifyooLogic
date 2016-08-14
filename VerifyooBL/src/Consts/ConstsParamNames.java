@@ -5,6 +5,13 @@ public class ConstsParamNames {
 	{
 		public static final String VELOCITIES = "SpatialVelocities";
 		public static final String ACCELERATIONS = "SpatialAccelerations";
+		public static final String RADIAL_VELOCITIES = "SpatialRadialVelocities";
+		
+		public static final String RADIAL_ACCELERATION = "SpatialRadialAccelerations";
+		public static final String TETA = "SpatialTeta";
+		public static final String DELTA_TETA = "SpatialDeltaTeta";
+		public static final String RADIUS = "SpatialRadius";
+		public static final String ACCUMULATED_NORM_AREA = "SpatialAccumulatedNormArea";
 	}
 	
 	public class Stroke

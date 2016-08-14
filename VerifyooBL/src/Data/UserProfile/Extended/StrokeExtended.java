@@ -16,6 +16,7 @@ import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Utils.Complex;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsMath;
@@ -144,13 +145,82 @@ public class StrokeExtended extends Stroke {
 		ListEventsExtended = ListEventsCompactToExtended(ListEvents);		
 		MedianFilters();
 		ListEventsExtended = CalculateAccelerationsForEventsList(ListEventsExtended);		
-		SpatialSampling();
-		
+		ListEventsExtended = CalculateRadialVelocityForEventsList(ListEventsExtended);
+				
 		Normalize();
+		ListEventsExtended = CalculateRadiusAndTeta(ListEventsExtended);
+		
+		SpatialSampling();
+		NormalizeSpatial();
 		
 		CalculateStartEndOfStroke();
 		PrepareData();		
 	}	
+	
+	private ArrayList<MotionEventExtended> CalculateRadialVelocityForEventsList(ArrayList<MotionEventExtended> listEvents) {
+		
+		Complex complexCurrent, complexPrev, complexDiff;
+
+		double diffPhase;
+		double diffTime;		
+		
+		double diffRadialVelocity;
+		
+		listEvents.get(0).RadialVelocity = 0;
+		
+		for(int idx = 1; idx < listEvents.size(); idx++) {
+			complexCurrent = new Complex(listEvents.get(idx).Xmm, listEvents.get(idx).Ymm);
+			complexPrev = new Complex(listEvents.get(idx - 1).Xmm, listEvents.get(idx - 1).Ymm);		
+			
+			complexDiff = complexPrev.divides(complexCurrent);
+			diffPhase = complexDiff.phase();
+			
+			diffTime = listEvents.get(idx).EventTime - listEvents.get(idx - 1).EventTime; 
+			
+			if(diffTime > 0) {
+				listEvents.get(idx).RadialVelocity = (diffPhase / diffTime);
+				diffRadialVelocity = (listEvents.get(idx).RadialVelocity - listEvents.get(idx - 1).RadialVelocity);
+				listEvents.get(idx).RadialAcceleration = diffRadialVelocity / diffTime;
+			}
+			else {
+				listEvents.get(idx).RadialVelocity = listEvents.get(idx - 1).RadialVelocity; 
+				listEvents.get(idx).RadialAcceleration = listEvents.get(idx - 1).RadialAcceleration;
+			}
+			
+			//RadialAcceleration = 
+		}
+		
+		return listEvents;
+	}
+	
+	private ArrayList<MotionEventExtended> CalculateRadiusAndTeta(ArrayList<MotionEventExtended> listEvents) {
+		
+		double x1, y1, x2, y2, x3, y3;
+		
+		double accumulatedArea = 0;
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			listEvents.get(idx).Radius = Utils.GetInstance().GetUtilsMath().CalcPitagoras(listEvents.get(idx).Xnormalized, listEvents.get(idx).Ynormalized);
+			listEvents.get(idx).Teta = Math.atan2(listEvents.get(idx).Ynormalized, listEvents.get(idx).Xnormalized);
+			
+			if(idx > 0) {
+				x1 = 0; y1 = 0;
+                x2 = ListEventsExtended.get(idx - 1).Xnormalized; y2 = ListEventsExtended.get(idx - 1).Ynormalized;
+                x3 = ListEventsExtended.get(idx).Xnormalized; y3 = ListEventsExtended.get(idx).Ynormalized;
+                ShapeDataObj.ShapeAreaMinXMinY += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
+				
+                accumulatedArea += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
+                listEvents.get(idx).AccumulatedNormalizedArea = accumulatedArea;
+                
+                listEvents.get(idx).DeltaTeta = listEvents.get(idx).Teta - listEvents.get(idx - 1).Teta;
+			}
+			else {
+				listEvents.get(idx).DeltaTeta = 0;
+			}
+		}
+		
+		return listEvents;
+	}
 	
 	private ArrayList<MotionEventExtended> CalculateAccelerationsForEventsList(ArrayList<MotionEventExtended> listEvents) {
 		
@@ -222,6 +292,11 @@ public class StrokeExtended extends Stroke {
 		double[] vectorSurfaceDistance = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsSpatialByDistanceExtended);				
 		double[] vectorSurfaceTime = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsSpatialByTimeExtended);
 		
+		
+		double[] vectorRadialVelocity = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsExtended);
+		double[] vectorRadialVelocityDistance = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsSpatialByDistanceExtended);
+		double[] vectorRadialVelocityTime = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsSpatialByTimeExtended);		
+		
 		int size = vectorXDistance.length;
 	}
 
@@ -234,21 +309,22 @@ public class StrokeExtended extends Stroke {
 		int size = vectorX.length;
 	}
 
-	private void Normalize() {
-		ListEventsExtended = mUtilsSpatialSampling.Normalize(ListEventsExtended);
+	private void NormalizeSpatial() {
 		ListEventsSpatialByDistanceExtended = mUtilsSpatialSampling.Normalize(ListEventsSpatialByDistanceExtended);
-		ListEventsSpatialByTimeExtended = mUtilsSpatialSampling.Normalize(ListEventsSpatialByTimeExtended);
-		
-		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsExtended);
-		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsExtended);
+		ListEventsSpatialByTimeExtended = mUtilsSpatialSampling.Normalize(ListEventsSpatialByTimeExtended);	
 		
 		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsSpatialByDistanceExtended);
 		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByDistanceExtended);
 		
 		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsSpatialByTimeExtended);
-		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByTimeExtended);
+		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByTimeExtended);		
+	}	
+	
+	private void Normalize() {
+		ListEventsExtended = mUtilsSpatialSampling.Normalize(ListEventsExtended);
 		
-		int size = vectorX.length;
+		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsExtended);
+		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsExtended);		
 	}	
 	
 	protected void CalculateStartEndOfStroke()

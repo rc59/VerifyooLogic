@@ -2,6 +2,8 @@ package Logic.Comparison.Stats.Norms;
 
 import java.util.HashMap;
 
+import Logic.Utils.Utils;
+
 public class SpatialNormContainer {
 	public HashMap<String, AccumulatorsContainer> HashNorms;
 	
@@ -10,7 +12,7 @@ public class SpatialNormContainer {
 	}
 	
 	public void AddValue(double value, String instruction, int idxStroke, int idxSpatial) {
-		String key = GenerateKey(instruction, idxStroke);
+		String key = Utils.GetInstance().GetUtilsGeneral().GenerateContainerKey(instruction, idxStroke);
 		
 		if(HashNorms.containsKey(key)) {
 			HashNorms.get(key).AddValue(value, idxSpatial);
@@ -23,39 +25,24 @@ public class SpatialNormContainer {
 	}
 	
 	public double GetMean(String instruction, int idxStroke, int idxSpatial) {
-		String key = GenerateKey(instruction, idxStroke);		
-		return HashNorms.get(key).GetMean(idxSpatial);		
+		String key = Utils.GetInstance().GetUtilsGeneral().GenerateContainerKeySafe(instruction, idxStroke, HashNorms);		
+		return HashNorms.get(key).GetMean(idxSpatial);
 	}
 	
 	public double GetStd(String instruction, int idxStroke, int idxSpatial) {
-		String key = GenerateKey(instruction, idxStroke);		
+		String key = Utils.GetInstance().GetUtilsGeneral().GenerateContainerKeySafe(instruction, idxStroke, HashNorms);		
 		return HashNorms.get(key).GetStd(idxSpatial);
 	}
 	
 	public double[] GetListMeans(String instruction, int idxStroke) {
-		String key = GenerateKey(instruction, idxStroke);
+		String key = Utils.GetInstance().GetUtilsGeneral().GenerateContainerKeySafe(instruction, idxStroke, HashNorms);
 		AccumulatorsContainer tempSpatialNormContainer = HashNorms.get(key);
 		return tempSpatialNormContainer.GetListMeans();
 	}
 	
 	public double[] GetListStds(String instruction, int idxStroke) {
-		String key = GenerateKey(instruction, idxStroke);
+		String key = Utils.GetInstance().GetUtilsGeneral().GenerateContainerKeySafe(instruction, idxStroke, HashNorms);
 		AccumulatorsContainer tempSpatialNormContainer = HashNorms.get(key);
 		return tempSpatialNormContainer.GetListStds();
-	}
-	
-	protected String GenerateKey(String instruction, int idxStroke) {
-		return String.format("%s-%s", instruction, Integer.toString(idxStroke));
-	}
-	
-//	public String ToString() {
-//		JSONSerializer serializer = new JSONSerializer();
-//		String strObj = serializer.deepSerialize(mHashNorms);
-//		return strObj;
-//	}
-//	
-//	public void FromString(String inputStr) {
-//		JSONDeserializer<HashMap<String, SpatialNormContainer>> deserializer = new JSONDeserializer<HashMap<String, SpatialNormContainer>>();
-//		mHashNorms = deserializer.deserialize(inputStr);		
-//	}
+	}	
 }

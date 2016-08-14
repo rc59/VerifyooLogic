@@ -363,6 +363,14 @@ public class UtilsSignalProcessing {
 		
 		tempEvent.Acceleration = GetSpatialValue(eventNext.Acceleration, eventCurrent.Acceleration, ratio);
 		
+		tempEvent.RadialVelocity = GetSpatialValue(eventNext.RadialVelocity, eventCurrent.RadialVelocity, ratio);
+		
+		tempEvent.RadialAcceleration = GetSpatialValue(eventNext.RadialAcceleration, eventCurrent.RadialAcceleration, ratio);
+		tempEvent.Radius = GetSpatialValue(eventNext.Radius, eventCurrent.Radius, ratio);
+		tempEvent.Teta = GetSpatialValue(eventNext.Teta, eventCurrent.Teta, ratio);
+		tempEvent.DeltaTeta = GetSpatialValue(eventNext.DeltaTeta, eventCurrent.DeltaTeta, ratio);
+		tempEvent.AccumulatedNormalizedArea = GetSpatialValue(eventNext.AccumulatedNormalizedArea, eventCurrent.AccumulatedNormalizedArea, ratio);
+		
 		return tempEvent;
 	}
 
