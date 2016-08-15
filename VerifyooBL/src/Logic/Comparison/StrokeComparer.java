@@ -47,6 +47,7 @@ public class StrokeComparer {
 	
 	public double DtwDistanceCoordinates;
 	public double DtwDistanceNormalizedCoordinates;
+	public double DtwDistanceNormalizedCoordinatesSpatialDistance;
 	public double DtwDistanceEvents;
 	public double DtwDistanceVelocities;
 	public double DtwDistanceAccelerations;
@@ -72,7 +73,7 @@ public class StrokeComparer {
 	public double SpatialScoreTimeAccumulatedNormArea;
 	
 	public ArrayList<IStatEngineResult> mListSpatialScores;
-	public double SpatialScore;
+	public double StrokeSpatialScore;
 	
 	public StrokeComparer(boolean isSimilarDevices)
 	{			
@@ -157,15 +158,15 @@ public class StrokeComparer {
 		SpatialScoreDistanceDeltaTeta = CalcDistanceSpatialByParameter(ConstsParamNames.StrokeSpatial.DELTA_TETA);
 		SpatialScoreDistanceAccumulatedNormArea = CalcDistanceSpatialByParameter(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA);
 		
-		SpatialScoreTimeVelocity = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.VELOCITIES);
-		SpatialScoreTimeAcceleration = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.ACCELERATIONS);
-		SpatialScoreTimeRadialVelocity = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES);
-		
-		SpatialScoreTimeRadialAcceleration = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION);
-		SpatialScoreTimeRadius = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIUS);
-		SpatialScoreTimeTeta = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.TETA);
-		SpatialScoreTimeDeltaTeta = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.DELTA_TETA);
-		SpatialScoreTimeAccumulatedNormArea = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA);			
+//		SpatialScoreTimeVelocity = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.VELOCITIES);
+//		SpatialScoreTimeAcceleration = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.ACCELERATIONS);
+//		SpatialScoreTimeRadialVelocity = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES);
+//		
+//		SpatialScoreTimeRadialAcceleration = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION);
+//		SpatialScoreTimeRadius = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIUS);
+//		SpatialScoreTimeTeta = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.TETA);
+//		SpatialScoreTimeDeltaTeta = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.DELTA_TETA);
+//		SpatialScoreTimeAccumulatedNormArea = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA);			
 		
 		Collections.sort(mListSpatialScores, new Comparator<IStatEngineResult>() {
             public int compare(IStatEngineResult score1, IStatEngineResult score2) {
@@ -179,7 +180,7 @@ public class StrokeComparer {
             }
         });
 		
-		int limit = 25;
+		int limit = mListSpatialScores.size();
 		int count = 0;
 		double result = 0;
 		double totalWeights = 0;
@@ -195,7 +196,7 @@ public class StrokeComparer {
 		}
 		
 		result = result / totalWeights;
-		SpatialScore = result;
+		StrokeSpatialScore = result;
 	}
 	
 	private double CalcDistanceSpatialByParameter(String parameter) {
@@ -263,6 +264,9 @@ public class StrokeComparer {
 		
 		ArrayList<IDTWObj> listNormalizedCoordsAuth = new  ArrayList<>();
 		ArrayList<IDTWObj> listNormalizedCoordsStored = new  ArrayList<>();
+				
+		ArrayList<IDTWObj> listNormalizedCoordsSpatialDistanceAuth = new  ArrayList<>();
+		ArrayList<IDTWObj> listNormalizedCoordsSpatialDistanceStored = new  ArrayList<>();
 		
 		ArrayList<IDTWObj> listEventsAuth = new  ArrayList<>();
 		ArrayList<IDTWObj> listEventsStored = new  ArrayList<>();		
@@ -272,6 +276,11 @@ public class StrokeComparer {
 		
 		ArrayList<IDTWObj> listAccelerationsAuth = new  ArrayList<>();
 		ArrayList<IDTWObj> listAccelerationsStored = new  ArrayList<>();
+		
+		for(int idxEvent = 0; idxEvent < mStrokeAuthExtended.ListEventsSpatialByDistanceExtended.size(); idxEvent++) {			
+			listNormalizedCoordsSpatialDistanceAuth.add(new DTWObjCoordinate(mStrokeAuthExtended.ListEventsSpatialByDistanceExtended.get(idxEvent).Xnormalized, mStrokeAuthExtended.ListEventsSpatialByDistanceExtended.get(idxEvent).Ynormalized));			
+			listNormalizedCoordsSpatialDistanceStored.add(new DTWObjCoordinate(mStrokeStoredExtended.ListEventsSpatialByDistanceExtended.get(idxEvent).Xnormalized, mStrokeStoredExtended.ListEventsSpatialByDistanceExtended.get(idxEvent).Ynormalized));
+		}
 		
 		for(int idxEvent = 0; idxEvent < mStrokeAuthExtended.ListEventsExtended.size(); idxEvent++) {
 			listCoordsAuth.add(new DTWObjCoordinate(mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Xmm, mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Ymm));
@@ -291,11 +300,13 @@ public class StrokeComparer {
 		
 		UtilsDTW dtwCoords = new UtilsDTW(listCoordsAuth, listCoordsStored);		
 		UtilsDTW dtwNormalizedCoords = new UtilsDTW(listNormalizedCoordsAuth, listNormalizedCoordsStored);
+		UtilsDTW dtwNormalizedSpatialDistance = new UtilsDTW(listNormalizedCoordsSpatialDistanceAuth, listNormalizedCoordsSpatialDistanceStored);
 		UtilsDTW dtwEvents = new UtilsDTW(listEventsAuth, listEventsStored);
 		UtilsDTW dtwVelocities = new UtilsDTW(listVelocitiesAuth, listVelocitiesStored);
 		UtilsDTW dtwAccelerations = new UtilsDTW(listAccelerationsAuth, listAccelerationsStored);
 		
 		DtwDistanceCoordinates = dtwCoords.getDistance();
+		DtwDistanceNormalizedCoordinatesSpatialDistance = dtwNormalizedSpatialDistance.getDistance();
 		DtwDistanceNormalizedCoordinates = dtwNormalizedCoords.getDistance();
 		DtwDistanceEvents = dtwEvents.getDistance();		
 		DtwDistanceVelocities = dtwVelocities.getDistance();

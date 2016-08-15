@@ -129,13 +129,13 @@ public class MotionEventExtended extends MotionEventCompact {
 		Pressure = motionEvent.Pressure;
 		TouchSurface = motionEvent.TouchSurface;
 		
-		AccelerometerX = motionEvent.AccelerometerX;
-		AccelerometerY = motionEvent.AccelerometerY;
-		AccelerometerZ = motionEvent.AccelerometerZ;
+		AccelerometerX = motionEvent.AccelerometerX();
+		AccelerometerY = motionEvent.AccelerometerY();
+		AccelerometerZ = motionEvent.AccelerometerZ();
 		
-		GyroX = motionEvent.GyroX;
-		GyroY = motionEvent.GyroY;
-		GyroZ = motionEvent.GyroZ;
+		GyroX = motionEvent.GyroX();
+		GyroY = motionEvent.GyroY();
+		GyroZ = motionEvent.GyroZ();
 		
 		Xmm = Xpixel / xdpi * ConstsMeasures.INCH_TO_MM;
         Ymm = Ypixel / ydpi * ConstsMeasures.INCH_TO_MM;

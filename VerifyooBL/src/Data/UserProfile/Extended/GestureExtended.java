@@ -8,6 +8,8 @@ import java.util.HashMap;
 import Consts.ConstsFeatures;
 import Consts.ConstsParamNames;
 import Data.MetaData.IndexValue;
+import Data.MetaData.NormalizedGesture;
+import Data.MetaData.NormalizedStroke;
 import Data.MetaData.ParameterAvgPoint;
 import Data.MetaData.ValueFreq;
 import Data.UserProfile.Raw.Gesture;
@@ -26,6 +28,8 @@ import Logic.Utils.UtilsMath;
 import Logic.Utils.UtilsSignalProcessing;
 
 public class GestureExtended extends Gesture {
+	
+	public NormalizedGesture NormalizedGestureObj;
 	
 	/*************** Shape Parameters ***************/
 	
@@ -210,6 +214,14 @@ public class GestureExtended extends Gesture {
 		//CalculateGestureStartMaxEndDirections();
 		CalculateAccumulatedDistanceLinearReg();		
 		CalculateAccelerations();
+		InitNormalizedGestures();		
+	}
+	
+	private void InitNormalizedGestures() {
+		NormalizedGestureObj = new NormalizedGesture();
+		for(int idxStroke = 0; idxStroke < ListStrokes.size(); idxStroke++) {
+			NormalizedGestureObj.ListNormalizedStrokes.add(new NormalizedStroke(ListStrokesExtended.get(idxStroke)));				
+		}
 	}
 	
 	private void CalculateVelocityFeatures() {
@@ -386,13 +398,13 @@ public class GestureExtended extends Gesture {
 			}
 			
 		
-			totalAccX += ListGestureEventsExtended.get(idxEvent).AccelerometerX;
-			totalAccY += ListGestureEventsExtended.get(idxEvent).AccelerometerY;
-			totalAccZ += ListGestureEventsExtended.get(idxEvent).AccelerometerZ;
+			totalAccX += ListGestureEventsExtended.get(idxEvent).AccelerometerX();
+			totalAccY += ListGestureEventsExtended.get(idxEvent).AccelerometerY();
+			totalAccZ += ListGestureEventsExtended.get(idxEvent).AccelerometerZ();
 			
-			GestureMaxAccX = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccX, ListGestureEventsExtended.get(idxEvent).AccelerometerX);
-			GestureMaxAccY = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccY, ListGestureEventsExtended.get(idxEvent).AccelerometerY);
-			GestureMaxAccZ = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccZ, ListGestureEventsExtended.get(idxEvent).AccelerometerZ);					
+			GestureMaxAccX = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccX, ListGestureEventsExtended.get(idxEvent).AccelerometerX());
+			GestureMaxAccY = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccY, ListGestureEventsExtended.get(idxEvent).AccelerometerY());
+			GestureMaxAccZ = Utils.GetInstance().GetUtilsMath().GetMaxValue(GestureMaxAccZ, ListGestureEventsExtended.get(idxEvent).AccelerometerZ());					
 			
 			try {
 				if(idxEvent > 0) {

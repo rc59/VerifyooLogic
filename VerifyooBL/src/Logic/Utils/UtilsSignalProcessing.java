@@ -152,7 +152,7 @@ public class UtilsSignalProcessing {
         	vectorX[idx] = listEventsSpatial.get(idx).Xpixel;
         	vectorY[idx] = listEventsSpatial.get(idx).Ypixel;
         	
-        	totalGyroX += listEventsSpatial.get(idx).GyroX;
+        	totalGyroX += listEventsSpatial.get(idx).GyroX();
         	totalVelocityX += listEventsSpatial.get(idx).VelocityX;
         	totalVelocityY += listEventsSpatial.get(idx).VelocityY;
         	totalPressure += listEventsSpatial.get(idx).Pressure;
@@ -299,7 +299,7 @@ public class UtilsSignalProcessing {
         	
         	totalDistanceX += listEventsSpatial.get(idx).Xpixel; 
         	totalDistanceY += listEventsSpatial.get(idx).Ypixel;
-        	totalGyroX += listEventsSpatial.get(idx).GyroX;
+        	totalGyroX += listEventsSpatial.get(idx).GyroX();
         	totalVelocityX += listEventsSpatial.get(idx).VelocityX;
         	totalVelocityY += listEventsSpatial.get(idx).VelocityY;
         	totalPressure += listEventsSpatial.get(idx).Pressure;
@@ -345,13 +345,13 @@ public class UtilsSignalProcessing {
 		
 		tempEvent.EventTime = GetSpatialValue(eventNext.EventTime, eventCurrent.EventTime, ratio);
 		
-		tempEvent.AccelerometerX = GetSpatialValue(eventNext.AccelerometerX, eventCurrent.AccelerometerX, ratio);
-		tempEvent.AccelerometerY = GetSpatialValue(eventNext.AccelerometerY, eventCurrent.AccelerometerY, ratio);
-		tempEvent.AccelerometerZ = GetSpatialValue(eventNext.AccelerometerZ, eventCurrent.AccelerometerZ, ratio);
+		tempEvent.SetAccelerometerX(GetSpatialValue(eventNext.AccelerometerX(), eventCurrent.AccelerometerX(), ratio));
+		tempEvent.SetAccelerometerY(GetSpatialValue(eventNext.AccelerometerY(), eventCurrent.AccelerometerY(), ratio));
+		tempEvent.SetAccelerometerZ(GetSpatialValue(eventNext.AccelerometerZ(), eventCurrent.AccelerometerZ(), ratio));
 		
-		tempEvent.GyroX = GetSpatialValue(eventNext.GyroX, eventCurrent.GyroX, ratio);
-		tempEvent.GyroY = GetSpatialValue(eventNext.GyroY, eventCurrent.GyroY, ratio);
-		tempEvent.GyroZ = GetSpatialValue(eventNext.GyroZ, eventCurrent.GyroZ, ratio);
+		tempEvent.SetGyroX(GetSpatialValue(eventNext.GyroX(), eventCurrent.GyroX(), ratio));
+		tempEvent.SetGyroY(GetSpatialValue(eventNext.GyroY(), eventCurrent.GyroY(), ratio));
+		tempEvent.SetGyroZ(GetSpatialValue(eventNext.GyroZ(), eventCurrent.GyroZ(), ratio));
 		
 		tempEvent.Pressure = GetSpatialValue(eventNext.Pressure, eventCurrent.Pressure, ratio);
 		

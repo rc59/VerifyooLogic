@@ -77,6 +77,8 @@ public class GestureComparer {
 	public double SpatialScoreTimeDeltaTeta;
 	public double SpatialScoreTimeAccumulatedNormArea;
 	
+	public double GestureSpatialScore;
+	
 	public GestureComparer(boolean isSimilarDevices)
 	{	
 		mIsSimilarDevices = isSimilarDevices;
@@ -270,7 +272,17 @@ public class GestureComparer {
 		return score;
 	}
 	
-	private void RunSpatialSampling()
+	private void RunSpatialSampling() {
+		GestureSpatialScore = 0;
+		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {
+			GestureSpatialScore += mListStrokeComparers.get(idx).StrokeSpatialScore;
+		}
+		
+		GestureSpatialScore = GestureSpatialScore / mListStrokeComparers.size();
+		double result = GestureSpatialScore;
+	}
+	
+	private void RunSpatialSampling2()
 	{
 		int numStrokes = mListStrokeComparers.size();
 		
@@ -305,15 +317,15 @@ public class GestureComparer {
 			SpatialScoreDistanceAccumulatedNormArea += mListStrokeComparers.get(idx).SpatialScoreDistanceAccumulatedNormArea;
 			
 			
-			SpatialScoreTimeVelocities += mListStrokeComparers.get(idx).SpatialScoreTimeVelocity;	
-			SpatialScoreTimeAccelerations += mListStrokeComparers.get(idx).SpatialScoreTimeAcceleration;
-			SpatialScoreTimeRadialVelocities += mListStrokeComparers.get(idx).SpatialScoreTimeRadialVelocity;
-			
-			SpatialScoreTimeRadialAccelerations += mListStrokeComparers.get(idx).SpatialScoreTimeRadialAcceleration;
-			SpatialScoreTimeRadius += mListStrokeComparers.get(idx).SpatialScoreTimeRadius;
-			SpatialScoreTimeTeta += mListStrokeComparers.get(idx).SpatialScoreTimeTeta;
-			SpatialScoreTimeDeltaTeta += mListStrokeComparers.get(idx).SpatialScoreTimeDeltaTeta;
-			SpatialScoreTimeAccumulatedNormArea += mListStrokeComparers.get(idx).SpatialScoreTimeAccumulatedNormArea;			
+//			SpatialScoreTimeVelocities += mListStrokeComparers.get(idx).SpatialScoreTimeVelocity;	
+//			SpatialScoreTimeAccelerations += mListStrokeComparers.get(idx).SpatialScoreTimeAcceleration;
+//			SpatialScoreTimeRadialVelocities += mListStrokeComparers.get(idx).SpatialScoreTimeRadialVelocity;
+//			
+//			SpatialScoreTimeRadialAccelerations += mListStrokeComparers.get(idx).SpatialScoreTimeRadialAcceleration;
+//			SpatialScoreTimeRadius += mListStrokeComparers.get(idx).SpatialScoreTimeRadius;
+//			SpatialScoreTimeTeta += mListStrokeComparers.get(idx).SpatialScoreTimeTeta;
+//			SpatialScoreTimeDeltaTeta += mListStrokeComparers.get(idx).SpatialScoreTimeDeltaTeta;
+//			SpatialScoreTimeAccumulatedNormArea += mListStrokeComparers.get(idx).SpatialScoreTimeAccumulatedNormArea;			
 		}
 		
 		SpatialScoreDistanceVelocities = SpatialScoreDistanceVelocities / numStrokes;
@@ -326,15 +338,15 @@ public class GestureComparer {
 		SpatialScoreDistanceDeltaTeta = SpatialScoreDistanceDeltaTeta / numStrokes;
 		SpatialScoreDistanceAccumulatedNormArea = SpatialScoreDistanceAccumulatedNormArea / numStrokes;
 		
-		SpatialScoreTimeVelocities = SpatialScoreTimeVelocities / numStrokes;
-		SpatialScoreTimeAccelerations = SpatialScoreTimeAccelerations / numStrokes;
-		SpatialScoreTimeRadialVelocities = SpatialScoreTimeRadialVelocities / numStrokes;
-		
-		SpatialScoreTimeRadialAccelerations = SpatialScoreTimeRadialAccelerations / numStrokes;
-		SpatialScoreTimeRadius = SpatialScoreTimeRadius / numStrokes;
-		SpatialScoreTimeTeta = SpatialScoreTimeTeta / numStrokes;
-		SpatialScoreTimeDeltaTeta = SpatialScoreTimeDeltaTeta / numStrokes;
-		SpatialScoreTimeAccumulatedNormArea = SpatialScoreTimeAccumulatedNormArea / numStrokes;
+//		SpatialScoreTimeVelocities = SpatialScoreTimeVelocities / numStrokes;
+//		SpatialScoreTimeAccelerations = SpatialScoreTimeAccelerations / numStrokes;
+//		SpatialScoreTimeRadialVelocities = SpatialScoreTimeRadialVelocities / numStrokes;
+//		
+//		SpatialScoreTimeRadialAccelerations = SpatialScoreTimeRadialAccelerations / numStrokes;
+//		SpatialScoreTimeRadius = SpatialScoreTimeRadius / numStrokes;
+//		SpatialScoreTimeTeta = SpatialScoreTimeTeta / numStrokes;
+//		SpatialScoreTimeDeltaTeta = SpatialScoreTimeDeltaTeta / numStrokes;
+//		SpatialScoreTimeAccumulatedNormArea = SpatialScoreTimeAccumulatedNormArea / numStrokes;
 			
 		double reduceScore = 0;
 		reduceScore += GetPropScore(0.25, 0.11, SpatialScoreDistanceVelocities);
@@ -359,14 +371,14 @@ public class GestureComparer {
 		total += SpatialScoreDistanceDeltaTeta;
 		total += SpatialScoreDistanceAccumulatedNormArea;
 		
-		total += SpatialScoreTimeVelocities; 
-		total += SpatialScoreTimeAccelerations;
-		total += SpatialScoreTimeRadialVelocities;
-		total += SpatialScoreTimeRadialAccelerations;
-		total += SpatialScoreTimeRadius;
-		total += SpatialScoreTimeTeta;
-		total += SpatialScoreTimeDeltaTeta;
-		total += SpatialScoreTimeAccumulatedNormArea;
+//		total += SpatialScoreTimeVelocities; 
+//		total += SpatialScoreTimeAccelerations;
+//		total += SpatialScoreTimeRadialVelocities;
+//		total += SpatialScoreTimeRadialAccelerations;
+//		total += SpatialScoreTimeRadius;
+//		total += SpatialScoreTimeTeta;
+//		total += SpatialScoreTimeDeltaTeta;
+//		total += SpatialScoreTimeAccumulatedNormArea;
 		
 		total = total / 6;
 	}
@@ -393,7 +405,7 @@ public class GestureComparer {
 		DtwDistanceNormalizedCoordinates = DtwDistanceNormalizedCoordinates / numStrokes;
 		DtwDistanceEvents = DtwDistanceEvents / numStrokes;
 		DtwDistanceVelocities = DtwDistanceVelocities / numStrokes;
-		DtwDistanceAccelerations = DtwDistanceAccelerations / numStrokes;		
+		DtwDistanceAccelerations = DtwDistanceAccelerations / numStrokes;
 	}
 
 	protected void CompareGestureMaxAcceleration() {

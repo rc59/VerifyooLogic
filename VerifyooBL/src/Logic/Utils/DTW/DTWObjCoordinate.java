@@ -3,21 +3,25 @@ package Logic.Utils.DTW;
 import Logic.Utils.Utils;
 
 public class DTWObjCoordinate implements IDTWObj {
-	protected double mX;
-	protected double mY;
+	public double X;
+	public double Y;
+	
+	public DTWObjCoordinate() {
+		
+	}
 	
 	public DTWObjCoordinate(double x, double y)
 	{
-		mX = x;
-		mY = y;
+		X = x;
+		Y = y;
 	}
 	
 	public double GetX() {
-		return mX;
+		return X;
 	}
 	
 	public double GetY() {
-		return mY;
+		return Y;
 	}
 	
 	public double CompareTo(IDTWObj obj)
@@ -26,8 +30,8 @@ public class DTWObjCoordinate implements IDTWObj {
 		double x1 = coordinate.GetX();
 		double y1 = coordinate.GetY();
 		
-		double x2 = mX;
-		double y2 = mY;
+		double x2 = X;
+		double y2 = Y;
 		
 		double diffX = x1 - x2;
 		double diffY = y1 - y2;

@@ -77,11 +77,23 @@ public class StatEngine implements IStatEngine {
 		
 		ArrayList<IStatEngineResult> listResults = new ArrayList<>();
 		
+		int popCount = 0;
+		int internalCount = 0;
+		
 		for(int idx = 1; idx < Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE; idx++) {			
 			
 			popMean = normMgr.NormContainerMgr.GetSpatialPopMean(instruction, paramName, idxStroke, idx);
 			popSd = normMgr.NormContainerMgr.GetSpatialPopSd(instruction, paramName, idxStroke, idx);
-			internalSd = popSd / 4;//normMgr.NormContainerMgr.GetSpatialInternalSd(instruction, paramName, idxStroke, idx);
+			internalSd = normMgr.NormContainerMgr.GetSpatialInternalSd(instruction, paramName, idxStroke, idx);
+			
+			if(popSd > internalSd) {
+				popCount++;	
+			}
+			else {
+				internalCount++;
+			}
+			
+			//internalSd = popSd / 3;
 			
 			valueAuth = listAuth.get(idx).GetParamByName(paramName);
 			valueStored = listStored.get(idx).GetParamByName(paramName);
@@ -92,13 +104,14 @@ public class StatEngine implements IStatEngine {
 			}
 			
 			tempValue = GetScoreSpatial(popMean, popSd, internalSd, valueAuth, valueStored);			
+			tempValue = GetScoreSpatial(popMean, popSd, internalSd, valueAuth, valueStored);
 			tempValuePercentage = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(valueAuth, valueStored);
 						
 			totalValues += (tempValue * currWeight);
 			weights += currWeight;
 			
-			listResults.add(new StatEngineResult(tempValue, currWeight));
-//			listResults.add(new StatEngineResult(tempValuePercentage, currWeight));
+//			listResults.add(new StatEngineResult(tempValue, currWeight));
+			listResults.add(new StatEngineResult(tempValuePercentage, 1));
 			
 			scores[idx] = tempValue;
 			percentages[idx] = tempValuePercentage;
@@ -234,6 +247,7 @@ public class StatEngine implements IStatEngine {
 
 		//contribution of user uniqueness 
 		double uniquenessFactor = 0.4 * Math.abs(zScoreForUser);
+		uniquenessFactor = 1;
 		
 		if(uniquenessFactor > 2) {
 			uniquenessFactor = 2;
