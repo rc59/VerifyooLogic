@@ -1,6 +1,12 @@
 package Consts;
 
 public class ConstsParamNames {
+	public class SpatialTypes
+	{
+		public static final String DISTANCE = "SpatialDistance";
+		public static final String TIME = "SpatialTime";
+	}
+	
 	public class StrokeSpatial
 	{
 		public static final String VELOCITIES = "SpatialVelocities";

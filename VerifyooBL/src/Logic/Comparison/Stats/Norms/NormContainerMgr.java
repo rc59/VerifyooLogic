@@ -3,32 +3,54 @@ package Logic.Comparison.Stats.Norms;
 import java.util.HashMap;
 
 public class NormContainerMgr {
-	public HashMap<String, SpatialNormContainer> HashMapSpatialNormsMeans;
-	public HashMap<String, SpatialNormContainer> HashMapSpatialNormsSds;
+	public HashMap<String, SpatialNormContainer> HashMapSpatialNormsMeansDistance;
+	public HashMap<String, SpatialNormContainer> HashMapSpatialNormsSdsDistance;
+	
+	public HashMap<String, SpatialNormContainer> HashMapSpatialNormsMeansTime;
+	public HashMap<String, SpatialNormContainer> HashMapSpatialNormsSdsTime;
 	
 	public HashMap<String, NumericNormContainer> HashMapNumericNormsMeans;
 	public HashMap<String, NumericNormContainer> HashMapNumericNormsSds;
 	
 	public NormContainerMgr() {
-		HashMapSpatialNormsMeans = new HashMap<>();
-		HashMapSpatialNormsSds = new HashMap<>();
+		HashMapSpatialNormsMeansDistance = new HashMap<>();
+		HashMapSpatialNormsSdsDistance = new HashMap<>();
+		
+		HashMapSpatialNormsMeansTime = new HashMap<>();
+		HashMapSpatialNormsSdsTime = new HashMap<>();
+		
 		HashMapNumericNormsMeans = new HashMap<>();
 		HashMapNumericNormsSds = new HashMap<>();
 	}
 	
-	public double GetSpatialPopMean(String instruction, String param, int idxStroke, int idxSpatial) {
+	public double GetSpatialPopMeanDistance(String instruction, String param, int idxStroke, int idxSpatial) {
 		instruction = CheckInstruction(instruction);
-		return HashMapSpatialNormsMeans.get(param).GetMean(instruction, idxStroke, idxSpatial);
+		return HashMapSpatialNormsMeansDistance.get(param).GetMean(instruction, idxStroke, idxSpatial);
 	}
 	
-	public double GetSpatialPopSd(String instruction, String param, int idxStroke, int idxSpatial) {
+	public double GetSpatialPopSdDistance(String instruction, String param, int idxStroke, int idxSpatial) {
 		instruction = CheckInstruction(instruction);
-		return HashMapSpatialNormsMeans.get(param).GetStd(instruction, idxStroke, idxSpatial);	
+		return HashMapSpatialNormsMeansDistance.get(param).GetStd(instruction, idxStroke, idxSpatial);	
 	}
 	
-	public double GetSpatialInternalSd(String instruction, String param, int idxStroke, int idxSpatial) {
+	public double GetSpatialInternalSdDistance(String instruction, String param, int idxStroke, int idxSpatial) {
 		instruction = CheckInstruction(instruction);
-		return HashMapSpatialNormsSds.get(param).GetMean(instruction, idxStroke, idxSpatial);
+		return HashMapSpatialNormsSdsDistance.get(param).GetMean(instruction, idxStroke, idxSpatial);
+	}
+	
+	public double GetSpatialPopMeanTime(String instruction, String param, int idxStroke, int idxSpatial) {
+		instruction = CheckInstruction(instruction);
+		return HashMapSpatialNormsMeansTime.get(param).GetMean(instruction, idxStroke, idxSpatial);
+	}
+	
+	public double GetSpatialPopSdTime(String instruction, String param, int idxStroke, int idxSpatial) {
+		instruction = CheckInstruction(instruction);
+		return HashMapSpatialNormsMeansTime.get(param).GetStd(instruction, idxStroke, idxSpatial);	
+	}
+	
+	public double GetSpatialInternalSdTime(String instruction, String param, int idxStroke, int idxSpatial) {
+		instruction = CheckInstruction(instruction);
+		return HashMapSpatialNormsSdsTime.get(param).GetMean(instruction, idxStroke, idxSpatial);
 	}
 	
 	public double GetNumericNormPopMean(String instruction, String param, int idxStroke) {

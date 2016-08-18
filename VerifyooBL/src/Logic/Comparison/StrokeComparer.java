@@ -128,7 +128,8 @@ public class StrokeComparer {
 				CompareAvgVelocity();
 				//CompareVectors();
 				TimeWarp();
-				CalculateFinalScore();	
+				CalculateFinalScore();
+				CheckFinalScore();
 			}
 		}
 		
@@ -139,6 +140,12 @@ public class StrokeComparer {
 			mCompareResult.Score = 0;
 		}		
 	}		
+	
+	protected void CheckFinalScore() {
+		if(mCompareResult.Score < 0) {
+			mCompareResult.Score = 0;
+		}
+	}
 
 	private void CompareSpatial() {
 		
@@ -148,27 +155,31 @@ public class StrokeComparer {
 		double[] velocitiesAuthTime = mUtilsVectors.GetVectorVel(mStrokeAuthExtended.ListEventsSpatialByTimeExtended);
 		double[] velocitiesStoredTime = mUtilsVectors.GetVectorVel(mStrokeStoredExtended.ListEventsSpatialByTimeExtended);
 		
-		SpatialScoreDistanceVelocity = CalcDistanceSpatialByParameter(ConstsParamNames.StrokeSpatial.VELOCITIES);
-		SpatialScoreDistanceAcceleration = CalcDistanceSpatialByParameter(ConstsParamNames.StrokeSpatial.ACCELERATIONS);
-		SpatialScoreDistanceRadialVelocity = CalcDistanceSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES);
+		SpatialScoreDistanceVelocity = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.VELOCITIES);
+		SpatialScoreDistanceAcceleration = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.ACCELERATIONS);
+		SpatialScoreDistanceRadialVelocity = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES);
 		
-		SpatialScoreDistanceRadialAcceleration = CalcDistanceSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION);
-		SpatialScoreDistanceRadius = CalcDistanceSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIUS);
-		SpatialScoreDistanceTeta = CalcDistanceSpatialByParameter(ConstsParamNames.StrokeSpatial.TETA);
-		SpatialScoreDistanceDeltaTeta = CalcDistanceSpatialByParameter(ConstsParamNames.StrokeSpatial.DELTA_TETA);
-		SpatialScoreDistanceAccumulatedNormArea = CalcDistanceSpatialByParameter(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA);
+		SpatialScoreDistanceRadialAcceleration = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION);
+		SpatialScoreDistanceRadius = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.RADIUS);
+		SpatialScoreDistanceTeta = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.TETA);
+		SpatialScoreDistanceDeltaTeta = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.DELTA_TETA);
+		SpatialScoreDistanceAccumulatedNormArea = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA);
 		
-//		SpatialScoreTimeVelocity = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.VELOCITIES);
-//		SpatialScoreTimeAcceleration = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.ACCELERATIONS);
-//		SpatialScoreTimeRadialVelocity = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES);
-//		
-//		SpatialScoreTimeRadialAcceleration = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION);
-//		SpatialScoreTimeRadius = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.RADIUS);
-//		SpatialScoreTimeTeta = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.TETA);
-//		SpatialScoreTimeDeltaTeta = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.DELTA_TETA);
-//		SpatialScoreTimeAccumulatedNormArea = CalcTimeSpatialByParameter(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA);			
+		SpatialScoreTimeVelocity = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.VELOCITIES);
+		SpatialScoreTimeAcceleration = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.ACCELERATIONS);
+		SpatialScoreTimeRadialVelocity = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES);
 		
-		Collections.sort(mListSpatialScores, new Comparator<IStatEngineResult>() {
+		SpatialScoreTimeRadialAcceleration = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION);
+		SpatialScoreTimeRadius = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.RADIUS);
+		SpatialScoreTimeTeta = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.TETA);
+		SpatialScoreTimeDeltaTeta = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.DELTA_TETA);
+		SpatialScoreTimeAccumulatedNormArea = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA);			
+				
+		StrokeSpatialScore = CalculateScoreFromList(mListSpatialScores);
+	}
+	
+	private double CalculateScoreFromList(ArrayList<IStatEngineResult> listScores) {
+		Collections.sort(listScores, new Comparator<IStatEngineResult>() {
             public int compare(IStatEngineResult score1, IStatEngineResult score2) {
                 if (Math.abs(score1.GetZScore()) > Math.abs(score2.GetZScore())) {
                     return -1;
@@ -180,14 +191,14 @@ public class StrokeComparer {
             }
         });
 		
-		int limit = mListSpatialScores.size();
+		int limit = listScores.size();
 		int count = 0;
 		double result = 0;
 		double totalWeights = 0;
 		for(int idx = 0; idx < limit; idx++) {			
 //			if(mListSpatialScores.get(idx).GetScore() != 0) {
-				totalWeights += mListSpatialScores.get(idx).GetZScore();
-				result += mListSpatialScores.get(idx).GetScore() * mListSpatialScores.get(idx).GetZScore();
+				totalWeights += listScores.get(idx).GetZScore();
+				result += listScores.get(idx).GetScore() * listScores.get(idx).GetZScore();
 				count++;
 //				if(count >= limit) {
 //					break;
@@ -196,23 +207,26 @@ public class StrokeComparer {
 		}
 		
 		result = result / totalWeights;
-		StrokeSpatialScore = result;
+		return result;
 	}
 	
-	private double CalcDistanceSpatialByParameter(String parameter) {
-//		double score = mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), mStrokeAuthExtended.ListEventsSpatialByDistanceExtended, mStrokeStoredExtended.ListEventsSpatialByDistanceExtended);
+	private double CalcSpatialByParameterDistance(String parameter) {
+
+		ArrayList<IStatEngineResult> listResults = mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), mStrokeAuthExtended.ListEventsSpatialByDistanceExtended, mStrokeStoredExtended.ListEventsSpatialByDistanceExtended, Consts.ConstsParamNames.SpatialTypes.DISTANCE); 
+		mListSpatialScores.addAll(listResults);
 		
-		mListSpatialScores.addAll(mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), mStrokeAuthExtended.ListEventsSpatialByDistanceExtended, mStrokeStoredExtended.ListEventsSpatialByDistanceExtended));
-		
-		return 0;
+		double score = CalculateScoreFromList(listResults);		
+		return score;
 	}
 	
-	private double CalcTimeSpatialByParameter(String parameter) {
-//		double score = mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), mStrokeAuthExtended.ListEventsSpatialByTimeExtended, mStrokeStoredExtended.ListEventsSpatialByTimeExtended);
+	
+	private double CalcSpatialByParameterTime(String parameter) {
+
+		ArrayList<IStatEngineResult> listResults = mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), mStrokeAuthExtended.ListEventsSpatialByTimeExtended, mStrokeStoredExtended.ListEventsSpatialByTimeExtended, Consts.ConstsParamNames.SpatialTypes.TIME);		
+		mListSpatialScores.addAll(listResults);
 		
-		mListSpatialScores.addAll(mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), mStrokeAuthExtended.ListEventsSpatialByTimeExtended, mStrokeStoredExtended.ListEventsSpatialByTimeExtended));
-		
-		return 0;
+		double score = CalculateScoreFromList(listResults);		
+		return score;
 	}
 
 	private void CompareVectors() {

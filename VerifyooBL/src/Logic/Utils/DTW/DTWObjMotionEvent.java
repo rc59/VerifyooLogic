@@ -25,7 +25,7 @@ public class DTWObjMotionEvent implements IDTWObj {
 		double diffXNormalized = 1 - Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mMotionEvent.Xnormalized, motionEventToCompare.Xnormalized);
 		double diffYNormalized = 1 - Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mMotionEvent.Ynormalized, motionEventToCompare.Ynormalized);
 		
-		double result = (diffPressure + diffSurface + diffXNormalized + diffYNormalized) / 4;		
+		double result = (diffPressure + diffSurface + diffXNormalized + diffYNormalized) / 4;
 		return result;
 	}
 
