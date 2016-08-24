@@ -25,6 +25,9 @@ import Logic.Utils.Utils;
 import Logic.Utils.UtilsComparison;
 import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsVectors;
+import Logic.Utils.DTW.DTWObjCoordinate;
+import Logic.Utils.DTW.IDTWObj;
+import Logic.Utils.DTW.UtilsDTW;
 
 public class GestureComparer {	
 	
@@ -39,7 +42,7 @@ public class GestureComparer {
 	protected UtilsVectors mUtilsVectors;
 	
 	protected ArrayList<StrokeComparer> mListStrokeComparers;	
-	protected double mGestureScore;
+	public double mGestureScore;
 	protected double mMinCosineDistanceScore;
 	protected double mStrokesScore;
 	CompareResultSummary mCompareResultsGesture;
@@ -51,17 +54,17 @@ public class GestureComparer {
 	
 	protected HashMap<String, Double> mCompareFilters;
 	
-	public double DtwDistanceCoordinatesRaw;
-	public double DtwDistanceNormalizedCoordinatesRaw;
-	public double DtwDistanceEventsRaw;
-	public double DtwDistanceVelocitiesRaw;
-	public double DtwDistanceAccelerationsRaw;
+	public double DtwCoordinatesRaw;
+	public double DtwNormalizedCoordinatesRaw;
+	public double DtwEventsRaw;
+	public double DtwVelocitiesRaw;
+	public double DtwAccelerationsRaw;
 	
-	public double DtwDistanceCoordinates;
-	public double DtwDistanceNormalizedCoordinates;
-	public double DtwDistanceEvents;
-	public double DtwDistanceVelocities;
-	public double DtwDistanceAccelerations;
+	public double DtwCoordinates;
+	public double DtwNormalizedCoordinates;
+	public double DtwEvents;
+	public double DtwVelocities;
+	public double DtwAccelerations;
 	
 	public double SpatialScoreDistanceVelocities;
 	public double SpatialScoreDistanceAccelerations;
@@ -84,7 +87,7 @@ public class GestureComparer {
 	public double SpatialScoreTimeAccumulatedNormArea;
 	
 	public double GestureSpatialScoreRaw;
-	public double GestureSpatialScore;
+	public double GestureSpatialScore;	
 	
 	public GestureComparer(boolean isSimilarDevices)
 	{	
@@ -192,87 +195,87 @@ public class GestureComparer {
 //		GestureSpatialScore = CheckValues(0.05, 0.4, 0.65, GestureSpatialScore, true);
 //		scoreToRemove += GestureSpatialScore;
 		
-		DtwDistanceCoordinates = CheckValues(0.02, 2.9, 7.5, DtwDistanceCoordinatesRaw, false);
-		scoreToRemove += DtwDistanceCoordinates;
+		DtwCoordinates = CheckValues(0.02, 2.8, 6, DtwCoordinatesRaw, false);
+		scoreToRemove += DtwCoordinates;
 		
-		DtwDistanceNormalizedCoordinates = CheckValues(0.02, 0.13, 0.04, DtwDistanceNormalizedCoordinatesRaw, false);				
-		scoreToRemove += DtwDistanceNormalizedCoordinates;
+		DtwNormalizedCoordinates = CheckValues(0.02, 0.03, 0.07, DtwNormalizedCoordinatesRaw, false);				
+		scoreToRemove += DtwNormalizedCoordinates;
 		
-		DtwDistanceEvents = CheckValues(0.05, 0.12, 0.25, DtwDistanceEventsRaw, false);				
-		scoreToRemove += DtwDistanceEvents;		
+		DtwEvents = CheckValues(0.05, 0.12, 0.2, DtwEventsRaw, false);				
+		scoreToRemove += DtwEvents;		
 		
-		DtwDistanceVelocities = CheckValues(0.02, 0.03, 0.04, DtwDistanceVelocitiesRaw, false);		
-		scoreToRemove += DtwDistanceVelocities;
+		DtwVelocities = CheckValues(0.02, 0.02, 0.04, DtwVelocitiesRaw, false);		
+		scoreToRemove += DtwVelocities;
 		
-		DtwDistanceAccelerations = CheckValues(0.02, 0.0007, 0.001, DtwDistanceAccelerationsRaw, false);
-		scoreToRemove += DtwDistanceAccelerations;
+		DtwAccelerations = CheckValues(0.02, 0.0005, 0.001, DtwAccelerationsRaw, false);
+		scoreToRemove += DtwAccelerations;
 	
 		mCompareResultsGesture.Score -= scoreToRemove;
 				
 		GestureSpatialScore = 0;	
 		double numValues = 0;
 		
-		tempScore = GetSpatialScore(SpatialScoreDistanceVelocities, 0, 0.74); 
+		tempScore = GetSpatialScore(SpatialScoreDistanceVelocities, 0.2, 0.55); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreDistanceAccelerations, 0, 0.63); 
+		tempScore = GetSpatialScore(SpatialScoreDistanceAccelerations, 0.32, 0.62); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreDistanceRadialVelocities, 0, 0.52); 
+		tempScore = GetSpatialScore(SpatialScoreDistanceRadialVelocities, 0.37, 0.76); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreDistanceRadialAccelerations, 0, 0.45); 
+		tempScore = GetSpatialScore(SpatialScoreDistanceRadialAccelerations, 0.47, 0.8); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreDistanceRadius, 0, 0.8); 
+		tempScore = GetSpatialScore(SpatialScoreDistanceRadius, 0.26, 0.67); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreDistanceTeta, 0, 0.76); 
+		tempScore = GetSpatialScore(SpatialScoreDistanceTeta, 0.26, 0.77); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreDistanceDeltaTeta, 0, 0.53); 
+		tempScore = GetSpatialScore(SpatialScoreDistanceDeltaTeta, 0.42, 0.74); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreDistanceDeltaTeta, 0, 0.65); 
+		tempScore = GetSpatialScore(SpatialScoreDistanceAccumulatedNormArea, 0.18, 0.53); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreTimeVelocities, 0, 0.68); 
+		tempScore = GetSpatialScore(SpatialScoreTimeVelocities, 0.23, 0.57); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreTimeAccelerations, 0, 0.6); 
+		tempScore = GetSpatialScore(SpatialScoreTimeAccelerations, 0.31, 0.6); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreTimeRadialVelocities, 0, 0.5); 
+		tempScore = GetSpatialScore(SpatialScoreTimeRadialVelocities, 0.4, 0.77); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreTimeRadialAccelerations, 0, 0.45); 
+		tempScore = GetSpatialScore(SpatialScoreTimeRadialAccelerations, 0.48, 0.8); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreTimeRadius, 0, 0.82); 
+		tempScore = GetSpatialScore(SpatialScoreTimeRadius, 0.24, 0.65); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreTimeTeta, 0, 0.76); 
+		tempScore = GetSpatialScore(SpatialScoreTimeTeta, 0.26, 0.76); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreTimeDeltaTeta, 0, 0.515); 
+		tempScore = GetSpatialScore(SpatialScoreTimeDeltaTeta, 0.45, 0.77); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
-		tempScore = GetSpatialScore(SpatialScoreTimeDeltaTeta, 0, 0.66); 
+		tempScore = GetSpatialScore(SpatialScoreTimeAccumulatedNormArea, 0.17, 0.51); 
 		GestureSpatialScore += tempScore;
 		numValues++;
 		
@@ -404,8 +407,18 @@ public class GestureComparer {
 			RunSpatialSampling();
 			RunSpatialSamplingDetailedCalculations();
 		}
+		if(IsNeedToRun("GestureDelayTime")){
+//			GestureDelayTime();
+		}
 	}
 	
+	private void GestureDelayTime() {
+		if(mGestureStored.GestureIndex > 0) {			
+			double gestureDelay = mGestureAuth.GestureDelay;
+			CalcDoubleParameter(ConstsParamNames.Gesture.GESTURE_DELAY_TIME, gestureDelay);
+		}
+	}
+
 	private double GetPropScore(double avg, double sd, double value) {
 		double score = 0;
 				
@@ -501,27 +514,27 @@ public class GestureComparer {
 	
 	private void RunTimeWarp() {		
 		
-		DtwDistanceCoordinatesRaw = 0;
-		DtwDistanceNormalizedCoordinatesRaw = 0;
-		DtwDistanceEventsRaw = 0;
-		DtwDistanceVelocitiesRaw = 0;
-		DtwDistanceAccelerationsRaw = 0;
+		DtwCoordinatesRaw = 0;
+		DtwNormalizedCoordinatesRaw = 0;
+		DtwEventsRaw = 0;
+		DtwVelocitiesRaw = 0;
+		DtwAccelerationsRaw = 0;
 		
 		int numStrokes = mListStrokeComparers.size();
 		
 		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {
-			DtwDistanceCoordinatesRaw += mListStrokeComparers.get(idx).DtwDistanceCoordinates;
-			DtwDistanceNormalizedCoordinatesRaw += mListStrokeComparers.get(idx).DtwDistanceNormalizedCoordinates;
-			DtwDistanceEventsRaw += mListStrokeComparers.get(idx).DtwDistanceEvents;
-			DtwDistanceVelocitiesRaw += mListStrokeComparers.get(idx).DtwDistanceVelocities;
-			DtwDistanceAccelerationsRaw += mListStrokeComparers.get(idx).DtwDistanceAccelerations;	
+			DtwCoordinatesRaw += mListStrokeComparers.get(idx).DtwCoordinates;
+			DtwNormalizedCoordinatesRaw += mListStrokeComparers.get(idx).DtwNormalizedCoordinates;
+			DtwEventsRaw += mListStrokeComparers.get(idx).DtwEvents;
+			DtwVelocitiesRaw += mListStrokeComparers.get(idx).DtwVelocities;
+			DtwAccelerationsRaw += mListStrokeComparers.get(idx).DtwAccelerations;	
 		}
 		
-		DtwDistanceCoordinatesRaw = DtwDistanceCoordinatesRaw / numStrokes;
-		DtwDistanceNormalizedCoordinatesRaw = DtwDistanceNormalizedCoordinatesRaw / numStrokes;
-		DtwDistanceEventsRaw = DtwDistanceEventsRaw / numStrokes;
-		DtwDistanceVelocitiesRaw = DtwDistanceVelocitiesRaw / numStrokes;
-		DtwDistanceAccelerationsRaw = DtwDistanceAccelerationsRaw / numStrokes;
+		DtwCoordinatesRaw = DtwCoordinatesRaw / numStrokes;
+		DtwNormalizedCoordinatesRaw = DtwNormalizedCoordinatesRaw / numStrokes;
+		DtwEventsRaw = DtwEventsRaw / numStrokes;
+		DtwVelocitiesRaw = DtwVelocitiesRaw / numStrokes;
+		DtwAccelerationsRaw = DtwAccelerationsRaw / numStrokes;
 	}
 
 	protected void CompareGestureMaxAcceleration() {
@@ -721,7 +734,8 @@ public class GestureComparer {
 		if(!mIsGesturesIdentical) {
 			CalculateGestureScore();
 			mCompareResultsGesture.Score = mGestureScore; //(mGestureScore + mStrokesScore) / 2;
-			CheckStrokesCosineDistance();			
+			CheckStrokesCosineDistance();
+			CheckStrokesDistanceScore();
 		}		
 		else 
 		{
@@ -732,23 +746,23 @@ public class GestureComparer {
 	protected void CheckSpatialAndDtw() {
 		int numFalses = 0;
 		
-		if(DtwDistanceCoordinatesRaw > 5)
+		if(DtwCoordinatesRaw > 5)
 		{
 			numFalses++;
 		}
-		if(DtwDistanceNormalizedCoordinatesRaw > 0.06)
+		if(DtwNormalizedCoordinatesRaw > 0.06)
 		{
 			numFalses++;
 		}		
-		if(DtwDistanceVelocitiesRaw > 0.05)
+		if(DtwVelocitiesRaw > 0.05)
 		{
 			numFalses++;
 		}
-		if(DtwDistanceAccelerationsRaw > 0.001)
+		if(DtwAccelerationsRaw > 0.001)
 		{
 			numFalses++;
 		}
-		if(DtwDistanceEventsRaw < 0.7)
+		if(DtwEventsRaw < 0.7)
 		{
 			numFalses++;
 		}		
@@ -785,14 +799,57 @@ public class GestureComparer {
 		}
 	}
 	
+	protected void CheckStrokesDistanceScore() {
+		
+		double deltaXAuth = mGestureAuth.PointMaxXMM - mGestureAuth.PointMinXMM; 
+		double deltaYAuth = mGestureAuth.PointMaxYMM - mGestureAuth.PointMinYMM;
+		
+		double deltaXStored = mGestureStored.PointMaxXMM - mGestureStored.PointMinXMM; 
+		double deltaYStored = mGestureStored.PointMaxYMM - mGestureStored.PointMinYMM;
+		
+		double areaAuth = deltaXAuth * deltaYAuth;
+		double areaStored = deltaXStored * deltaYStored;
+		
+		double score = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(areaAuth, areaStored);
+		
+		for(int idxStrokeComparer = 1; idxStrokeComparer < mListStrokeComparers.size(); idxStrokeComparer++) {
+//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreStartToStart);
+//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreStartToEnd);
+//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreEndToStart);
+//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreEndToEnd);
+			
+//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScore);
+//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreX);
+//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreY);
+			
+			
+			
+		}
+	}
+	
+	protected void CheckStrokeDistanceAndUpdateScore(double strokeDistanceScore) {
+//		if(strokeDistanceScore < 0.75) {
+//			mCompareResultsGesture.Score -= 0.05;
+//		}
+		if(strokeDistanceScore < 0.7) {
+			mCompareResultsGesture.Score -= 0.05;
+		}
+		if(strokeDistanceScore < 0.6) {
+			mCompareResultsGesture.Score -= 0.05;
+		}
+		if(strokeDistanceScore < 0.5) {
+			mCompareResultsGesture.Score -= 0.1;
+		}
+	}
+	
 	protected void CheckStrokesCosineDistance() {		
 		mIsStrokeCosineDistanceValid = true;
 		for(int idxStrokeComparer = 0; idxStrokeComparer < mListStrokeComparers.size(); idxStrokeComparer++) {
-			if(mListStrokeComparers.get(idxStrokeComparer).GetMinCosineDistance() < 1) {
+			if(mListStrokeComparers.get(idxStrokeComparer).GetMinCosineDistance() < 1.3) {
 				mCompareResultsGesture.Score = 0;
 				mIsStrokeCosineDistanceValid = false;
 			}
-		}		
+		}
 	}
 
 	protected void CalculateGestureScore() {
@@ -866,7 +923,8 @@ public class GestureComparer {
 		String key = mUtilsGeneral.GenerateGestureFeatureMeanKey(mGestureStored.Instruction, parameterName);
 		
 		double mean = 0;
-		double sd = 0;
+		double internalSd = 0;
+		double popSd = 0;
 		
 		HashMap<String, IFeatureMeanData> hashFeatureMeans = mGestureStored.GetFeatureMeansHash(); 
 		
@@ -874,11 +932,12 @@ public class GestureComparer {
 			mean = hashFeatureMeans.get(key).GetMean();
 			
 			INormData normData = NormMgr.GetInstance().GetNormDataByParamName(parameterName, mGestureStored.Instruction);			
-			sd = normData.GetInternalStandardDev();
+			internalSd = normData.GetInternalStandardDev();
+			popSd = normData.GetStandardDev();
 		}
 		
 		ICompareResult compareResult = 
-				(ICompareResult) new CompareResultGeneric(parameterName, score, weight, originalValue, mean, sd);
+				(ICompareResult) new CompareResultGeneric(parameterName, score, weight, originalValue, mean, popSd, internalSd);
 		mCompareResultsGesture.ListCompareResults.add(compareResult);
 	}
 	
@@ -889,5 +948,9 @@ public class GestureComparer {
 
 	public boolean IsStrokeCosineDistanceValid() {
 		return mIsStrokeCosineDistanceValid;
+	}
+	
+	public ArrayList<StrokeComparer> GetStrokeComparers() {
+		return mListStrokeComparers;
 	}
 }

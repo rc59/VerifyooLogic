@@ -121,9 +121,12 @@ public class TemplateComparer {
 			for(int idxScore = 1; idxScore < listScores.size(); idxScore++) {
 				avgScore += listScores.get(idxScore);
 				scoreCount++;
-			}
+			}			
 			
-			mCompareResultsTemplate.Score = avgScore / scoreCount;	
+			mCompareResultsTemplate.Score = avgScore / scoreCount;
+			if(listScores.get(0) < 0.5) {
+				mCompareResultsTemplate.Score = 0;
+			}
 		}		
 	}
 	

@@ -2,6 +2,8 @@ package Logic.Comparison.Stats.Norms;
 
 import java.util.HashMap;
 
+import Consts.ConstsParamNames;
+
 public class NormContainerMgr {
 	public HashMap<String, SpatialNormContainer> HashMapSpatialNormsMeansDistance;
 	public HashMap<String, SpatialNormContainer> HashMapSpatialNormsSdsDistance;
@@ -23,7 +25,7 @@ public class NormContainerMgr {
 		HashMapNumericNormsSds = new HashMap<>();
 	}
 	
-	public double GetSpatialPopMeanDistance(String instruction, String param, int idxStroke, int idxSpatial) {
+	public double GetSpatialPopMeanDistance(String instruction, String param, int idxStroke, int idxSpatial) {		
 		instruction = CheckInstruction(instruction);
 		return HashMapSpatialNormsMeansDistance.get(param).GetMean(instruction, idxStroke, idxSpatial);
 	}
@@ -53,12 +55,12 @@ public class NormContainerMgr {
 		return HashMapSpatialNormsSdsTime.get(param).GetMean(instruction, idxStroke, idxSpatial);
 	}
 	
-	public double GetNumericNormPopMean(String instruction, String param, int idxStroke) {
+	public double GetNumericNormPopMean(String instruction, String param, int idxStroke) {	
 		instruction = CheckInstruction(instruction);
 		return HashMapNumericNormsMeans.get(param).GetMean(instruction, idxStroke);
 	}
 	
-	public double GetNumericNormPopSd(String instruction, String param, int idxStroke) {
+	public double GetNumericNormPopSd(String instruction, String param, int idxStroke) {		
 		instruction = CheckInstruction(instruction);
 		return HashMapNumericNormsMeans.get(param).GetStd(instruction, idxStroke);
 	}
@@ -69,16 +71,28 @@ public class NormContainerMgr {
 	}
 
 	public double GetNumericNormPopMean(String instruction, String param) {
+		if(param == ConstsParamNames.Gesture.GESTURE_DELAY_TIME) {
+			return 700;
+		}		
+		
 		instruction = CheckInstruction(instruction);
 		return HashMapNumericNormsMeans.get(param).GetMean(instruction);
 	}
 	
 	public double GetNumericNormPopSd(String instruction, String param) {
+		if(param == ConstsParamNames.Gesture.GESTURE_DELAY_TIME) {
+			return 120;
+		}
+		
 		instruction = CheckInstruction(instruction);
 		return HashMapNumericNormsMeans.get(param).GetStd(instruction);
 	}
 	
 	public double GetNumericNormInternalSd(String instruction, String param) {
+		if(param == ConstsParamNames.Gesture.GESTURE_DELAY_TIME) {
+			return 60;
+		}
+		
 		instruction = CheckInstruction(instruction);
 		return HashMapNumericNormsSds.get(param).GetMean(instruction);
 	}

@@ -20,6 +20,8 @@ import Logic.Utils.Utils;
 import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsMath;
 import Logic.Utils.UtilsStat;
+import Logic.Utils.DTW.DTWObjDouble;
+import Logic.Utils.DTW.IDTWObj;
 
 public class StatEngine implements IStatEngine {
 	
@@ -56,6 +58,44 @@ public class StatEngine implements IStatEngine {
       return mInstance;
     }
 	
+	public ArrayList<IDTWObj> GetSpatialVector(String instruction, String paramName, int idxStroke, ArrayList<MotionEventExtended> listEvents, String spatialType) {
+		
+		ArrayList<IDTWObj> listSpatialVector = new ArrayList<>();
+		NormMgr normMgr = (NormMgr) NormMgr.GetInstance();	
+		
+		double popMean = 0;
+		double popSd = 0;
+		
+		double currWeight;
+		
+		double zScore;
+		
+		for(int idx = 1; idx < Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE - 1; idx++) {			
+			
+			switch(spatialType) {
+				case ConstsParamNames.SpatialTypes.DISTANCE:
+					popMean = normMgr.NormContainerMgr.GetSpatialPopMeanDistance(instruction, paramName, idxStroke, idx);
+					popSd = normMgr.NormContainerMgr.GetSpatialPopSdDistance(instruction, paramName, idxStroke, idx);											
+				break;
+				case ConstsParamNames.SpatialTypes.TIME:
+					popMean = normMgr.NormContainerMgr.GetSpatialPopMeanTime(instruction, paramName, idxStroke, idx);
+					popSd = normMgr.NormContainerMgr.GetSpatialPopSdTime(instruction, paramName, idxStroke, idx);									
+				break;
+			}		
+			
+			zScore = (listEvents.get(idx).GetParamByName(paramName) - popMean) / popSd;
+			
+			listSpatialVector.add(new DTWObjDouble(zScore));
+			
+			currWeight = Math.abs(zScore);
+			if(currWeight > 2) {
+				currWeight = 2;
+			}			
+		}
+		
+		return listSpatialVector;
+	}
+	
 	public ArrayList<IStatEngineResult> CompareStrokeSpatial(String instruction, String paramName, int idxStroke, ArrayList<MotionEventExtended> listAuth, ArrayList<MotionEventExtended> listStored, String spatialType) {
 		
 		NormMgr normMgr = (NormMgr) NormMgr.GetInstance();	
@@ -78,89 +118,91 @@ public class StatEngine implements IStatEngine {
 		double valueAuth, valueStored;
 		
 		ArrayList<IStatEngineResult> listResults = new ArrayList<>();
+		ArrayList<ArrayList<IStatEngineResult>> listAllResults = new ArrayList<>();
 		
 		int popCount = 0;
 		int internalCount = 0;
 		
 		double zScore;
 		
-		for(int idx = 1; idx < Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE; idx++) {			
-			
-			switch(spatialType) {
-				case ConstsParamNames.SpatialTypes.DISTANCE:
-					popMean = normMgr.NormContainerMgr.GetSpatialPopMeanDistance(instruction, paramName, idxStroke, idx);
-					popSd = normMgr.NormContainerMgr.GetSpatialPopSdDistance(instruction, paramName, idxStroke, idx);
-					internalSd = normMgr.NormContainerMgr.GetSpatialInternalSdDistance(instruction, paramName, idxStroke, idx);
-						
-				break;
-				case ConstsParamNames.SpatialTypes.TIME:
-					popMean = normMgr.NormContainerMgr.GetSpatialPopMeanTime(instruction, paramName, idxStroke, idx);
-					popSd = normMgr.NormContainerMgr.GetSpatialPopSdTime(instruction, paramName, idxStroke, idx);
-					internalSd = normMgr.NormContainerMgr.GetSpatialInternalSdTime(instruction, paramName, idxStroke, idx);					
-				break;
-			}
-						
-			if(popSd > internalSd) {
-				popCount++;	
-			}
-			else {
-				internalCount++;
-			}
-			
-			//internalSd = popSd / 3;
-			
-			valueAuth = listAuth.get(idx).GetParamByName(paramName);
-			valueStored = listStored.get(idx).GetParamByName(paramName);
-			
-			zScore = (listAuth.get(idx).GetParamByName(paramName) - popMean) / popSd;
-			listWeights[idx] = zScore;
-			
-			currWeight = Math.abs(zScore);
-			if(currWeight > 2) {
-				currWeight = 2;
-			}
-			
-			tempValue = GetScoreSpatial(popMean, popSd, internalSd, valueAuth, valueStored);			
-			tempValue = GetScoreSpatial(popMean, popSd, internalSd, valueAuth, valueStored);
-			tempValuePercentage = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(valueAuth, valueStored);
-						
-			totalValues += (tempValue * currWeight);
-			weights += currWeight;
-			
-//			listResults.add(new StatEngineResult(tempValue, currWeight));
-			listResults.add(new StatEngineResult(tempValuePercentage, 1));
-			
-			scores[idx] = tempValue;
-			percentages[idx] = tempValuePercentage;
-			
-		}
+		int idxVectorStart = 1;
+		int idxShiftEnd = 8;
+		int idxShiftStart = idxVectorStart;
+		int numShifts = idxShiftEnd - idxShiftStart;
+		int idxSpatial;
 		
-//		Collections.sort(listResults, new Comparator<IStatEngineResult>() {
-//            public int compare(IStatEngineResult score1, IStatEngineResult score2) {
-//                if (Math.abs(score1.GetZScore()) > Math.abs(score2.GetZScore())) {
-//                    return -1;
-//                }
-//                if (Math.abs(score1.GetZScore()) < Math.abs(score2.GetZScore())) {
-//                    return 1;
-//                }
-//                return 0;
-//            }
-//        });
-//				
-//		int limit = 5;
-//		double result = 0;
-//		double totalWeights = 0;
-//		for(int idx = 0; idx < 5; idx++) {
-//			totalWeights += listResults.get(idx).GetZScore();
-//			result += listResults.get(idx).GetScore() * listResults.get(idx).GetZScore(); 
-//		}
-//		
-//		double avg = totalValues / weights;
-//		
-//		result = result / totalWeights;
-		return listResults;
-	}
-	
+		double scoreMax = Double.MIN_VALUE;
+		double scoreTemp;
+		int scoreMaxIdx = 0;
+		ArrayList<Double> listTempScores = new ArrayList<>();
+		
+		for(int idxShift = 0; idxShift < numShifts; idxShift++) {
+			idxSpatial = idxVectorStart;
+			listResults = new ArrayList<>();
+			for(int idx = idxShiftStart; idx < Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE - idxShiftEnd - 1; idx++) {			
+				
+				switch(spatialType) {
+					case ConstsParamNames.SpatialTypes.DISTANCE:
+						popMean = normMgr.NormContainerMgr.GetSpatialPopMeanDistance(instruction, paramName, idxStroke, idxSpatial);
+						popSd = normMgr.NormContainerMgr.GetSpatialPopSdDistance(instruction, paramName, idxStroke, idxSpatial);
+						internalSd = normMgr.NormContainerMgr.GetSpatialInternalSdDistance(instruction, paramName, idxStroke, idxSpatial);
+							
+					break;
+					case ConstsParamNames.SpatialTypes.TIME:
+						popMean = normMgr.NormContainerMgr.GetSpatialPopMeanTime(instruction, paramName, idxStroke, idxSpatial);
+						popSd = normMgr.NormContainerMgr.GetSpatialPopSdTime(instruction, paramName, idxStroke, idxSpatial);
+						internalSd = normMgr.NormContainerMgr.GetSpatialInternalSdTime(instruction, paramName, idxStroke, idxSpatial);					
+					break;
+				}
+							
+				if(popSd > internalSd) {
+					popCount++;	
+				}
+				else {
+					internalCount++;
+				}
+				
+				//internalSd = popSd / 3;
+				
+				valueAuth = listAuth.get(idx).GetParamByName(paramName);
+				valueStored = listStored.get(idx).GetParamByName(paramName);
+				
+				zScore = (valueStored - popMean) / popSd;
+				listWeights[idx] = zScore;
+				
+				currWeight = Math.abs(zScore);
+				if(currWeight > 2) {
+					currWeight = 2;
+				}
+				
+				tempValue = GetScoreSpatial(popMean, popSd, internalSd, valueAuth, valueStored);							
+				tempValuePercentage = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(valueAuth, valueStored);
+							
+				totalValues += (tempValue * currWeight);
+				weights += currWeight;
+				
+				listResults.add(new StatEngineResult(tempValue, currWeight));
+				//listResults.add(new StatEngineResult(tempValuePercentage, 1));
+				idxSpatial++;
+				scores[idx] = tempValue;
+				percentages[idx] = tempValuePercentage;			
+			}
+			
+			scoreTemp = Utils.GetInstance().GetUtilsComparison().GetTotalSpatialScore(listResults);
+			listTempScores.add(scoreTemp);
+			if(scoreTemp > scoreMax) {
+				scoreMax = scoreTemp;
+				scoreMaxIdx = listAllResults.size();
+			}
+			
+			idxShiftStart++;
+			idxShiftEnd--;
+			
+			listAllResults.add(listResults);
+		}		
+		return listAllResults.get(scoreMaxIdx);
+	}	
+
 	private double GetDistance(MotionEventExtended event1, MotionEventExtended event2) {
 		UtilsMath utilsMath = new UtilsMath();
 		

@@ -31,6 +31,8 @@ public class ConstsParamNames {
 	
 	public class Gesture
 	{
+		public static final String GESTURE_DELAY_TIME = "GestureDelayTime";
+
 		public static final String GESTURE_NUM_EVENTS = "NumEvents";
 		public static final String GESTURE_AVERAGE_VELOCITY = "GestureAvgVelocity";
 		public static final String GESTURE_MAX_VELOCITY = "GestureMaxVelocity";

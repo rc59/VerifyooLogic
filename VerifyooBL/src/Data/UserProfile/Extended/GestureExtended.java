@@ -33,10 +33,10 @@ public class GestureExtended extends Gesture {
 	
 	/*************** Shape Parameters ***************/
 	
-	private double mPointMinXMM;
-	private double mPointMaxXMM;
-	private double mPointMinYMM;
-	private double mPointMaxYMM;
+	public double PointMinXMM;
+	public double PointMaxXMM;
+	public double PointMinYMM;
+	public double PointMaxYMM;
 	
 	public double GestureLengthPixel;
 	public double GestureLengthMM;
@@ -120,6 +120,8 @@ public class GestureExtended extends Gesture {
 	
 	protected IStatEngine mStatEngine;
 	
+	public double GestureDelay;
+	
 	public GestureExtended(Gesture gesture, HashMap<String, IFeatureMeanData> hashFeatureMeans, int gestureIdx) {		
 		Id = gesture.Id;
 		Instruction = gesture.Instruction;		
@@ -159,13 +161,18 @@ public class GestureExtended extends Gesture {
 	}	
 
 	protected void PreCalculations() {
-		Stroke tempStroke;		
-		StrokeExtended tempStrokeExtended;		
-		IsOnlyPoints = true;				
+		Stroke tempStroke;
+		StrokeExtended tempStrokeExtended, prevStrokeExtended;
+		IsOnlyPoints = true;					
 		
 		for(int idxStroke = 0; idxStroke < ListStrokes.size(); idxStroke++) {
-			tempStroke = ListStrokes.get(idxStroke);				
+			tempStroke = ListStrokes.get(idxStroke);
 			tempStrokeExtended = new StrokeExtended(tempStroke, mHashFeatureMeans, Instruction, idxStroke);
+			
+			if(idxStroke > 0) {
+				prevStrokeExtended = ListStrokesExtended.get(ListStrokesExtended.size() - 1);
+				tempStrokeExtended = CalculateStrokeDistances(tempStroke, ListStrokes.get(idxStroke - 1), tempStrokeExtended);
+			}
 			
 			ListStrokesExtended.add(tempStrokeExtended);
 			if(!tempStrokeExtended.IsPoint) {
@@ -183,21 +190,37 @@ public class GestureExtended extends Gesture {
 			}
 			
 			if(idxStroke == 0) {
-				mPointMinXMM = tempStrokeExtended.PointMinXMM;
-				mPointMinYMM = tempStrokeExtended.PointMinYMM;
-				mPointMaxXMM = tempStrokeExtended.PointMaxXMM;
-				mPointMaxYMM = tempStrokeExtended.PointMaxYMM;				
+				PointMinXMM = tempStrokeExtended.PointMinXMM;
+				PointMinYMM = tempStrokeExtended.PointMinYMM;
+				PointMaxXMM = tempStrokeExtended.PointMaxXMM;
+				PointMaxYMM = tempStrokeExtended.PointMaxYMM;				
 			}
 			else {
-				mPointMinXMM = mUtilsMath.GetMinValue(mPointMinXMM, tempStrokeExtended.PointMinXMM);
-				mPointMinYMM = mUtilsMath.GetMinValue(mPointMinYMM, tempStrokeExtended.PointMinYMM);
+				PointMinXMM = mUtilsMath.GetMinValue(PointMinXMM, tempStrokeExtended.PointMinXMM);
+				PointMinYMM = mUtilsMath.GetMinValue(PointMinYMM, tempStrokeExtended.PointMinYMM);
 								
-				mPointMaxXMM = mUtilsMath.GetMaxValue(mPointMaxXMM, tempStrokeExtended.PointMaxXMM);
-				mPointMaxYMM = mUtilsMath.GetMaxValue(mPointMaxYMM, tempStrokeExtended.PointMaxYMM);
+				PointMaxXMM = mUtilsMath.GetMaxValue(PointMaxXMM, tempStrokeExtended.PointMaxXMM);
+				PointMaxYMM = mUtilsMath.GetMaxValue(PointMaxYMM, tempStrokeExtended.PointMaxYMM);
 			}
 		}		
 	}
 	
+	
+private StrokeExtended CalculateStrokeDistances(Stroke tempStroke, Stroke prevStroke, StrokeExtended currStrokeExtended) {
+		MotionEventCompact currStrokeStart = tempStroke.ListEvents.get(0);
+		MotionEventCompact currStrokeEnd = tempStroke.ListEvents.get(tempStroke.ListEvents.size() - 1);
+		
+		MotionEventCompact prevStrokeStart = prevStroke.ListEvents.get(0);
+		MotionEventCompact prevStrokeEnd = prevStroke.ListEvents.get(prevStroke.ListEvents.size() - 1);
+
+		currStrokeExtended.StrokeDistanceStartToStart =  Utils.GetInstance().GetUtilsMath().CalcDistanceInPixels(currStrokeStart, prevStrokeStart);
+		currStrokeExtended.StrokeDistanceStartToEnd =  Utils.GetInstance().GetUtilsMath().CalcDistanceInPixels(currStrokeStart, prevStrokeEnd);
+		currStrokeExtended.StrokeDistanceEndToStart =  Utils.GetInstance().GetUtilsMath().CalcDistanceInPixels(currStrokeEnd, prevStrokeStart);
+		currStrokeExtended.StrokeDistanceEndToEnd =  Utils.GetInstance().GetUtilsMath().CalcDistanceInPixels(currStrokeEnd, prevStrokeEnd);
+		
+		return currStrokeExtended;
+	}	
+
 	protected void InitFeatures() {
 		CalculateListGestureEventsFeatures();
 		CalculateVelocityFeatures();
@@ -414,8 +437,8 @@ public class GestureExtended extends Gesture {
 	                GestureTotalArea += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
 
 	                x1 = 0; y1 = 0;
-	                x2 = ListGestureEventsExtended.get(idxEvent - 1).Xmm - mPointMinXMM; y2 = ListGestureEventsExtended.get(idxEvent - 1).Ymm - mPointMinYMM;
-	                x3 = ListGestureEventsExtended.get(idxEvent).Xmm - mPointMinXMM; y3 = ListGestureEventsExtended.get(idxEvent).Ymm - mPointMinYMM;
+	                x2 = ListGestureEventsExtended.get(idxEvent - 1).Xmm - PointMinXMM; y2 = ListGestureEventsExtended.get(idxEvent - 1).Ymm - PointMinYMM;
+	                x3 = ListGestureEventsExtended.get(idxEvent).Xmm - PointMinXMM; y3 = ListGestureEventsExtended.get(idxEvent).Ymm - PointMinYMM;
 	                GestureTotalAreaMinXMinY += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
 				}	
 			}
@@ -513,7 +536,7 @@ public class GestureExtended extends Gesture {
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_NUM_EVENTS, ListGestureEventsExtended.size());
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, GestureTotalStrokeTimeInterval);
 		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA, GestureTotalStrokeArea);
-		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, GestureTotalStrokeAreaMinXMinY);
+		AddGestureValue(Instruction, ConstsParamNames.Gesture.GESTURE_TOTAL_STROKE_AREA_MINX_MINY, GestureTotalStrokeAreaMinXMinY);		
 	}
 
 	protected void CalculateGestureTotalTimeWithPauses() {

@@ -38,8 +38,8 @@ public class StrokeExtended extends Stroke {
 	private MotionEventCompact mPointMinY;
 	private MotionEventCompact mPointMaxY;
 	
-	private double mStrokeCenterXpixel;
-	private double mStrokeCenterYpixel;	
+	public double StrokeCenterXpixel;
+	public double StrokeCenterYpixel;	
 
 	public double PointMinXMM;
 	public double PointMaxXMM;
@@ -89,6 +89,12 @@ public class StrokeExtended extends Stroke {
 	public ArrayList<MotionEventExtended> ListEventsSpatialByTimeExtended;	
 	
 	public double LengthPixel;
+	
+	public double StrokeDistanceStartToStart;
+	public double StrokeDistanceStartToEnd;
+	public double StrokeDistanceEndToStart;
+	public double StrokeDistanceEndToEnd;
+
 	/****************************************/
 	
 	public StrokeExtended(Stroke stroke, HashMap<String, IFeatureMeanData> hashFeatureMeans, String instruction, int strokeIdx)
@@ -104,7 +110,10 @@ public class StrokeExtended extends Stroke {
 			mStrokeIdx = strokeIdx;
 			mInstruction = instruction;
 			LengthPixel = stroke.Length;								
-			ListEvents = stroke.ListEvents;			
+			
+			for(int idx = 0; idx < stroke.ListEvents.size(); idx++) {
+				ListEvents.add(stroke.ListEvents.get(idx).Clone());
+			}			
 			
 			Xdpi = stroke.Xdpi;		
 			Ydpi = stroke.Ydpi;
@@ -152,9 +161,9 @@ public class StrokeExtended extends Stroke {
 		
 		SpatialSampling();
 		NormalizeSpatial();
-		
+				
 		CalculateStartEndOfStroke();
-		PrepareData();		
+		PrepareData();
 	}	
 	
 	private ArrayList<MotionEventExtended> CalculateRadialVelocityForEventsList(ArrayList<MotionEventExtended> listEvents) {
@@ -267,64 +276,58 @@ public class StrokeExtended extends Stroke {
 		ListEventsSpatialByDistanceExtended = mUtilsSpatialSampling.ConvertToVectorByDistance(ListEventsExtended, LengthPixel);
 		ListEventsSpatialByTimeExtended = mUtilsSpatialSampling.ConvertToVectorByTime(ListEventsExtended);
 		
-		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsExtended);
-		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsExtended);
-		
-		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByDistanceExtended);
-		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByDistanceExtended);
-		
-		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByTimeExtended);
-		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByTimeExtended);
-		
-		double[] vectorVel = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsExtended);
-		double[] vectorVelDistance = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsSpatialByDistanceExtended);				
-		double[] vectorVelTime = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsSpatialByTimeExtended);
-		
-		double[] vectorAcc = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsExtended);
-		double[] vectorAccDistance = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsSpatialByDistanceExtended);				
-		double[] vectorAccTime = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsSpatialByTimeExtended);
-		
-		double[] vectorPressure = Utils.GetInstance().GetUtilsVectors().GetVectorPressure(ListEventsExtended);
-		double[] vectorPressureDistance = Utils.GetInstance().GetUtilsVectors().GetVectorPressure(ListEventsSpatialByDistanceExtended);				
-		double[] vectorPressureTime = Utils.GetInstance().GetUtilsVectors().GetVectorPressure(ListEventsSpatialByTimeExtended);
-		
-		double[] vectorSurface = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsExtended);
-		double[] vectorSurfaceDistance = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsSpatialByDistanceExtended);				
-		double[] vectorSurfaceTime = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsSpatialByTimeExtended);
-		
-		
-		double[] vectorRadialVelocity = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsExtended);
-		double[] vectorRadialVelocityDistance = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsSpatialByDistanceExtended);
-		double[] vectorRadialVelocityTime = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsSpatialByTimeExtended);		
-		
-		int size = vectorXDistance.length;
+//		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsExtended);
+//		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsExtended);
+//		
+//		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByDistanceExtended);
+//		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByDistanceExtended);
+//		
+//		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByTimeExtended);
+//		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByTimeExtended);
+//		
+//		double[] vectorVel = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsExtended);
+//		double[] vectorVelDistance = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsSpatialByDistanceExtended);				
+//		double[] vectorVelTime = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsSpatialByTimeExtended);
+//		
+//		double[] vectorAcc = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsExtended);
+//		double[] vectorAccDistance = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsSpatialByDistanceExtended);				
+//		double[] vectorAccTime = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsSpatialByTimeExtended);
+//		
+//		double[] vectorPressure = Utils.GetInstance().GetUtilsVectors().GetVectorPressure(ListEventsExtended);
+//		double[] vectorPressureDistance = Utils.GetInstance().GetUtilsVectors().GetVectorPressure(ListEventsSpatialByDistanceExtended);				
+//		double[] vectorPressureTime = Utils.GetInstance().GetUtilsVectors().GetVectorPressure(ListEventsSpatialByTimeExtended);
+//		
+//		double[] vectorSurface = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsExtended);
+//		double[] vectorSurfaceDistance = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsSpatialByDistanceExtended);				
+//		double[] vectorSurfaceTime = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsSpatialByTimeExtended);		
+//		
+//		double[] vectorRadialVelocity = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsExtended);
+//		double[] vectorRadialVelocityDistance = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsSpatialByDistanceExtended);
+//		double[] vectorRadialVelocityTime = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsSpatialByTimeExtended);		
+//		
+//		int size = vectorXDistance.length;
 	}
 
 	private void CenterAndRotate() {
 		ListEvents = mUtilsSpatialSampling.CenterAndRotate(ListEvents);
-
-		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXpixel(ListEvents);
-		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYpixel(ListEvents);
-		
-		int size = vectorX.length;
 	}
 
 	private void NormalizeSpatial() {
 		ListEventsSpatialByDistanceExtended = mUtilsSpatialSampling.Normalize(ListEventsSpatialByDistanceExtended);
 		ListEventsSpatialByTimeExtended = mUtilsSpatialSampling.Normalize(ListEventsSpatialByTimeExtended);	
 		
-		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsSpatialByDistanceExtended);
-		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByDistanceExtended);
-		
-		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsSpatialByTimeExtended);
-		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByTimeExtended);		
+//		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsSpatialByDistanceExtended);
+//		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByDistanceExtended);
+//		
+//		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsSpatialByTimeExtended);
+//		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByTimeExtended);		
 	}	
 	
 	private void Normalize() {
 		ListEventsExtended = mUtilsSpatialSampling.Normalize(ListEventsExtended);
 		
-		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsExtended);
-		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsExtended);		
+//		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsExtended);
+//		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsExtended);		
 	}	
 	
 	protected void CalculateStartEndOfStroke()
@@ -360,21 +363,21 @@ public class StrokeExtended extends Stroke {
 		CalculateAverageVelocity();
 		CalculateMiddlePressureAndSurface();
 		CalculateStrokeVelocityPeaks();
-		CalculateStrokeAccelerationPeaks();
-	}
-	
+		CalculateStrokeAccelerationPeaks();		
+	}	
+
 	protected void ConvertToMotionEventExtended()
 	{	
 		ListEventsSpatialByDistanceExtended = ListEventsCompactToExtended(ListEventsSpatialByDistance);
 		ListEventsSpatialByTimeExtended = ListEventsCompactToExtended(ListEventsSpatialByTime);
 		
-		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByDistanceExtended);
-		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByDistanceExtended);
-		
-		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByTimeExtended);
-		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByTimeExtended);
-		
-		int size = vectorXTime.length;
+//		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByDistanceExtended);
+//		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByDistanceExtended);
+//		
+//		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByTimeExtended);
+//		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByTimeExtended);
+//		
+//		int size = vectorXTime.length;
 	}
 	
 	protected ArrayList<MotionEventExtended> ListEventsCompactToExtended(ArrayList<MotionEventCompact> listEventsCompact)
@@ -587,13 +590,13 @@ public class StrokeExtended extends Stroke {
             }
         }
 		
-		mStrokeCenterXpixel = (mPointMinX.Xpixel + mPointMaxX.Xpixel) / 2;
-        mStrokeCenterYpixel = (mPointMinY.Ypixel + mPointMaxY.Ypixel) / 2;
+		StrokeCenterXpixel = (mPointMinX.Xpixel + mPointMaxX.Xpixel) / 2;
+        StrokeCenterYpixel = (mPointMinY.Ypixel + mPointMaxY.Ypixel) / 2;
 
-        PointMinXMM = (mPointMinX.Xpixel - mStrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
-        PointMaxXMM = (mPointMaxX.Xpixel - mStrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
-        PointMinYMM = (mPointMinY.Ypixel - mStrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
-        PointMaxYMM = (mPointMinY.Ypixel - mStrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
+        PointMinXMM = (mPointMinX.Xpixel - StrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
+        PointMaxXMM = (mPointMaxX.Xpixel - StrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
+        PointMinYMM = (mPointMinY.Ypixel - StrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
+        PointMaxYMM = (mPointMinY.Ypixel - StrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
 	}
 	
 	protected void CalculateSpatialSamplingVector()

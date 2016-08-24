@@ -2,6 +2,7 @@ package Logic.Utils;
 
 import Consts.ConstsMeasures;
 import Data.UserProfile.Extended.MotionEventExtended;
+import Data.UserProfile.Raw.MotionEventCompact;
 
 public class UtilsMath {
 //calculate alpha-beta
@@ -24,9 +25,27 @@ public class UtilsMath {
 		return avg;
 	}
 	
+	public double CalcDistanceInPixels(MotionEventCompact eventCurr, MotionEventCompact eventNext) {
+        double deltaX = eventCurr.Xpixel - eventNext.Xpixel;
+        double deltaY = eventCurr.Ypixel - eventNext.Ypixel;
+		
+        double distance = CalcPitagoras(deltaX, deltaY);
+
+        return distance;
+    }
+	
 	public double CalcDistanceInPixels(MotionEventExtended eventCurr, MotionEventExtended eventNext) {
         double deltaX = eventCurr.Xpixel - eventNext.Xpixel;
         double deltaY = eventCurr.Ypixel - eventNext.Ypixel;
+		
+        double distance = CalcPitagoras(deltaX, deltaY);
+
+        return distance;
+    }
+	
+	public double CalcDistanceInMMs(MotionEventExtended eventCurr, MotionEventExtended eventNext) {
+        double deltaX = eventCurr.Xmm - eventNext.Xmm;
+        double deltaY = eventCurr.Ymm - eventNext.Ymm;
 		
         double distance = CalcPitagoras(deltaX, deltaY);
 
@@ -90,5 +109,14 @@ public class UtilsMath {
 	
 	public double CalculateTriangleArea(double x1, double y1, double x2, double y2, double x3, double y3){
 		return Math.abs(0.5 * (x1*(y3-y2) + x2*(y1-y3) + x3*(y2-y1)));
+	}
+
+	public Complex[] ToComplex(double[] velocitiesAuthDistance) {
+		Complex[] result = new Complex[velocitiesAuthDistance.length];
+		for(int idx = 0; idx < velocitiesAuthDistance.length; idx++) {
+			result[idx] = new Complex(velocitiesAuthDistance[idx], 0);
+		}
+	
+		return result;
 	}
 }

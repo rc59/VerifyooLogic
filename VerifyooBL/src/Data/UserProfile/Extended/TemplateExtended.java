@@ -3,6 +3,7 @@ package Data.UserProfile.Extended;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Consts.ConstsParamNames;
 import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.Template;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
@@ -30,9 +31,21 @@ public class TemplateExtended extends Template {
 		mHashGesturesByInstruction = new HashMap<>();
 		ArrayList<GestureExtended> tempListGestures;
 		
+		double currGestureStartTime, prevGestureEndTime;
+		double tempDelay;
+		
 		for(int idxGesture = 0; idxGesture < template.ListGestures.size(); idxGesture++) {
 			tempGesture = template.ListGestures.get(idxGesture);
 			tempGestureExtended = new GestureExtended(tempGesture, mHashFeatureMeans, idxGesture);
+			
+			if(idxGesture > 0) {
+				currGestureStartTime = tempGestureExtended.ListGestureEventsExtended.get(0).EventTime;
+				prevGestureEndTime = GetPrevGestureEndTime();
+				tempDelay = currGestureStartTime - prevGestureEndTime;
+				tempGestureExtended.GestureDelay = tempDelay;
+				
+				tempGestureExtended.AddGestureValue(tempGestureExtended.Instruction, ConstsParamNames.Gesture.GESTURE_DELAY_TIME, tempGestureExtended.GestureDelay);
+			}
 			
 			ListGestureExtended.add(tempGestureExtended);
 			
@@ -48,6 +61,19 @@ public class TemplateExtended extends Template {
 		}
 	}
 	
+	private double GetPrevGestureEndTime() {
+		int numGestures = ListGestureExtended.size();
+		GestureExtended prevGesture = ListGestureExtended.get(numGestures - 1);
+				
+		int numStrokes = prevGesture.ListStrokesExtended.size();
+		StrokeExtended prevGestureLastStroke = prevGesture.ListStrokesExtended.get(numStrokes - 1);
+		
+		int numEvents = prevGestureLastStroke.ListEventsExtended.size();
+		MotionEventExtended prevGestureLastStrokeLastEvent = prevGestureLastStroke.ListEventsExtended.get(numEvents - 1);
+		
+		return prevGestureLastStrokeLastEvent.EventTime;
+	}
+
 	public HashMap<String, ArrayList<GestureExtended>> GetHashGesturesByInstruction() {
 		return mHashGesturesByInstruction;
 	}
