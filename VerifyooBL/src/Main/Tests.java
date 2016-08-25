@@ -29,14 +29,16 @@ public class Tests {
 //			score = t.CompareTemplates("Roeeyshaked@gmail.com", "abuchnick@yahoo.com", 39);
 			
 			String name;
-//			for(int idx = 1; idx <= 15; idx++) {
-//				name = "Roy2408-Auth" + Integer.toString(idx);
+//			for(int idx = 1; idx <= 5; idx++) {
+//				name = "Roy2508-Auth" + Integer.toString(idx);
 //				score = t.CompareTemplates("Roy2408-Reg", name);
 //			}
-			for(int idx = 1; idx <= 10; idx++) {
-				name = "Roy2408-Hack" + Integer.toString(idx);
-				score = t.CompareTemplates("Roy2408-Reg", name);
-			}
+//			for(int idx = 1; idx <= 10; idx++) {
+//				name = "Roy2408-Hack" + Integer.toString(idx);
+//				score = t.CompareTemplates("Roy2408-Reg", name);
+//			}
+			score = t.CompareTemplates("Roy2408-Reg", "Roy2508-AuthHigh");
+			score = t.CompareTemplates("Roy2408-Reg", "Roy2508-AuthLow");
 			
 			if(score < minScore) {
 				fn++;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import Consts.ConstsParamNames;
+import Data.MetaData.GestureMaxTimeContainer;
 import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.Template;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
@@ -15,11 +16,15 @@ public class TemplateExtended extends Template {
 	
 	private HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	
+	private GestureMaxTimeContainer mGestureMaxTimeContainer;
+	
 	public TemplateExtended(Template template) {		
 		InitTemplateExtended(template);
 	}
 
 	private void InitTemplateExtended(Template template) {
+		
+		mGestureMaxTimeContainer = new GestureMaxTimeContainer(); 
 		Id = template.Id;
 		mHashFeatureMeans = new HashMap<>();
 		ListGestureExtended = new ArrayList<GestureExtended>();
@@ -47,6 +52,7 @@ public class TemplateExtended extends Template {
 				tempGestureExtended.AddGestureValue(tempGestureExtended.Instruction, ConstsParamNames.Gesture.GESTURE_DELAY_TIME, tempGestureExtended.GestureDelay);
 			}
 			
+			mGestureMaxTimeContainer.AddGesture(tempGestureExtended);
 			ListGestureExtended.add(tempGestureExtended);
 			
 			if(!mHashGesturesByInstruction.containsKey(tempGestureExtended.Instruction)) {
@@ -76,5 +82,9 @@ public class TemplateExtended extends Template {
 
 	public HashMap<String, ArrayList<GestureExtended>> GetHashGesturesByInstruction() {
 		return mHashGesturesByInstruction;
+	}
+	
+	public double GetGestureMaxTimeInterval(String instruction) {
+		return mGestureMaxTimeContainer.GetMaxTimeForGesture(instruction);
 	}
 }

@@ -352,7 +352,7 @@ public class GestureComparer {
 			CompareGestureAreasMinXMinY();
 		}
 		if(IsNeedToRun("CompareGesturePressure")){
-			CompareGesturePressure();
+			//CompareGesturePressure();
 		}
 		if(IsNeedToRun("CompareGestureSurface")){
 			CompareGestureSurface();
@@ -734,8 +734,7 @@ public class GestureComparer {
 		if(!mIsGesturesIdentical) {
 			CalculateGestureScore();
 			mCompareResultsGesture.Score = mGestureScore; //(mGestureScore + mStrokesScore) / 2;
-			CheckStrokesCosineDistance();
-			CheckStrokesDistanceScore();
+			CheckStrokesCosineAndStrokeDistance();			
 		}		
 		else 
 		{
@@ -800,30 +799,11 @@ public class GestureComparer {
 	}
 	
 	protected void CheckStrokesDistanceScore() {
-		
-		double deltaXAuth = mGestureAuth.PointMaxXMM - mGestureAuth.PointMinXMM; 
-		double deltaYAuth = mGestureAuth.PointMaxYMM - mGestureAuth.PointMinYMM;
-		
-		double deltaXStored = mGestureStored.PointMaxXMM - mGestureStored.PointMinXMM; 
-		double deltaYStored = mGestureStored.PointMaxYMM - mGestureStored.PointMinYMM;
-		
-		double areaAuth = deltaXAuth * deltaYAuth;
-		double areaStored = deltaXStored * deltaYStored;
-		
-		double score = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(areaAuth, areaStored);
-		
-		for(int idxStrokeComparer = 1; idxStrokeComparer < mListStrokeComparers.size(); idxStrokeComparer++) {
-//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreStartToStart);
-//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreStartToEnd);
-//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreEndToStart);
-//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreEndToEnd);
-			
-//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScore);
-//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreX);
-//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScoreY);
-			
-			
-			
+		for(int idxStrokeComparer = 0; idxStrokeComparer < mListStrokeComparers.size(); idxStrokeComparer++) {
+			if(mListStrokeComparers.get(idxStrokeComparer).GetMinCosineDistance() < 1.3) {
+				mCompareResultsGesture.Score = 0;
+				mIsStrokeCosineDistanceValid = false;
+			}
 		}
 	}
 	
@@ -831,24 +811,26 @@ public class GestureComparer {
 //		if(strokeDistanceScore < 0.75) {
 //			mCompareResultsGesture.Score -= 0.05;
 //		}
-		if(strokeDistanceScore < 0.7) {
-			mCompareResultsGesture.Score -= 0.05;
-		}
-		if(strokeDistanceScore < 0.6) {
-			mCompareResultsGesture.Score -= 0.05;
-		}
+		
 		if(strokeDistanceScore < 0.5) {
-			mCompareResultsGesture.Score -= 0.1;
+			mCompareResultsGesture.Score -= 0.5;
+		}
+		else {
+			if(strokeDistanceScore > 0.5 && strokeDistanceScore < 0.7) {
+				double diff = strokeDistanceScore - 0.5;
+				mCompareResultsGesture.Score -= (diff * 2);
+			}
 		}
 	}
 	
-	protected void CheckStrokesCosineDistance() {		
+	protected void CheckStrokesCosineAndStrokeDistance() {		
 		mIsStrokeCosineDistanceValid = true;
 		for(int idxStrokeComparer = 0; idxStrokeComparer < mListStrokeComparers.size(); idxStrokeComparer++) {
 			if(mListStrokeComparers.get(idxStrokeComparer).GetMinCosineDistance() < 1.3) {
 				mCompareResultsGesture.Score = 0;
-				mIsStrokeCosineDistanceValid = false;
+				mIsStrokeCosineDistanceValid = false;					
 			}
+			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScore);
 		}
 	}
 

@@ -2,6 +2,9 @@ package Logic.Utils;
 
 import java.util.HashMap;
 
+import Data.UserProfile.Extended.GestureExtended;
+import Data.UserProfile.Extended.MotionEventExtended;
+
 public class UtilsGeneral {
 	public String GenerateGestureFeatureMeanKey(String instruction, String paramName)
 	{
@@ -37,5 +40,14 @@ public class UtilsGeneral {
 	
 	public String GenerateContainerKey(String instruction, int idxStroke) {
 		return String.format("%s-%s", instruction, Integer.toString(idxStroke));
+	}
+
+	public double GetGestureTotalTime(GestureExtended gesture) {				
+		MotionEventExtended eventStart = gesture.ListGestureEventsExtended.get(0);
+		MotionEventExtended eventEnd = gesture.ListGestureEventsExtended.get(gesture.ListGestureEventsExtended.size() - 1);
+		
+		double gestureTotalTime = eventEnd.EventTime - eventStart.EventTime;
+		
+		return gestureTotalTime;
 	}
 }

@@ -14,8 +14,6 @@ public class Template {
 	public String Name;
 	public String ModelName;
 
-	protected IStatEngine mStatEngine;
-
 	public Template Clone() {
 		Template clonedTemplate = new  Template();
 		
@@ -33,6 +31,5 @@ public class Template {
 	
 	public Template() {
 		ListGestures = new ArrayList<>();
-		mStatEngine = StatEngine.GetInstance();
 	}
 }

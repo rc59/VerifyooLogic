@@ -20,7 +20,7 @@ public class MotionEventCompact {
 	
 	protected double GyroX;
 	protected double GyroY;
-	protected double GyroZ;
+	protected double GyroZ;	
 	
 	public double VelocityX() {
 		return VelocityX;
