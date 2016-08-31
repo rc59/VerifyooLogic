@@ -77,6 +77,54 @@ public class UtilsMath {
 		}
 	}
 	
+	public double GetRelativeDistanceBetween(double value, double lowerBound, double upperBound) {
+
+		double result = 0;	
+		
+		if(value > lowerBound && value < upperBound) {
+			if(value < 0) {
+				double temp = lowerBound;
+				value = value * -1;
+				lowerBound = upperBound * -1;
+				upperBound = temp * -1;
+			}
+			
+			value = value - lowerBound;
+			upperBound = upperBound - lowerBound;
+			
+			result = 1 - (value / upperBound);
+		}
+		
+        return result;
+    }
+
+	public double GetRelativeDistanceBetween(double value, double center, double bound1, double bound2) {
+
+		double result = 0;	
+		
+		double lowerBound1 = center - bound1;
+		double lowerBound2 = center - bound2;
+		
+		double upperBound1 = center + bound1;
+		double upperBound2 = center + bound2;				
+		
+		if(value > lowerBound1 && value < upperBound1) {
+			if(value < 0) {
+				double temp = lowerBound1;
+				value = value * -1;
+				lowerBound1 = upperBound1 * -1;
+				upperBound1 = temp * -1;
+			}
+			
+			value = value - lowerBound1;
+			upperBound1 = upperBound1 - lowerBound1;
+			
+			result = 1 - (value / upperBound1);
+		}
+		
+        return result;
+    }
+		
 	public double GetPercentageDiff(double value1, double value2) {
 
         if(value1 == 0 || value2 == 0)

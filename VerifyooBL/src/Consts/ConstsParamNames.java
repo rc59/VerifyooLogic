@@ -22,11 +22,25 @@ public class ConstsParamNames {
 	
 	public class Stroke
 	{
-		public static final String MINIMUM_COSINE_DISTANCE = "StrokeMinimumCosineDistance";
-		public static final String STROKE_AREA = "StrokeArea";
-		public static final String STROKE_AREA_MINX_MINY = "StrokeAreaMinXMinY";
-		public static final String AVERAGE_VELOCITY = "StrokeAvgVelocity";
-		public static final String TIME_INTERVAL = "StrokeTimeInterval";	
+		public static final String MINIMUM_COSINE_DISTANCE = "StrokeMinimumCosineDistance";		
+		
+		public static final String STROKE_NUM_EVENTS = "StrokeNumEvents";
+		public static final String STROKE_LENGTH = "StrokeLength";				
+		public static final String STROKE_TIME_INTERVAL = "StrokeTimeInterval";
+		public static final String STROKE_TRANSITION_TIME = "StrokeTransitionTime";
+		
+		public static final String STROKE_TOTAL_AREA = "StrokeTotalArea";
+		public static final String STROKE_TOTAL_AREA_MINX_MINY = "StrokeTotalAreaMinXMinY";
+		
+		public static final String STROKE_AVERAGE_VELOCITY = "StrokeAvgVelocity";
+		public static final String STROKE_MAX_VELOCITY = "StrokeMaxVelocity";
+		public static final String STROKE_MID_VELOCITY = "StrokMidVelocity";		
+		
+		public static final String STROKE_AVERAGE_ACCELERATION = "StrokeAvgAcceleration";
+		public static final String STROKE_MAX_ACCELERATION = "StrokeMaxAcceleration";
+
+		public static final String STROKE_MIDDLE_PRESSURE = "StrokeMiddlePressure";
+		public static final String STROKE_MIDDLE_SURFACE = "StrokeMiddleSurface";
 	}
 	
 	public class Gesture

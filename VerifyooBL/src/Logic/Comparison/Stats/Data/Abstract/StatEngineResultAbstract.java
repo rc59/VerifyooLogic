@@ -5,11 +5,13 @@ import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
 public abstract class StatEngineResultAbstract implements IStatEngineResult {
 	public double mScore;
 	public double mZscore;
+	public double mWeight;
 	
-	public StatEngineResultAbstract(double score, double zScore)
+	public StatEngineResultAbstract(double score, double zScore, double weight)
 	{
 		mScore = score;
 		mZscore = zScore;
+		mWeight = weight;
 	}
 	
 	@Override
@@ -22,6 +24,10 @@ public abstract class StatEngineResultAbstract implements IStatEngineResult {
 		return mZscore;
 	}
 	
+	@Override
+	public double GetWeight() {
+		return mWeight;
+	}
 //	@Override
 //	public boolean IsValid() {
 //		// TODO Auto-generated method stub

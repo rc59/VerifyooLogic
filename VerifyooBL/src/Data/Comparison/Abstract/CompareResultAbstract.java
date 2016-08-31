@@ -10,8 +10,10 @@ public abstract class CompareResultAbstract implements ICompareResult {
 	public double OriginalValue;
 	public double Weight;
 	public double Mean;
+	public double PopMean;
 	public double StandardDev;
 	public double InternalStandardDev;
+	public double InternalStandardDevUserOnly;
 		
 	@Override
 	public String GetName() {
@@ -36,12 +38,24 @@ public abstract class CompareResultAbstract implements ICompareResult {
 		return Mean;
 	}
 	
+	public double GetPopMean() { 
+		return PopMean;
+	}
+	
 	public double GetSD() { 
 		return StandardDev;
 	}
 	
 	public double GetInternalSD() { 
 		return InternalStandardDev;
+	}
+	
+	public double GetInternalSdUserOnly() { 
+		return InternalStandardDevUserOnly;
+	}
+	
+	public double GetZScore() { 
+		return ((OriginalValue - PopMean) / StandardDev);
 	}
 	
 	@Override
@@ -67,11 +81,19 @@ public abstract class CompareResultAbstract implements ICompareResult {
 		Mean = mean;
 	}
 	
+	public void SetPopMean(double popMean) {
+		PopMean = popMean;
+	}
+	
 	public void SetStandardDev(double standardDev) {
 		StandardDev = standardDev;
 	}
 	
 	public void SetInternalStandardDev(double internalStandardDev) {
 		InternalStandardDev = internalStandardDev;
+	}
+	
+	public void SetInternalStandardDevUserOnly(double internalStandardDevUserOnly) {
+		InternalStandardDevUserOnly = internalStandardDevUserOnly;
 	}
 }

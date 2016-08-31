@@ -36,7 +36,7 @@ public class StatEngine implements IStatEngine {
 	protected StatEngine()
 	{
 		
-	}
+	}	
 	
 	public static IStatEngine GetInstance() {
       if(mInstance == null) {
@@ -46,6 +46,14 @@ public class StatEngine implements IStatEngine {
 		  mUtilsGeneral = new UtilsGeneral();
 		  
 		  mHashMapScaleParams = new HashMap<>();
+		  
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Stroke.STROKE_LENGTH, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Stroke.STROKE_TIME_INTERVAL, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Stroke.STROKE_TRANSITION_TIME, true);
+		  mHashMapScaleParams.put(Consts.ConstsParamNames.Stroke.STROKE_NUM_EVENTS, true);
+		  
 		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_LENGTH, true);
 		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERVAL, true);
 		  mHashMapScaleParams.put(Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_STROKES_TIME_INTERVAL, true);
@@ -57,6 +65,57 @@ public class StatEngine implements IStatEngine {
       }
       return mInstance;
     }
+	
+	public IStatEngineResult CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
+	{
+		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);		
+		String key = mUtilsGeneral.GenerateGestureFeatureMeanKey(instruction, paramName);
+
+		IStatEngineResult statResult = CompareDoubleValues(authValue, paramName, normObj, key, hashFeatureMeans);
+		return statResult;
+	}
+	
+	public IStatEngineResult CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
+	{		
+		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction, strokeIdx);
+				
+		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
+				
+		IStatEngineResult statResult = CompareDoubleValues(authValue, paramName, normObj, key, hashFeatureMeans);
+		return statResult;
+	}	
+	
+	protected IStatEngineResult CompareDoubleValues(double authValue, String paramName, INormData normObj, String key, HashMap<String, IFeatureMeanData> hashFeatureMeans) {
+		double popMean = normObj.GetMean();
+		double popSd = normObj.GetStandardDev();
+		
+		double internalMean = hashFeatureMeans.get(key).GetMean();
+		double internalSd = normObj.GetInternalStandardDev();
+		double internalSdUserOnly = hashFeatureMeans.get(key).GetInternalSd();			
+		
+		double zScore = (internalMean - popMean) / popSd;
+		double weight = Math.abs(zScore);
+		if(weight > 2) {
+			weight = 2;
+		}
+		
+		if(mHashMapScaleParams.containsKey(paramName)) {
+			double factor = internalMean / popMean; 
+			if(factor < 1) {
+				factor = 1;
+			}
+			if(factor > 2) {
+				factor = 2;
+			}
+			internalSd = internalSd * factor;
+		}
+		
+		double score = Utils.GetInstance().GetUtilsStat().CalculateScore(authValue, popMean, popSd, internalMean, internalSd);
+		
+		weight = Utils.GetInstance().GetUtilsStat().CalcWeight(internalMean, internalSd, popMean, popSd);
+		IStatEngineResult statResult = new StatEngineResult(score, zScore, weight);
+		return statResult;
+	}
 	
 	public ArrayList<IDTWObj> GetSpatialVector(String instruction, String paramName, int idxStroke, ArrayList<MotionEventExtended> listEvents, String spatialType) {
 		
@@ -81,7 +140,7 @@ public class StatEngine implements IStatEngine {
 					popMean = normMgr.NormContainerMgr.GetSpatialPopMeanTime(instruction, paramName, idxStroke, idx);
 					popSd = normMgr.NormContainerMgr.GetSpatialPopSdTime(instruction, paramName, idxStroke, idx);									
 				break;
-			}		
+			}
 			
 			zScore = (listEvents.get(idx).GetParamByName(paramName) - popMean) / popSd;
 			
@@ -170,22 +229,20 @@ public class StatEngine implements IStatEngine {
 				zScore = (valueStored - popMean) / popSd;
 				listWeights[idx] = zScore;
 				
-				currWeight = Math.abs(zScore);
-				if(currWeight > 2) {
-					currWeight = 2;
-				}
+				currWeight = Utils.GetInstance().GetUtilsStat().CalcWeight(valueStored, internalSd, popMean, popSd);
 				
-				tempValue = GetScoreSpatial(popMean, popSd, internalSd, valueAuth, valueStored);							
-				tempValuePercentage = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(valueAuth, valueStored);
+//				tempValue = GetScoreSpatial(popMean, popSd, internalSd, valueAuth, valueStored);
+				tempValue = Utils.GetInstance().GetUtilsStat().CalculateScore(valueAuth, popMean, popSd, valueStored, internalSd);
+//				tempValuePercentage = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(valueAuth, valueStored);
 							
 				totalValues += (tempValue * currWeight);
 				weights += currWeight;
 				
-				listResults.add(new StatEngineResult(tempValue, currWeight));
+				listResults.add(new StatEngineResult(tempValue, zScore, currWeight));
 				//listResults.add(new StatEngineResult(tempValuePercentage, 1));
 				idxSpatial++;
 				scores[idx] = tempValue;
-				percentages[idx] = tempValuePercentage;			
+//				percentages[idx] = tempValuePercentage;			
 			}
 			
 			scoreTemp = Utils.GetInstance().GetUtilsComparison().GetTotalSpatialScore(listResults);
@@ -216,83 +273,7 @@ public class StatEngine implements IStatEngine {
 //		totalScore += utilsMath.GetPercentageDiff(event1.Ynormalized, event2.Ynormalized);		
 		
 		return totalScore / 4;
-	}
-	
-	public IStatEngineResult CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
-	{		
-		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
-				
-		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
-				
-		double populationMean = normObj.GetMean();
-		double populationSd = normObj.GetStandardDev();
-		
-		double internalMean = hashFeatureMeans.get(key).GetMean();
-		double internalSd = hashFeatureMeans.get(key).GetInternalSd();
-		
-		double zScore = (authValue - populationMean) / populationSd;
-		
-		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
-		
-		IStatEngineResult statResult = new StatEngineResult(score, zScore);
-		return statResult;
-	}
-	
-//	public IStatEngineResult CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
-//	{
-//		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
-//		
-//		String key = mUtilsGeneral.GenerateGestureFeatureMeanKey(instruction, paramName);
-//				
-//		double populationMean = normObj.GetMean();
-//		double populationSd = normObj.GetStandardDev();
-//		double populationInternalSd = normObj.GetInternalStandardDev();		
-//		
-//		double internalMean = hashFeatureMeans.get(key).GetMean();
-//		double internalSd = hashFeatureMeans.get(key).GetInternalSd();
-//		
-//		double upperInternalSD = internalMean + populationInternalSd;
-//		double lowerInternalSD = internalMean - populationInternalSd;		
-//		
-//		double zScoreForUser = (internalMean - populationMean) / populationSd;
-//		IStatEngineResult statResult;
-//		
-//		double zScore = (authValue - populationMean) / populationSd;
-//		
-//		double score = mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
-//		
-//		if(internalSd < populationInternalSd) {
-//			double upperInternalSDUser = internalMean + internalSd;
-//			double lowerInternalSDUser = internalMean - internalSd;
-//			
-//			if(authValue > lowerInternalSDUser && authValue < upperInternalSDUser) {
-//				statResult = new StatEngineResult(1, zScoreForUser);
-//				return statResult;
-//			}	
-//		}
-//		
-//		if(authValue > lowerInternalSD && authValue < upperInternalSD) {
-//			statResult = new StatEngineResult(0.90, zScoreForUser);
-//			return statResult;
-//		}
-//		
-//		if(authValue > GetUpper(internalMean, populationInternalSd, 2) || authValue < GetLower(internalMean, populationInternalSd, 2)) {
-//			score -= 0.1;
-//		}
-//		if(authValue > GetUpper(internalMean, populationInternalSd, 3) || authValue < GetLower(internalMean, populationInternalSd, 3)) {
-//			score -= 0.1;
-//		}
-//		if(authValue > GetUpper(internalMean, populationInternalSd, 4) || authValue < GetLower(internalMean, populationInternalSd, 4)) {
-//			score -= 0.1;
-//		}
-//		
-//		if(score < 0) {
-//			score = 0;
-//		}
-//		
-//		statResult = new StatEngineResult(score, zScoreForUser);
-//		return statResult;	
-//	}
+	}	
 	
 	public double GetScoreSpatial(double popMean, double popSd, double internalSd, double authValue, double storedValue) {
 		double populationMean = popMean;
@@ -344,8 +325,8 @@ public class StatEngine implements IStatEngine {
 				
 		//statResult = new StatEngineResult(score, zScoreForUser);
 		return score;	
-	}
-	
+	}	
+
 	public double GetScore(double popMean, double popSd, double internalSd, double authValue, double storedValue) {
 		double populationMean = popMean;
 		double populationSd = popSd;
@@ -399,97 +380,7 @@ public class StatEngine implements IStatEngine {
 		return score;	
 	}
 
-	public IStatEngineResult CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
-	{
-		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
-		
-		String key = mUtilsGeneral.GenerateGestureFeatureMeanKey(instruction, paramName);
-				
-		double populationMean = normObj.GetMean();
-		double populationSd = normObj.GetStandardDev();
-		double populationInternalSd = normObj.GetInternalStandardDev();		
-		
-		double internalMean = hashFeatureMeans.get(key).GetMean();
-		double internalSd = hashFeatureMeans.get(key).GetInternalSd();
-		
-		double zScoreForUser = (internalMean - populationMean) / populationSd;
-		IStatEngineResult statResult;
-
-		//contribution of user uniqueness 
-		double uniquenessFactor = 0.4 * Math.abs(zScoreForUser) + 1;
-		
-		if(uniquenessFactor > 2) {
-			uniquenessFactor = 2;
-		}
-
-		if(mHashMapScaleParams.containsKey(paramName)) {
-			double factor = internalMean / populationMean; 
-			if(factor < 1) {
-				factor = 1;
-			}
-			populationInternalSd = populationInternalSd * factor;			
-		}
-				
-		double twoUpperPopulationInternalSD = (internalMean + populationInternalSd * uniquenessFactor);
-		double twoLowerPopulationInternalSD = (internalMean - populationInternalSd * uniquenessFactor);
-		
-		double pUser;
-		
-		double threeUpperPopulationInternalSD = (internalMean + 1.5 * populationInternalSd * uniquenessFactor);
-		double threeLowerPopulationInternalSD = (internalMean - 1.5 * populationInternalSd * uniquenessFactor);		
-//		double pAttacker = 1-mUtilsStat.CalculateScore(authValue, populationMean, populationSd, internalMean);
-//		
-//
-//		if((authValue > twoLowerPopulationInternalSD) && (authValue < twoUpperPopulationInternalSD)) {
-//			pUser = 1;
-//		}
-//		else if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)){
-//			if(authValue > internalMean){
-//				pUser = (threeUpperPopulationInternalSD - authValue) / populationInternalSd ;
-//			}
-//			else{
-//				pUser = (authValue - threeLowerPopulationInternalSD) / populationInternalSd ;
-//			}
-//		}
-//		else{
-//			pUser = 0;
-//		}
-//		
-//		double score = pUser;
-//		
-//		if(uniquenessFactor > 1) {
-//			score = score * (1-pAttacker);	
-//		}
-
-		double score;
-		if((authValue > twoLowerPopulationInternalSD) && (authValue < twoUpperPopulationInternalSD)) {
-			score = 1;
-		}
-		else {
-			if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)) {
-				if(authValue > twoLowerPopulationInternalSD) {
-					double u = Math.abs(threeUpperPopulationInternalSD - authValue);
-					double d = Math.abs(threeUpperPopulationInternalSD - twoUpperPopulationInternalSD);
-					
-					score = u/d;					
-				}
-				else {
-					double u = Math.abs(threeLowerPopulationInternalSD - authValue);
-					double d = Math.abs(threeLowerPopulationInternalSD - twoLowerPopulationInternalSD);
-					
-					score = u/d;
-				}
-			}
-			else {
-				score = 0;
-			}
-		}
-				
-		statResult = new StatEngineResult(score, zScoreForUser);
-		return statResult;	
 	
-	}
-
 	public IStatEngineResult CompareGestureScoreWithoutDistribution(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
 	{
 		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction);
@@ -511,7 +402,7 @@ public class StatEngine implements IStatEngine {
 			score = 0;
 
 		double zScoreForUser = 1;
-		statResult = new StatEngineResult(score, zScoreForUser);
+		statResult = new StatEngineResult(score, zScoreForUser, zScoreForUser);
 		return statResult;	
 	}
 

@@ -35,8 +35,8 @@ public class UtilsComparison {
 		double result = 0;
 		double totalWeights = 0;
 		for(int idx = 0; idx < limit; idx++) {			
-			totalWeights += listScores.get(idx).GetZScore();
-			result += listScores.get(idx).GetScore() * listScores.get(idx).GetZScore();				
+			totalWeights += listScores.get(idx).GetWeight();
+			result += listScores.get(idx).GetScore() * listScores.get(idx).GetWeight();				
 		}
 		
 		result = result / totalWeights;

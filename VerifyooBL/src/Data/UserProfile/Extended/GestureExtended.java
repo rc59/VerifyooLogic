@@ -171,7 +171,7 @@ public class GestureExtended extends Gesture {
 			
 			if(idxStroke > 0) {
 				prevStrokeExtended = ListStrokesExtended.get(ListStrokesExtended.size() - 1);
-				tempStrokeExtended = CalculateStrokeDistances(tempStroke, ListStrokes.get(idxStroke - 1), tempStrokeExtended);
+				tempStrokeExtended = CalculateStrokeDistancesAndTransitionTime(tempStroke, ListStrokes.get(idxStroke - 1), tempStrokeExtended);
 			}
 			
 			ListStrokesExtended.add(tempStrokeExtended);
@@ -203,10 +203,9 @@ public class GestureExtended extends Gesture {
 				PointMaxYMM = mUtilsMath.GetMaxValue(PointMaxYMM, tempStrokeExtended.PointMaxYMM);
 			}
 		}		
-	}
+	}	
 	
-	
-private StrokeExtended CalculateStrokeDistances(Stroke tempStroke, Stroke prevStroke, StrokeExtended currStrokeExtended) {
+	private StrokeExtended CalculateStrokeDistancesAndTransitionTime(Stroke tempStroke, Stroke prevStroke, StrokeExtended currStrokeExtended) {
 		MotionEventCompact currStrokeStart = tempStroke.ListEvents.get(0);
 		MotionEventCompact currStrokeEnd = tempStroke.ListEvents.get(tempStroke.ListEvents.size() - 1);
 		
@@ -217,6 +216,9 @@ private StrokeExtended CalculateStrokeDistances(Stroke tempStroke, Stroke prevSt
 		currStrokeExtended.StrokeDistanceStartToEnd =  Utils.GetInstance().GetUtilsMath().CalcDistanceInPixels(currStrokeStart, prevStrokeEnd);
 		currStrokeExtended.StrokeDistanceEndToStart =  Utils.GetInstance().GetUtilsMath().CalcDistanceInPixels(currStrokeEnd, prevStrokeStart);
 		currStrokeExtended.StrokeDistanceEndToEnd =  Utils.GetInstance().GetUtilsMath().CalcDistanceInPixels(currStrokeEnd, prevStrokeEnd);
+		
+		currStrokeExtended.StrokeTransitionTime = currStrokeStart.EventTime - prevStrokeEnd.EventTime;
+		currStrokeExtended.AddStrokeValue(currStrokeExtended.GetInstruction(), ConstsParamNames.Stroke.STROKE_TRANSITION_TIME, currStrokeExtended.GetStrokeIdx(), currStrokeExtended.StrokeTransitionTime);
 		
 		return currStrokeExtended;
 	}	

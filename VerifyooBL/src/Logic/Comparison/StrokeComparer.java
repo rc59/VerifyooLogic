@@ -20,6 +20,9 @@ import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Comparison.Stats.Norms.NormData;
+import Logic.Comparison.Stats.Norms.NormMgr;
+import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Utils.Complex;
 import Logic.Utils.FFT;
 import Logic.Utils.Utils;
@@ -47,6 +50,8 @@ public class StrokeComparer {
 	protected StrokeExtended mStrokeAuthExtended;		
 	protected double mMinCosineDistanceScore;
 	protected boolean mIsSimilarDevices;
+	
+	public double DtwScoreToRemove;
 	
 	public double DtwCoordinates;
 	public double DtwNormalizedCoordinates;
@@ -201,14 +206,19 @@ public class StrokeComparer {
 			if(!mIsStrokesIdentical) {				
 				CompareStrokeDistances();
 				CompareSpatial();
-				CreateSpatialVectors();
+				CreateSpatialVectorsForDtwAnalysis();
 				CompareMinCosineDistance();
 				CompareStrokeAreas();
 				CompareTimeInterval();
-				CompareAvgVelocity();
+				CompareNumEvents();
+				CompareVelocities();
+				ComparePressureAndSurface();
+				CompareStrokeTransitionTimes();
+				CompareAccelerations();
 				CompareVectors();
-				TimeWarp();
+				//TimeWarp();
 				CalculateFinalScore();
+				//CheckDtw();		
 				CheckFinalScore();
 			}
 		}
@@ -220,6 +230,53 @@ public class StrokeComparer {
 			mCompareResult.Score = 0;
 		}		
 	}		
+	
+	protected void CheckDtw() {
+		double scoreToRemove = 0;
+				
+		double factorVelocities = 0.03; 
+		double factorCoords = 5;
+		double factorEvents = 0.18;
+		double factorCoordsNorm = 0.06;
+		
+		double dtwScore = 0;
+		
+		dtwScore += DtwCoordinates / factorCoords;
+		dtwScore += DtwNormalizedCoordinates / factorCoordsNorm;
+		dtwScore += DtwVelocities / factorVelocities;		
+			
+		DtwScoreToRemove = CheckValues(0.1, 0.7, 2, dtwScore, false);
+		
+//		scoreToRemove += CheckValues(0.03, 3, 6, DtwCoordinates, false);
+//		scoreToRemove += CheckValues(0.03, 0.04, 0.08, DtwNormalizedCoordinates, false);		
+//		scoreToRemove += CheckValues(0.03, 0.15, 0.2, DtwEvents, false);		
+//		scoreToRemove += CheckValues(0.03, 0.02, 0.03, DtwVelocities, false);		
+//		scoreToRemove += CheckValues(0.03, 0.0007, 0.008, DtwAccelerations, false);
+			
+		mCompareResult.Score -= DtwScoreToRemove;
+	}
+	
+	protected double CheckValues(double totalToRemove, double lowerBoundary, double upperBoundary, double value, boolean isHigherBetter) {
+		if(!isHigherBetter) {
+			value = -1 * value;
+			double tempValue = upperBoundary;
+			
+			upperBoundary = -1 * lowerBoundary;
+			lowerBoundary = -1 * tempValue;
+		}
+		
+		double scoreToRemove = 0;
+		if(value < upperBoundary) {
+			scoreToRemove = totalToRemove;
+			if(value > lowerBoundary) {
+				double diff = upperBoundary - value;
+				double propScore = diff / (upperBoundary - lowerBoundary);
+				scoreToRemove = scoreToRemove * propScore;
+			}			
+		}
+		
+		return scoreToRemove;
+	}
 	
 	protected void CompareStrokeDistances() {				
 		StrokeDistanceTotalScoreStartToStart = 1;
@@ -246,9 +303,12 @@ public class StrokeComparer {
 		if(mCompareResult.Score < 0) {
 			mCompareResult.Score = 0;
 		}
+		if(mCompareResult.Score > 1) {
+			mCompareResult.Score = 1;
+		}
 	}
 
-	private void CreateSpatialVectors() {
+	private void CreateSpatialVectorsForDtwAnalysis() {
 		VectorSpatialVelocityDistanceAuth = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeAuthExtended);
 		VectorSpatialVelocityDistanceStored = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeStoredExtended);
 		
@@ -295,14 +355,7 @@ public class StrokeComparer {
 		VectorSpatialDeltaTetaTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.DELTA_TETA, mStrokeStoredExtended);
 		
 		VectorSpatialAccumNormAreaTimeAuth = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA, mStrokeAuthExtended);
-		VectorSpatialAccumNormAreaTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA, mStrokeStoredExtended);
-		
-		
-		
-		
-		
-		VectorSpatialVelocityDistanceAuth = GetSpatialVector(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeAuthExtended.ListEventsSpatialByDistanceExtended);
-		VectorSpatialVelocityTimeAuth = GetSpatialVector(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeAuthExtended.ListEventsSpatialByTimeExtended);				
+		VectorSpatialAccumNormAreaTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA, mStrokeStoredExtended);					
 	}
 	
 	private ArrayList<IDTWObj> CreateDistanceSpatialVectorsByParamName(String paramName, StrokeExtended stroke) {
@@ -572,36 +625,63 @@ public class StrokeComparer {
 	
 	protected void CompareStrokeAreas()
 	{
-		double areaStored = mStrokeStoredExtended.ShapeDataObj.ShapeArea;
 		double areaAuth = mStrokeAuthExtended.ShapeDataObj.ShapeArea;
-		
-		double finalScore = mUtilsComparison.CompareNumericalValues(areaStored, areaAuth, 0.65);
-		AddDoubleParameter(ConstsParamNames.Stroke.STROKE_AREA, finalScore, ConstsParamWeights.HIGH, areaStored);
-
-		areaStored = mStrokeStoredExtended.ShapeDataObj.ShapeAreaMinXMinY;
-		areaAuth = mStrokeAuthExtended.ShapeDataObj.ShapeAreaMinXMinY;
-		
-		finalScore = mUtilsComparison.CompareNumericalValues(areaStored, areaAuth, 0.65);
-		AddDoubleParameter(ConstsParamNames.Stroke.STROKE_AREA_MINX_MINY, finalScore, ConstsParamWeights.HIGH, areaStored);
+		double areaAuthMinXMinY = mStrokeAuthExtended.ShapeDataObj.ShapeAreaMinXMinY;
+				
+		CompareParameter(ConstsParamNames.Stroke.STROKE_TOTAL_AREA, areaAuth);
+		CompareParameter(ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY, areaAuthMinXMinY);		
 	}	
+	
+	protected void CompareNumEvents()
+	{		
+		double numEventsAuth = mStrokeAuthExtended.ListEventsExtended.size();
+		CompareParameter(ConstsParamNames.Stroke.STROKE_NUM_EVENTS, numEventsAuth);
+	}
 	
 	protected void CompareTimeInterval()
 	{
-		double timeIntervalStored = mStrokeStoredExtended.StrokeTimeInterval;
 		double timeIntervalAuth = mStrokeAuthExtended.StrokeTimeInterval;
-		
-		double finalScore = mUtilsComparison.CompareNumericalValues(timeIntervalStored, timeIntervalAuth, 0.75);		
-		AddDoubleParameter(ConstsParamNames.Stroke.TIME_INTERVAL, finalScore, ConstsParamWeights.MEDIUM, timeIntervalAuth);		
+		CompareParameter(ConstsParamNames.Stroke.STROKE_TIME_INTERVAL, timeIntervalAuth);
 	}
 	
-	protected void CompareAvgVelocity()
+	protected void CompareLengths()
 	{
-		double avgVelocityStored = mStrokeStoredExtended.AverageVelocity;
-		double avgVelocityAuth = mStrokeAuthExtended.AverageVelocity;
+		double lengthAuth = mStrokeAuthExtended.StrokePropertiesObj.LengthMM;
+		CompareParameter(ConstsParamNames.Stroke.STROKE_LENGTH, lengthAuth);
+	}
+	
+	protected void CompareAccelerations() {
+		double avgAccelerationAuth = mStrokeAuthExtended.StrokeAverageAcceleration;
+		double maxAccelerationAuth = mStrokeAuthExtended.StrokeMaxAcceleration;
 		
-		//double finalScore = mStatEngine.CompareStrokeDoubleValues(mStrokeStoredExtended.GetInstruction(), ConstsParamNames.Stroke.AVERAGE_VELOCITY, mStrokeStoredExtended.GetStrokeIdx(), avgVelocityStored, avgVelocityAuth);
-		double finalScore = mUtilsComparison.CompareNumericalValues(avgVelocityStored, avgVelocityAuth, 0.75);
-		AddDoubleParameter(ConstsParamNames.Stroke.AVERAGE_VELOCITY, finalScore, ConstsParamWeights.MEDIUM, avgVelocityAuth);
+//		CompareParameter(ConstsParamNames.Stroke.STROKE_AVERAGE_ACCELERATION, avgAccelerationAuth);
+		CompareParameter(ConstsParamNames.Stroke.STROKE_MAX_ACCELERATION, maxAccelerationAuth);
+	}
+	
+	protected void CompareStrokeTransitionTimes() {
+		if(mStrokeAuthExtended.GetStrokeIdx() > 0) {
+			double transitionTimeAuth = mStrokeAuthExtended.StrokeTransitionTime;		
+			CompareParameter(ConstsParamNames.Stroke.STROKE_TRANSITION_TIME, transitionTimeAuth);	
+		}
+	}
+	
+	protected void ComparePressureAndSurface() {
+		double middlePressureAuth = mStrokeAuthExtended.MiddlePressure;
+		double middleSurfaceAuth = mStrokeAuthExtended.MiddleSurface;
+		
+		CompareParameter(ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE, middlePressureAuth);
+		CompareParameter(ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE, middleSurfaceAuth);		
+	}
+	
+	protected void CompareVelocities()
+	{
+		double avgVelocityAuth = mStrokeAuthExtended.StrokeAverageVelocity;
+		double maxVelocityAuth = mStrokeAuthExtended.StrokeMaxVelocity;
+		double midVelocityAuth = mStrokeAuthExtended.StrokeMidVelocity;
+		
+		CompareParameter(ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY, avgVelocityAuth);
+		CompareParameter(ConstsParamNames.Stroke.STROKE_MAX_VELOCITY, maxVelocityAuth);
+		CompareParameter(ConstsParamNames.Stroke.STROKE_MID_VELOCITY, midVelocityAuth);		
 	}
 	
 	protected void CalculateFinalScore()
@@ -614,6 +694,9 @@ public class StrokeComparer {
 		}
 		
 		mCompareResult.Score = avgScore / totalWeights;
+		
+		StrokeSpatialScore = StrokeSpatialScore + 0.15;
+		mCompareResult.Score = (mCompareResult.Score + StrokeSpatialScore) / 2;
 		
 		double strokeDistance = StrokeDistanceTotalScore + 0.3;
 		if(strokeDistance > 1) {
@@ -646,10 +729,6 @@ public class StrokeComparer {
 			score = 1;
 		}
 		
-		ICompareResult compareResult = 
-				(ICompareResult) new CompareResultParamVectors(ConstsParamNames.Stroke.MINIMUM_COSINE_DISTANCE, score, ConstsParamWeights.MEDIUM, minimumCosineDistanceScore, vectorStored, vectorAuth);
-		mCompareResult.ListCompareResults.add(compareResult);
-		
 		mMinCosineDistanceScore = minimumCosineDistanceScore;
 	}
 	/****************************/
@@ -677,15 +756,39 @@ public class StrokeComparer {
 	{
 		return mIsStrokesIdentical;
 	}
+
+	protected void CompareParameter(String paramName, double authValue) {
+		IStatEngineResult result = 
+				mStatEngine.CompareStrokeDoubleValues(mStrokeAuthExtended.GetInstruction(), paramName, mStrokeAuthExtended.GetStrokeIdx(), authValue, mStrokeStoredExtended.GetFeatureMeansHash());
+		
+		double finalScore = result.GetScore();
+		AddDoubleParameter(paramName, finalScore, result.GetZScore(), authValue);		
+	}
 	
 	protected void AddDoubleParameter(String parameterName, double score, double weight, double originalValue)
 	{	
 		double mean = 0;
 		double internalSd = 0;
 		double popSd = 0;
+		double popMean = 0;
+		double internalSdUserOnly = 0;
+		
+		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(mStrokeStoredExtended.GetInstruction(), parameterName, mStrokeStoredExtended.GetStrokeIdx());
+		
+		HashMap<String, IFeatureMeanData> hashFeatureMeans = mStrokeStoredExtended.GetFeatureMeansHash(); 
+		
+		if(hashFeatureMeans.containsKey(key)) {
+			mean = hashFeatureMeans.get(key).GetMean();
+			
+			INormData normData = NormMgr.GetInstance().GetNormDataByParamName(parameterName, mStrokeStoredExtended.GetInstruction(), mStrokeStoredExtended.GetStrokeIdx());
+			internalSd = normData.GetInternalStandardDev();
+			popSd = normData.GetStandardDev();
+			popMean = normData.GetMean();
+			internalSdUserOnly = hashFeatureMeans.get(key).GetInternalSd();
+		}
 		
 		ICompareResult compareResult = 
-				(ICompareResult) new CompareResultGeneric(parameterName, score, weight, originalValue, mean, popSd, internalSd);
+				(ICompareResult) new CompareResultGeneric(parameterName, score, originalValue, mean, popMean ,popSd, internalSd, internalSdUserOnly);
 		mCompareResult.ListCompareResults.add(compareResult);
 	}
 	/****************************/

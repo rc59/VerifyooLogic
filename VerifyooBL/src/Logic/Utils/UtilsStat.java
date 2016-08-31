@@ -1,24 +1,83 @@
 package Logic.Utils;
 
-public class UtilsStat {
+import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
 
-	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean) {
+public class UtilsStat {
+	public double CalculateScore1(double authValue, double populationMean, double populationSd, double internalMean, double internalSd) {
+		double boundary = internalMean * 0.2;
 		
-		double distanceFromInternalMean = Math.abs(internalMean - authValue);
+		double lowerBound = internalMean - boundary;
+		double upperBound = internalMean + boundary;
 		
-		double authValueLower = internalMean - distanceFromInternalMean;
-		double authValueUpper = internalMean + distanceFromInternalMean;
+		double score;
+		if((authValue > lowerBound) && (authValue < upperBound)) {
+			score = 1;
+		}
+		else {
+			score = 0;
+		}
 		
-		double zLower = CalculateZScore(authValueLower, populationMean, populationSd);
-		double zUpper = CalculateZScore(authValueUpper, populationMean, populationSd);
-		
-		double probZLower = ConvertZToProbability(zLower);
-		double probZUpper = ConvertZToProbability(zUpper);
-		
-		double score = 1 - Math.abs(probZUpper - probZLower);		
 		return score;
 	}
 	
+	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd) {
+		double boundary = internalMean * 0.15;
+		
+		double zScore = (internalMean - populationMean) / populationSd;
+		double weight = Math.abs(zScore);
+		if(weight > 2) {
+			weight = 2;
+		}
+		
+		double uniquenessFactor = 1;
+		
+		double twoUpperPopulationInternalSD = (internalMean + boundary * uniquenessFactor);
+		double twoLowerPopulationInternalSD = (internalMean - boundary * uniquenessFactor);
+		
+		double threeUpperPopulationInternalSD = (internalMean + 2 * boundary * uniquenessFactor);
+		double threeLowerPopulationInternalSD = (internalMean - 2 * boundary * uniquenessFactor);
+		double score;
+		if((authValue > twoLowerPopulationInternalSD) && (authValue < twoUpperPopulationInternalSD)) {
+			score = 1;
+		}
+		else {
+			if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)) {
+				if(authValue > twoLowerPopulationInternalSD) {
+					double u = Math.abs(threeUpperPopulationInternalSD - authValue);
+					double d = Math.abs(threeUpperPopulationInternalSD - twoUpperPopulationInternalSD);
+					
+					score = u/d;
+				}
+				else {
+					double u = Math.abs(threeLowerPopulationInternalSD - authValue);
+					double d = Math.abs(threeLowerPopulationInternalSD - twoLowerPopulationInternalSD);
+					
+					score = u/d;
+				}
+			}
+			else {
+				score = 0;
+			}
+		}
+		
+		return score;
+	}		
+	
+	public double CalcWeight(double internalMean, double internalSd, double popMean, double popSd) {
+		double lowerBound = internalMean - internalSd;
+		double upperBound = internalMean + internalSd;
+		
+		double lowerBoundZ = CalculateZScore(lowerBound, popMean, popSd);
+		double upperBoundZ = CalculateZScore(upperBound, internalMean, internalSd);
+		
+		double lowerBoundProb = ConvertZToProbabilityCheckNegative(lowerBoundZ);
+		double upperBoundProb = ConvertZToProbabilityCheckNegative(upperBoundZ);
+		
+		double weight = 1 - Math.abs(upperBoundProb - lowerBoundProb);
+		
+		return weight;
+	}
+		
 	protected double CalculateProbability(double authValue, double internalMean, double internalSd, boolean isAbs) {
 		double zScore = CalculateZScore(authValue, internalMean, internalSd);
 		if(isAbs) {
@@ -28,9 +87,18 @@ public class UtilsStat {
 		return probability;
 	}
 
-	protected double CalculateZScore(double authValue, double internalMean, double internalSd) {
-		double zScore = (authValue - internalMean) / internalSd;
+	protected double CalculateZScore(double value, double mean, double std) {
+		double zScore = (value - mean) / std;
 		return zScore;
+	}
+	
+	public double ConvertZToProbabilityCheckNegative(double z) {
+		double prob = ConvertZToProbability(z);
+		if(z < 0) {
+			prob = 1 - prob;
+		}
+		
+		return prob;
 	}
 	
 	public double ConvertZToProbability(double z) {
