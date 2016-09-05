@@ -92,7 +92,6 @@ public class StatEngine implements IStatEngine {
 		
 		double internalMean = hashFeatureMeans.get(key).GetMean();
 		double internalSd = normObj.GetInternalStandardDev();
-		double internalSdUserOnly = hashFeatureMeans.get(key).GetInternalSd();			
 		
 		double zScore = (internalMean - popMean) / popSd;
 		double weight = Math.abs(zScore);
@@ -164,37 +163,17 @@ public class StatEngine implements IStatEngine {
 		
 		NormMgr normMgr = (NormMgr) NormMgr.GetInstance();
 		
-		double totalValues = 0;
-		double tempValue;
-		double tempValuePercentage;
+		double tempValue;		
 		
 		double popMean = 0;
 		double popSd = 0;
 		double internalSd = 0;
 		
-		double[] percentages = new double[Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE];
-		double[] scores = new double[Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE];
-		double[] listWeights = new double[Consts.ConstsGeneral.SPATIAL_SAMPLING_SIZE];
-		
-		double weights = 0;
-		double currWeight;
-		
 		double valueAuth, valueStored;
 		
 		ArrayList<IStatEngineResult> listResults = new ArrayList<>();
-		ArrayList<ArrayList<IStatEngineResult>> listAllResults = new ArrayList<>();
-		
-		int popCount = 0;
-		int internalCount = 0;
-		
-		double zScore;
 		int idxSpatial;
-		
-		double scoreMax = Double.MIN_VALUE;
-		double scoreTemp;
-		int scoreMaxIdx = 0;
-		ArrayList<Double> listTempScores = new ArrayList<>();		
-		
+			
 		ArrayList<MotionEventExtended> listAuth = new ArrayList<>();
 		for(int idx = 0; idx < listAuthOriginal.size(); idx++) {
 			listAuth.add(listAuthOriginal.get(idx).Clone());
@@ -212,19 +191,7 @@ public class StatEngine implements IStatEngine {
 				listAuth.remove(listAuth.size() - 1);
 				listMean.remove(0);
 			}
-		}
-		
-		double[] vectorAuthX = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(listAuth);
-		double[] vectorAuthY = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(listAuth);
-				
-		double[] vectorMeanX = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(listMean);
-		double[] vectorMeanY = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(listMean);		
-				
-		double[] vectorAuthVel = Utils.GetInstance().GetUtilsVectors().GetVectorVel(listAuth);
-		double[] vectorMeanVel = Utils.GetInstance().GetUtilsVectors().GetVectorVel(listMean);
-		
-		double currentMaxScore = Double.MIN_VALUE;
-		double currentScore;
+		}		
 		
 		for(int idxEvent = 1; idxEvent < listMean.size(); idxEvent++) {		
 			idxSpatial = idxEvent;													
@@ -247,29 +214,11 @@ public class StatEngine implements IStatEngine {
 			tempValue = Utils.GetInstance().GetUtilsStat().CalculateScoreSpatial(valueAuth, popMean, popSd, valueStored, internalSd);
 			
 			listResults.add(new StatEngineResult(tempValue, 1, 1));
-		}		
-			
-		
-		scoreTemp = Utils.GetInstance().GetUtilsComparison().GetTotalSpatialScore(listResults);	
+		}
 		
 		return listResults;
 	}	
 
-	private double GetDistance(MotionEventExtended event1, MotionEventExtended event2) {
-		UtilsMath utilsMath = new UtilsMath();
-		
-		double totalScore = 0;
-		
-		totalScore += utilsMath.GetPercentageDiff(event1.Velocity, event2.Velocity);
-		totalScore += utilsMath.GetPercentageDiff(event1.Pressure, event2.Pressure);
-		totalScore += utilsMath.GetPercentageDiff(event1.TouchSurface, event2.TouchSurface);
-		totalScore += utilsMath.GetPercentageDiff(event1.Acceleration, event2.Acceleration);
-//		totalScore += utilsMath.GetPercentageDiff(event1.Xnormalized, event2.Xnormalized);
-//		totalScore += utilsMath.GetPercentageDiff(event1.Ynormalized, event2.Ynormalized);		
-		
-		return totalScore / 4;
-	}	
-	
 	public double GetScoreSpatial(double popMean, double popSd, double internalSd, double authValue, double storedValue) {
 		double populationMean = popMean;
 		double populationSd = popSd;
@@ -277,8 +226,7 @@ public class StatEngine implements IStatEngine {
 		
 		double internalMean = storedValue;		
 		
-		double zScoreForUser = (internalMean - populationMean) / populationSd;
-		IStatEngineResult statResult;
+		double zScoreForUser = (internalMean - populationMean) / populationSd;		
 
 		//contribution of user uniqueness 
 		double uniquenessFactor = 0.4 * Math.abs(zScoreForUser);
@@ -330,8 +278,7 @@ public class StatEngine implements IStatEngine {
 		double internalMean = storedValue;		
 		
 		double zScoreForUser = (internalMean - populationMean) / populationSd;
-		IStatEngineResult statResult;
-
+		
 		//contribution of user uniqueness 
 		double uniquenessFactor = 0.4 * Math.abs(zScoreForUser) + 1;
 		
@@ -340,9 +287,7 @@ public class StatEngine implements IStatEngine {
 		}
 				
 		double twoUpperPopulationInternalSD = (internalMean + populationInternalSd * uniquenessFactor);
-		double twoLowerPopulationInternalSD = (internalMean - populationInternalSd * uniquenessFactor);
-		
-		double pUser;
+		double twoLowerPopulationInternalSD = (internalMean - populationInternalSd * uniquenessFactor);		
 		
 		double threeUpperPopulationInternalSD = (internalMean + 1.5 * populationInternalSd * uniquenessFactor);
 		double threeLowerPopulationInternalSD = (internalMean - 1.5 * populationInternalSd * uniquenessFactor);		

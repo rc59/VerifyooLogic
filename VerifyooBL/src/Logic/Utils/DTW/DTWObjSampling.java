@@ -36,7 +36,7 @@ public class DTWObjSampling implements IDTWObj {
 	
 	public String GetParamName() {
 		return mParam;
-	}	
+	}
 	
 	public double CompareTo(IDTWObj obj) {		
 		DTWObjSampling authObj = (DTWObjSampling)obj;

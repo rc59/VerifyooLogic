@@ -193,8 +193,7 @@ public class StrokeComparer {
 				CompareVelocities();
 				ComparePressureAndSurface();
 				CompareStrokeTransitionTimes();
-				CompareAccelerations();
-				CompareVectors();				
+				CompareAccelerations();						
 				CalculateFinalScore();	
 				CheckFinalScore();
 			}
@@ -429,61 +428,7 @@ public class StrokeComparer {
 	private ArrayList<IDTWObj> GetSpatialVector(String parameter, ArrayList<MotionEventExtended> listEvents) {
 		ArrayList<IDTWObj> vector = mStatEngine.GetSpatialVector(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), listEvents, Consts.ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING); 				
 		return vector;
-	}	
-	
-	private void CompareVectors() {
-//		double[] vectorStoredVelocitiesDistance = Utils.GetInstance().GetUtilsVectors().GetVectorVel(mStrokeStoredExtended.ListEventsSpatialByDistanceExtended);
-//		double[] vectorAuthVelocitiesDistance = Utils.GetInstance().GetUtilsVectors().GetVectorVel(mStrokeAuthExtended.ListEventsSpatialByDistanceExtended);
-//				
-//		double[] vectorStoredVelocitiesTime = Utils.GetInstance().GetUtilsVectors().GetVectorVel(mStrokeStoredExtended.ListEventsSpatialByTimeExtended);
-//		double[] vectorAuthVelocitiesTime = Utils.GetInstance().GetUtilsVectors().GetVectorVel(mStrokeAuthExtended.ListEventsSpatialByTimeExtended);
-		
-		
-		
-		
-		
-//		double[] vectorStoredVelocities = new double[mStrokeStoredExtended.ListEventsExtended.size()];
-//		double[] vectorAuthVelocities = new double[mStrokeAuthExtended.ListEventsExtended.size()];
-//		
-//		
-//		double[] vectorStoredAcceleration = new double[mStrokeStoredExtended.ListEventsExtended.size()];
-//		double[] vectorAuthAcceleration = new double[mStrokeStoredExtended.ListEventsExtended.size()];
-//		
-//		double[] vectorStoredPressure = new double[mStrokeStoredExtended.ListEventsExtended.size()];
-//		double[] vectorAuthPressure = new double[mStrokeStoredExtended.ListEventsExtended.size()];
-//		
-//		double[] vectorStoredSurface = new double[mStrokeStoredExtended.ListEventsExtended.size()];
-//		double[] vectorAuthSurface = new double[mStrokeStoredExtended.ListEventsExtended.size()];
-//				
-//		double[] vectorStoredVelocitiesX = new double[mStrokeStoredExtended.ListEventsExtended.size()];
-//		double[] vectorAuthVelocitiesX = new double[mStrokeStoredExtended.ListEventsExtended.size()];
-//		
-//		double[] vectorStoredVelocitiesY = new double[mStrokeStoredExtended.ListEventsExtended.size()];
-//		double[] vectorAuthVelocitiesY = new double[mStrokeStoredExtended.ListEventsExtended.size()];		
-//				
-//		for(int idx = 0; idx < mStrokeStoredExtended.ListEventsExtended.size(); idx++) {
-//			vectorStoredVelocities[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).Velocity;
-//			vectorAuthVelocities[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).Velocity;
-//						
-//			vectorStoredAcceleration[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).Acceleration;
-//			vectorAuthAcceleration[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).Acceleration;
-//			
-//			vectorStoredPressure[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).Pressure;
-//			vectorAuthPressure[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).Pressure;
-//			
-//			vectorStoredSurface[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).TouchSurface;
-//			vectorAuthSurface[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).TouchSurface;
-//			
-//			vectorStoredVelocitiesX[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).VelocityX;
-//			vectorAuthVelocitiesX[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).VelocityX;
-//			
-//			vectorStoredVelocitiesY[idx] = mStrokeStoredExtended.ListEventsExtended.get(idx).VelocityY;
-//			vectorAuthVelocitiesY[idx] = mStrokeAuthExtended.ListEventsExtended.get(idx).VelocityY;
-//		}
-		
-		double x = 1;
-		x++;
-	}	
+	}		
 	
 	protected double GetSpatialDtwScore(ArrayList<IDTWObj> vectorAuth, ArrayList<IDTWObj> vectorStored) {
 		UtilsDTW tempDtw = new UtilsDTW(vectorAuth, vectorStored);
@@ -536,11 +481,9 @@ public class StrokeComparer {
 		CompareParameter(ConstsParamNames.Stroke.STROKE_LENGTH, lengthAuth);
 	}
 	
-	protected void CompareAccelerations() {
-		double avgAccelerationAuth = mStrokeAuthExtended.StrokeAverageAcceleration;
+	protected void CompareAccelerations() {		
 		double maxAccelerationAuth = mStrokeAuthExtended.StrokeMaxAcceleration;
 		
-//		CompareParameter(ConstsParamNames.Stroke.STROKE_AVERAGE_ACCELERATION, avgAccelerationAuth);
 		CompareParameter(ConstsParamNames.Stroke.STROKE_MAX_ACCELERATION, maxAccelerationAuth);
 	}
 	
