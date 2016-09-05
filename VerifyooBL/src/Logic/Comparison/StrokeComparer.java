@@ -288,24 +288,43 @@ public class StrokeComparer {
 	
 	private void CreateSpatialVectorsForDtwAnalysis() {		
 		DtwSpatialVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1);
-//		DtwSpatialTeta = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.TETA, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1.63);
-//		DtwSpatialRadialVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIAL_VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 3.88);		
-//		DtwSpatialAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.ACCELERATIONS, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 4.4);	
-//		DtwSpatialRadialAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIAL_ACCELERATION, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 3.72);
+		DtwSpatialRadialVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIAL_VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 3.9);
+//		DtwSpatialTeta = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.TETA, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1);			
+//		DtwSpatialAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.ACCELERATIONS, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1);	
+//		DtwSpatialRadialAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIAL_ACCELERATION, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1);
 //		DtwSpatialRadius = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIUS, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING , 1);		
-//		DtwSpatialDeltaTeta = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.DELTA_TETA, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1.9);
+//		DtwSpatialDeltaTeta = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.DELTA_TETA, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1);
 //		DtwSpatialAccumNormArea = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.ACCUMULATED_NORM_AREA, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1);		
-		
-		DtwSpatialTotalScore = DtwSpatialVelocity;
-		
+				
+		DtwTemporalAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.ACCELERATIONS, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 4.2);		
 //		DtwTemporalVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
-//		DtwTemporalAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.ACCELERATIONS, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
 //		DtwTemporalRadialVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIAL_VELOCITIES, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
 //		DtwTemporalRadialAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIAL_ACCELERATION, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
 //		DtwTemporalRadius = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIUS, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
 //		DtwTemporalTeta = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.TETA, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
 //		DtwTemporalDeltaTeta = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.DELTA_TETA, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
 //		DtwTemporalAccumNormArea = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.ACCUMULATED_NORM_AREA, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
+		
+		ArrayList<Double> listScores = new ArrayList<>();
+		listScores.add(DtwSpatialVelocity);
+		listScores.add(DtwSpatialRadialVelocity);
+		listScores.add(DtwTemporalAcceleration);
+		
+		Collections.sort(listScores, new Comparator<Double>() {
+            public int compare(Double score1, Double score2) {
+                if (score1 > score2) {
+                    return 1;
+                }
+                if (score1 < score2) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+		
+		listScores.remove(0);
+				
+		DtwSpatialTotalScore = (listScores.get(0) + listScores.get(1)) / 2;
 	}
 	
 	private ArrayList<IDTWObj> CreateSpatialVectorsByParamName(String paramName, StrokeExtended stroke) {

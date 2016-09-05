@@ -773,10 +773,10 @@ public class GestureComparer {
 			
 			double totalScores = 0;
 			double totalWeights = 0;
-			
+
 			for(int idx = 0; idx < listScores.size(); idx++) {
 				totalScores += listScores.get(idx).GetValue();
-				totalWeights += listScores.get(idx).GetWeight();
+				totalWeights += listScores.get(idx).GetWeight();				
 			}
 			
 			double numStrokes = mListStrokeComparers.size();
@@ -786,8 +786,8 @@ public class GestureComparer {
 			
 			dtwScore = dtwScore / numStrokes;
 			
-			mCompareResultsGesture.Score = ((totalScores / totalWeights) + dtwScore) / 2;
-//			mCompareResultsGesture.Score = totalScores / totalWeights;
+			double paramsTotalScore = 2 * totalScores / totalWeights;
+			mCompareResultsGesture.Score = (paramsTotalScore + dtwScore) / 3;
 						
 			double removeMiddlePressureScore = (1 - avgSurfaceScore * avgSurfaceScore) / 5;
 			mCompareResultsGesture.Score -= removeMiddlePressureScore;

@@ -18,6 +18,12 @@ public class UtilsGeneral {
 		return key;
 	}
 	
+	public String GenerateStrokeSamplingFeatureMeanKey(String instruction, String paramName, String samplingType, int strokeIdx)
+	{
+		String key = String.format("%s-%s-%s-%s", instruction, String.valueOf(strokeIdx) , paramName, samplingType);
+		return key;
+	}
+	
 	public String GenerateContainerKeySafe(String instruction, int idxStroke, HashMap hashNorms) {
 		String key = GenerateContainerKey(instruction, idxStroke);
 		boolean strokeWasFound = false;
