@@ -16,6 +16,7 @@ import Data.Comparison.Interfaces.ICompareResult;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Extended.StrokeExtended;
 import Data.UserProfile.Raw.Stroke;
+import Logic.Comparison.Stats.FeatureMeanDataListEvents;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
@@ -59,22 +60,26 @@ public class StrokeComparer {
 	public double DtwEvents;
 	public double DtwVelocities;
 	public double DtwAccelerations;	
-	public double DtwSpatialVelocityDistance;
-	public double DtwSpatialAccelerationDistance;
-	public double DtwSpatialRadialVelocityDistance;
-	public double DtwSpatialRadialAccelerationDistance;
-	public double DtwSpatialRadiusDistance;
-	public double DtwSpatialTetaDistance;
-	public double DtwSpatialDeltaTetaDistance;
-	public double DtwSpatialAccumNormAreaDistance;
-	public double DtwSpatialVelocityTime;
-	public double DtwSpatialAccelerationTime;
-	public double DtwSpatialRadialVelocityTime;
-	public double DtwSpatialRadialAccelerationTime;
-	public double DtwSpatialRadiusTime;
-	public double DtwSpatialTetaTime;
-	public double DtwSpatialDeltaTetaTime;
-	public double DtwSpatialAccumNormAreaTime;
+	
+	public double DtwSpatialTotalScore;
+	
+	public double DtwSpatialVelocity;
+	public double DtwSpatialAcceleration;
+	public double DtwSpatialRadialVelocity;
+	public double DtwSpatialRadialAcceleration;
+	public double DtwSpatialRadius;
+	public double DtwSpatialTeta;
+	public double DtwSpatialDeltaTeta;
+	public double DtwSpatialAccumNormArea;
+	
+	public double DtwTemporalVelocity;
+	public double DtwTemporalAcceleration;
+	public double DtwTemporalRadialVelocity;
+	public double DtwTemporalRadialAcceleration;
+	public double DtwTemporalRadius;
+	public double DtwTemporalTeta;
+	public double DtwTemporalDeltaTeta;
+	public double DtwTemporalAccumNormArea;
 	
 	public double StrokeDistanceTotalScoreStartToStart;
 	public double StrokeDistanceTotalScoreStartToEnd;
@@ -83,77 +88,28 @@ public class StrokeComparer {
 	
 	public double StrokeDistanceTotalScore;
 	
-	/*********************************** Spatial Vector Distance ***********************************/
-	
-	public ArrayList<IDTWObj> VectorSpatialVelocityDistanceAuth;	
-	public ArrayList<IDTWObj> VectorSpatialVelocityDistanceStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialAccelerationDistanceAuth;	
-	public ArrayList<IDTWObj> VectorSpatialAccelerationDistanceStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialRadialVelocityDistanceAuth;	
-	public ArrayList<IDTWObj> VectorSpatialRadialVelocityDistanceStored;	
-	
-	public ArrayList<IDTWObj> VectorSpatialRadialAccelerationDistanceAuth;	
-	public ArrayList<IDTWObj> VectorSpatialRadialAccelerationDistanceStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialRadiusDistanceAuth;	
-	public ArrayList<IDTWObj> VectorSpatialRadiusDistanceStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialTetaDistanceAuth;	
-	public ArrayList<IDTWObj> VectorSpatialTetaDistanceStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialDeltaTetaDistanceAuth;	
-	public ArrayList<IDTWObj> VectorSpatialDeltaTetaDistanceStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialAccumNormAreaDistanceAuth;	
-	public ArrayList<IDTWObj> VectorSpatialAccumNormAreaDistanceStored;
-	
-	/*********************************** Spatial Vector Time ***********************************/	
-	
-	public ArrayList<IDTWObj> VectorSpatialVelocityTimeAuth;	
-	public ArrayList<IDTWObj> VectorSpatialVelocityTimeStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialAccelerationTimeAuth;	
-	public ArrayList<IDTWObj> VectorSpatialAccelerationTimeStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialRadialVelocityTimeAuth;	
-	public ArrayList<IDTWObj> VectorSpatialRadialVelocityTimeStored;	
-	
-	public ArrayList<IDTWObj> VectorSpatialRadialAccelerationTimeAuth;	
-	public ArrayList<IDTWObj> VectorSpatialRadialAccelerationTimeStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialRadiusTimeAuth;	
-	public ArrayList<IDTWObj> VectorSpatialRadiusTimeStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialTetaTimeAuth;	
-	public ArrayList<IDTWObj> VectorSpatialTetaTimeStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialDeltaTetaTimeAuth;	
-	public ArrayList<IDTWObj> VectorSpatialDeltaTetaTimeStored;
-	
-	public ArrayList<IDTWObj> VectorSpatialAccumNormAreaTimeAuth;	
-	public ArrayList<IDTWObj> VectorSpatialAccumNormAreaTimeStored;
-	
 	/*********************************** Spatial Scores ***********************************/
 	
-	public double SpatialScoreDistanceVelocity;
-	public double SpatialScoreDistanceAcceleration;
-	public double SpatialScoreDistanceRadialVelocity;
-	public double SpatialScoreDistanceRadialAcceleration;
-	public double SpatialScoreDistanceRadius;
-	public double SpatialScoreDistanceTeta;
-	public double SpatialScoreDistanceDeltaTeta;
-	public double SpatialScoreDistanceAccumulatedNormArea;
+	public double SpatialScoreVelocity;
+	public double SpatialScoreAcceleration;
+	public double SpatialScoreRadialVelocity;
+	public double SpatialScoreRadialAcceleration;
+	public double SpatialScoreRadius;
+	public double SpatialScoreTeta;
+	public double SpatialScoreDeltaTeta;
+	public double SpatialScoreAccumulatedNormArea;
 	
-	public double SpatialScoreTimeVelocity;
-	public double SpatialScoreTimeAcceleration;
-	public double SpatialScoreTimeRadialVelocity;	
-	public double SpatialScoreTimeRadialAcceleration;
-	public double SpatialScoreTimeRadius;
-	public double SpatialScoreTimeTeta;
-	public double SpatialScoreTimeDeltaTeta;
-	public double SpatialScoreTimeAccumulatedNormArea;
+	public double TemporalScoreVelocity;
+	public double TemporalScoreAcceleration;
+	public double TemporalScoreRadialVelocity;	
+	public double TemporalScoreRadialAcceleration;
+	public double TemporalScoreRadius;
+	public double TemporalScoreTeta;
+	public double TemporalScoreDeltaTeta;
+	public double TemporalScoreAccumulatedNormArea;
+	
+	public double MiddlePressureScore;
+	public double MiddleSurfaceScore;
 	
 	public ArrayList<IStatEngineResult> mListSpatialScores;
 	public double StrokeSpatialScore;
@@ -192,6 +148,30 @@ public class StrokeComparer {
 		return pointStatus;
 	}
 	
+	public void CompareStrokeShapes(StrokeExtended strokeStored, StrokeExtended strokeAuth)	
+	{		
+		mStrokeStoredExtended = strokeStored;
+		mStrokeAuthExtended = strokeAuth;
+		PointStatus pointStatus= CheckPoints();
+		
+		if(pointStatus == PointStatus.NONE) {
+			mIsStrokesIdentical = true;			
+			
+			CheckIfStrokesAreIdentical();
+			
+			if(!mIsStrokesIdentical) {								
+				CompareMinCosineDistance();
+			}
+		}
+		
+		if(pointStatus == PointStatus.BOTH) {
+			mCompareResult.Score = 1;
+		}
+		if(pointStatus == PointStatus.ONE) {
+			mCompareResult.Score = 0;
+		}		
+	}	
+	
 	public void CompareStrokes(StrokeExtended strokeStored, StrokeExtended strokeAuth)	
 	{		
 		mStrokeStoredExtended = strokeStored;
@@ -205,7 +185,6 @@ public class StrokeComparer {
 			
 			if(!mIsStrokesIdentical) {				
 				CompareStrokeDistances();
-				CompareSpatial();
 				CreateSpatialVectorsForDtwAnalysis();
 				CompareMinCosineDistance();
 				CompareStrokeAreas();
@@ -215,10 +194,8 @@ public class StrokeComparer {
 				ComparePressureAndSurface();
 				CompareStrokeTransitionTimes();
 				CompareAccelerations();
-				CompareVectors();
-				//TimeWarp();
-				CalculateFinalScore();
-				//CheckDtw();		
+				CompareVectors();				
+				CalculateFinalScore();	
 				CheckFinalScore();
 			}
 		}
@@ -229,32 +206,7 @@ public class StrokeComparer {
 		if(pointStatus == PointStatus.ONE) {
 			mCompareResult.Score = 0;
 		}		
-	}		
-	
-	protected void CheckDtw() {
-		double scoreToRemove = 0;
-				
-		double factorVelocities = 0.03; 
-		double factorCoords = 5;
-		double factorEvents = 0.18;
-		double factorCoordsNorm = 0.06;
-		
-		double dtwScore = 0;
-		
-		dtwScore += DtwCoordinates / factorCoords;
-		dtwScore += DtwNormalizedCoordinates / factorCoordsNorm;
-		dtwScore += DtwVelocities / factorVelocities;		
-			
-		DtwScoreToRemove = CheckValues(0.1, 0.7, 2, dtwScore, false);
-		
-//		scoreToRemove += CheckValues(0.03, 3, 6, DtwCoordinates, false);
-//		scoreToRemove += CheckValues(0.03, 0.04, 0.08, DtwNormalizedCoordinates, false);		
-//		scoreToRemove += CheckValues(0.03, 0.15, 0.2, DtwEvents, false);		
-//		scoreToRemove += CheckValues(0.03, 0.02, 0.03, DtwVelocities, false);		
-//		scoreToRemove += CheckValues(0.03, 0.0007, 0.008, DtwAccelerations, false);
-			
-		mCompareResult.Score -= DtwScoreToRemove;
-	}
+	}			
 	
 	protected double CheckValues(double totalToRemove, double lowerBoundary, double upperBoundary, double value, boolean isHigherBetter) {
 		if(!isHigherBetter) {
@@ -308,102 +260,94 @@ public class StrokeComparer {
 		}
 	}
 
-	private void CreateSpatialVectorsForDtwAnalysis() {
-		VectorSpatialVelocityDistanceAuth = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeAuthExtended);
-		VectorSpatialVelocityDistanceStored = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeStoredExtended);
+	private double CalculateDtwForSamplingVector(String paramName, String samplingType, double factor) {		
+		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(mStrokeStoredExtended.GetInstruction(), samplingType, mStrokeStoredExtended.GetStrokeIdx());
+		FeatureMeanDataListEvents tempFeatureDtw = (FeatureMeanDataListEvents) mStrokeStoredExtended.GetFeatureMeansHash().get(key);
 		
-		VectorSpatialAccelerationDistanceAuth = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCELERATIONS, mStrokeAuthExtended);
-		VectorSpatialAccelerationDistanceStored = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCELERATIONS, mStrokeStoredExtended);
+		ArrayList<MotionEventExtended> tempListEvents = null;
+
+		switch(samplingType) {
+			case ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING:
+				tempListEvents = mStrokeAuthExtended.ListEventsSpatialExtended;
+					
+			break;
+			case ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING:
+				tempListEvents = mStrokeAuthExtended.ListEventsTemporalExtended;				
+			break;
+		}		
 		
-		VectorSpatialRadialVelocityDistanceAuth = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES, mStrokeAuthExtended);
-		VectorSpatialRadialVelocityDistanceStored = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES, mStrokeStoredExtended);
+		double minDistance = tempFeatureDtw.GetMinDtwDistance(tempListEvents, paramName);
 		
-		VectorSpatialRadialAccelerationDistanceAuth = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION, mStrokeAuthExtended);
-		VectorSpatialRadialAccelerationDistanceStored = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION, mStrokeStoredExtended);
+		double result = (1 - minDistance) * factor;
+		if(result > 1) {
+			result = 1;
+		}
 		
-		VectorSpatialRadiusDistanceAuth = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIUS, mStrokeAuthExtended);
-		VectorSpatialRadiusDistanceStored = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIUS, mStrokeStoredExtended);
-		
-		VectorSpatialTetaDistanceAuth = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.TETA, mStrokeAuthExtended);
-		VectorSpatialTetaDistanceStored = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.TETA, mStrokeStoredExtended);
-		
-		VectorSpatialDeltaTetaDistanceAuth = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.DELTA_TETA, mStrokeAuthExtended);
-		VectorSpatialDeltaTetaDistanceStored = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.DELTA_TETA, mStrokeStoredExtended);
-		
-		VectorSpatialAccumNormAreaDistanceAuth = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA, mStrokeAuthExtended);
-		VectorSpatialAccumNormAreaDistanceStored = CreateDistanceSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA, mStrokeStoredExtended);
-		
-		VectorSpatialVelocityTimeAuth = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeAuthExtended);
-		VectorSpatialVelocityTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeStoredExtended);
-		
-		VectorSpatialAccelerationTimeAuth = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCELERATIONS, mStrokeAuthExtended);
-		VectorSpatialAccelerationTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCELERATIONS, mStrokeStoredExtended);
-		
-		VectorSpatialRadialVelocityTimeAuth = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES, mStrokeAuthExtended);
-		VectorSpatialRadialVelocityTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES, mStrokeStoredExtended);
-		
-		VectorSpatialRadialAccelerationTimeAuth = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION, mStrokeAuthExtended);
-		VectorSpatialRadialAccelerationTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION, mStrokeStoredExtended);
-		
-		VectorSpatialRadiusTimeAuth = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIUS, mStrokeAuthExtended);
-		VectorSpatialRadiusTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.RADIUS, mStrokeStoredExtended);
-		
-		VectorSpatialTetaTimeAuth = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.TETA, mStrokeAuthExtended);
-		VectorSpatialTetaTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.TETA, mStrokeStoredExtended);
-		
-		VectorSpatialDeltaTetaTimeAuth = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.DELTA_TETA, mStrokeAuthExtended);
-		VectorSpatialDeltaTetaTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.DELTA_TETA, mStrokeStoredExtended);
-		
-		VectorSpatialAccumNormAreaTimeAuth = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA, mStrokeAuthExtended);
-		VectorSpatialAccumNormAreaTimeStored = CreateTimeSpatialVectorsByParamName(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA, mStrokeStoredExtended);					
+		return result;
 	}
 	
-	private ArrayList<IDTWObj> CreateDistanceSpatialVectorsByParamName(String paramName, StrokeExtended stroke) {
-		return GetSpatialVector(paramName, stroke.ListEventsSpatialByDistanceExtended);					
+	private void CreateSpatialVectorsForDtwAnalysis() {		
+		DtwSpatialVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1);
+//		DtwSpatialTeta = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.TETA, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1.63);
+//		DtwSpatialRadialVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIAL_VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 3.88);		
+//		DtwSpatialAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.ACCELERATIONS, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 4.4);	
+//		DtwSpatialRadialAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIAL_ACCELERATION, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 3.72);
+//		DtwSpatialRadius = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIUS, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING , 1);		
+//		DtwSpatialDeltaTeta = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.DELTA_TETA, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1.9);
+//		DtwSpatialAccumNormArea = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.ACCUMULATED_NORM_AREA, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1);		
+		
+		DtwSpatialTotalScore = DtwSpatialVelocity;
+		
+//		DtwTemporalVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
+//		DtwTemporalAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.ACCELERATIONS, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
+//		DtwTemporalRadialVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIAL_VELOCITIES, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
+//		DtwTemporalRadialAcceleration = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIAL_ACCELERATION, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
+//		DtwTemporalRadius = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.RADIUS, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
+//		DtwTemporalTeta = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.TETA, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
+//		DtwTemporalDeltaTeta = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.DELTA_TETA, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
+//		DtwTemporalAccumNormArea = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.ACCUMULATED_NORM_AREA, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, 1);
 	}
 	
-	private ArrayList<IDTWObj> CreateTimeSpatialVectorsByParamName(String paramName, StrokeExtended stroke) {
-		return GetSpatialVector(paramName, stroke.ListEventsSpatialByTimeExtended);					
+	private ArrayList<IDTWObj> CreateSpatialVectorsByParamName(String paramName, StrokeExtended stroke) {
+		return GetSpatialVector(paramName, stroke.ListEventsSpatialExtended);					
+	}
+	
+	private ArrayList<IDTWObj> CreateTemporalVectorsByParamName(String paramName, StrokeExtended stroke) {
+		return GetTemporalVector(paramName, stroke.ListEventsTemporalExtended);					
 	}
 	
 	private void CompareSpatial() {
 		
-//		double[] velocitiesAuthDistance = mUtilsVectors.GetVectorVel(mStrokeAuthExtended.ListEventsSpatialByDistanceExtended);
-//		double[] velocitiesStoredDistance = mUtilsVectors.GetVectorVel(mStrokeStoredExtended.ListEventsSpatialByDistanceExtended);
-//		
-//		double[] velocitiesAuthTime = mUtilsVectors.GetVectorVel(mStrokeAuthExtended.ListEventsSpatialByTimeExtended);
-//		double[] velocitiesStoredTime = mUtilsVectors.GetVectorVel(mStrokeStoredExtended.ListEventsSpatialByTimeExtended);
-//				
-//		Complex[] resultAuthDistance = FFT.fft(Utils.GetInstance().GetUtilsMath().ToComplex(velocitiesAuthDistance));
-//		Complex[] resultStoredDistance = FFT.fft(Utils.GetInstance().GetUtilsMath().ToComplex(velocitiesStoredDistance));
-//		
-//		FFTCheck(resultAuthDistance);
-//		FFTCheck(resultStoredDistance);
+			
+//		VectorSpatialVelocityDistanceStored = GetSpatialVector(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeStoredExtended.ListEventsSpatialExtended);
+//		VectorSpatialVelocityTimeStored = GetSpatialVector(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeStoredExtended.ListEventsTemporalExtended);
 		
-		VectorSpatialVelocityDistanceStored = GetSpatialVector(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeStoredExtended.ListEventsSpatialByDistanceExtended);
-		VectorSpatialVelocityTimeStored = GetSpatialVector(ConstsParamNames.StrokeSpatial.VELOCITIES, mStrokeStoredExtended.ListEventsSpatialByTimeExtended);
+		SpatialScoreVelocity = CalcSpatialParameter(ConstsParamNames.StrokeSampling.VELOCITIES);
+		SpatialScoreAcceleration = CalcSpatialParameter(ConstsParamNames.StrokeSampling.ACCELERATIONS);
 		
-		SpatialScoreDistanceVelocity = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.VELOCITIES);	
-		SpatialScoreDistanceAcceleration = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.ACCELERATIONS);
-		SpatialScoreDistanceRadialVelocity = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES);
+		SpatialScoreRadialVelocity = CalcSpatialParameter(ConstsParamNames.StrokeSampling.RADIAL_VELOCITIES);	
+		SpatialScoreRadialAcceleration = CalcSpatialParameter(ConstsParamNames.StrokeSampling.RADIAL_ACCELERATION);
+		SpatialScoreRadius = CalcSpatialParameter(ConstsParamNames.StrokeSampling.RADIUS);
 		
-		SpatialScoreDistanceRadialAcceleration = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION);
-		SpatialScoreDistanceRadius = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.RADIUS);
-		SpatialScoreDistanceTeta = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.TETA);
-		SpatialScoreDistanceDeltaTeta = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.DELTA_TETA);
-		SpatialScoreDistanceAccumulatedNormArea = CalcSpatialByParameterDistance(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA);
+		SpatialScoreTeta = CalcSpatialParameter(ConstsParamNames.StrokeSampling.TETA);
+		SpatialScoreDeltaTeta = CalcSpatialParameter(ConstsParamNames.StrokeSampling.DELTA_TETA);
 		
-		SpatialScoreTimeVelocity = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.VELOCITIES);
-		SpatialScoreTimeAcceleration = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.ACCELERATIONS);
-		SpatialScoreTimeRadialVelocity = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES);
-		
-		SpatialScoreTimeRadialAcceleration = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION);
-		SpatialScoreTimeRadius = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.RADIUS);
-		SpatialScoreTimeTeta = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.TETA);
-		SpatialScoreTimeDeltaTeta = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.DELTA_TETA);
-		SpatialScoreTimeAccumulatedNormArea = CalcSpatialByParameterTime(ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA);			
+		SpatialScoreAccumulatedNormArea = CalcSpatialParameter(ConstsParamNames.StrokeSampling.ACCUMULATED_NORM_AREA);
 				
-		StrokeSpatialScore = CalculateScoreFromList(mListSpatialScores);
+		TemporalScoreVelocity = CalcTemporalParameter(ConstsParamNames.StrokeSampling.VELOCITIES);
+		TemporalScoreAcceleration = CalcTemporalParameter(ConstsParamNames.StrokeSampling.ACCELERATIONS);
+	
+		TemporalScoreRadialVelocity = CalcTemporalParameter(ConstsParamNames.StrokeSampling.RADIAL_VELOCITIES);		
+		TemporalScoreRadialAcceleration = CalcTemporalParameter(ConstsParamNames.StrokeSampling.RADIAL_ACCELERATION);
+		
+		TemporalScoreRadius = CalcTemporalParameter(ConstsParamNames.StrokeSampling.RADIUS);
+		
+		TemporalScoreTeta = CalcTemporalParameter(ConstsParamNames.StrokeSampling.TETA);
+		TemporalScoreDeltaTeta = CalcTemporalParameter(ConstsParamNames.StrokeSampling.DELTA_TETA);
+		
+		TemporalScoreAccumulatedNormArea = CalcTemporalParameter(ConstsParamNames.StrokeSampling.ACCUMULATED_NORM_AREA);
+		
+ 		StrokeSpatialScore = (SpatialScoreRadius + TemporalScoreRadius + SpatialScoreAccumulatedNormArea + TemporalScoreAccumulatedNormArea) / 4; 		
 	}
 	
 	private void FFTCheck(Complex[] resultAuthDistance) {
@@ -437,26 +381,34 @@ public class StrokeComparer {
 		return result;
 	}
 	
-	private double CalcSpatialByParameterDistance(String parameter) {
+	private double CalcSpatialParameter(String parameter) {
 
-		ArrayList<IStatEngineResult> listResults = mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), mStrokeAuthExtended.ListEventsSpatialByDistanceExtended, mStrokeStoredExtended.ListEventsSpatialByDistanceExtended, Consts.ConstsParamNames.SpatialTypes.DISTANCE); 
+		double[] vectorAuthX = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(mStrokeAuthExtended.ListEventsSpatialExtended);
+		double[] vectorAuthY = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(mStrokeAuthExtended.ListEventsSpatialExtended);	
+		
+		ArrayList<IStatEngineResult> listResults = mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), mStrokeAuthExtended.ListEventsSpatialExtended, Consts.ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, mStrokeStoredExtended.GetFeatureMeansHash()); 
 		mListSpatialScores.addAll(listResults);
 		
 		double score = CalculateScoreFromList(listResults);		
 		return score;
 	}	
 	
-	private double CalcSpatialByParameterTime(String parameter) {
+	private double CalcTemporalParameter(String parameter) {
 
-		ArrayList<IStatEngineResult> listResults = mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), mStrokeAuthExtended.ListEventsSpatialByTimeExtended, mStrokeStoredExtended.ListEventsSpatialByTimeExtended, Consts.ConstsParamNames.SpatialTypes.TIME);		
+		ArrayList<IStatEngineResult> listResults = mStatEngine.CompareStrokeSpatial(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), mStrokeAuthExtended.ListEventsTemporalExtended, Consts.ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, mStrokeStoredExtended.GetFeatureMeansHash());		
 		mListSpatialScores.addAll(listResults);
 		
 		double score = CalculateScoreFromList(listResults);
 		return score;
 	}
 
+	private ArrayList<IDTWObj> GetTemporalVector(String parameter, ArrayList<MotionEventExtended> listEvents) {
+		ArrayList<IDTWObj> vector = mStatEngine.GetSpatialVector(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), listEvents, Consts.ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING); 				
+		return vector;
+	}		
+	
 	private ArrayList<IDTWObj> GetSpatialVector(String parameter, ArrayList<MotionEventExtended> listEvents) {
-		ArrayList<IDTWObj> vector = mStatEngine.GetSpatialVector(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), listEvents, Consts.ConstsParamNames.SpatialTypes.DISTANCE); 				
+		ArrayList<IDTWObj> vector = mStatEngine.GetSpatialVector(mStrokeAuthExtended.GetInstruction(), parameter, mStrokeAuthExtended.GetStrokeIdx(), listEvents, Consts.ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING); 				
 		return vector;
 	}	
 	
@@ -512,92 +464,7 @@ public class StrokeComparer {
 		
 		double x = 1;
 		x++;
-	}
-
-	private void TimeWarp() {			
-		ArrayList<IDTWObj> listCoordsAuth = new  ArrayList<>();
-		ArrayList<IDTWObj> listCoordsStored = new  ArrayList<>();
-		
-		ArrayList<IDTWObj> listNormalizedCoordsAuth = new  ArrayList<>();
-		ArrayList<IDTWObj> listNormalizedCoordsStored = new  ArrayList<>();
-				
-		ArrayList<IDTWObj> listNormalizedCoordsSpatialDistanceAuth = new  ArrayList<>();
-		ArrayList<IDTWObj> listNormalizedCoordsSpatialDistanceStored = new  ArrayList<>();
-		
-		ArrayList<IDTWObj> listEventsAuth = new  ArrayList<>();
-		ArrayList<IDTWObj> listEventsStored = new  ArrayList<>();		
-		
-		ArrayList<IDTWObj> listVelocitiesAuth = new  ArrayList<>();
-		ArrayList<IDTWObj> listVelocitiesStored = new  ArrayList<>();
-		
-		ArrayList<IDTWObj> listAccelerationsAuth = new  ArrayList<>();
-		ArrayList<IDTWObj> listAccelerationsStored = new  ArrayList<>();
-		
-		double[] vectorX = new double[mStrokeAuthExtended.ListEventsExtended.size()];
-		double[] vectorY = new double[mStrokeAuthExtended.ListEventsExtended.size()];
-		
-		for(int idxEvent = 0; idxEvent < mStrokeAuthExtended.ListEventsSpatialByDistanceExtended.size(); idxEvent++) {			
-			listNormalizedCoordsSpatialDistanceAuth.add(new DTWObjCoordinate(mStrokeAuthExtended.ListEventsSpatialByDistanceExtended.get(idxEvent).Xnormalized, mStrokeAuthExtended.ListEventsSpatialByDistanceExtended.get(idxEvent).Ynormalized));			
-			listNormalizedCoordsSpatialDistanceStored.add(new DTWObjCoordinate(mStrokeStoredExtended.ListEventsSpatialByDistanceExtended.get(idxEvent).Xnormalized, mStrokeStoredExtended.ListEventsSpatialByDistanceExtended.get(idxEvent).Ynormalized));
-		}
-		
-		for(int idxEvent = 0; idxEvent < mStrokeAuthExtended.ListEventsExtended.size(); idxEvent++) {
-			vectorX[idxEvent] = mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Xmm;
-			vectorY[idxEvent] = mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Ymm;
-			
-			listCoordsAuth.add(new DTWObjCoordinate(mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Xmm, mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Ymm));
-			listNormalizedCoordsAuth.add(new DTWObjCoordinate(mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Xnormalized, mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Ynormalized));
-			listEventsAuth.add(new DTWObjMotionEvent(mStrokeAuthExtended.ListEventsExtended.get(idxEvent)));
-			listVelocitiesAuth.add(new DTWObjDouble(mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Velocity));
-			listAccelerationsAuth.add(new DTWObjDouble(mStrokeAuthExtended.ListEventsExtended.get(idxEvent).Acceleration));
-		}
-		
-		for(int idxEvent = 0; idxEvent < mStrokeStoredExtended.ListEventsExtended.size(); idxEvent++) {
-			listCoordsStored.add(new DTWObjCoordinate(mStrokeStoredExtended.ListEventsExtended.get(idxEvent).Xmm, mStrokeStoredExtended.ListEventsExtended.get(idxEvent).Ymm));
-			listNormalizedCoordsStored.add(new DTWObjCoordinate(mStrokeStoredExtended.ListEventsExtended.get(idxEvent).Xnormalized, mStrokeStoredExtended.ListEventsExtended.get(idxEvent).Ynormalized));
-			listEventsStored.add(new DTWObjMotionEvent(mStrokeStoredExtended.ListEventsExtended.get(idxEvent)));
-			listVelocitiesStored.add(new DTWObjDouble(mStrokeStoredExtended.ListEventsExtended.get(idxEvent).Velocity));
-			listAccelerationsStored.add(new DTWObjDouble(mStrokeStoredExtended.ListEventsExtended.get(idxEvent).Acceleration));
-		}
-		
-		UtilsDTW dtwCoords = new UtilsDTW(listCoordsAuth, listCoordsStored);		
-		UtilsDTW dtwNormalizedCoords = new UtilsDTW(listNormalizedCoordsAuth, listNormalizedCoordsStored);
-		UtilsDTW dtwNormalizedSpatialDistance = new UtilsDTW(listNormalizedCoordsSpatialDistanceAuth, listNormalizedCoordsSpatialDistanceStored);
-		UtilsDTW dtwEvents = new UtilsDTW(listEventsAuth, listEventsStored);
-		UtilsDTW dtwVelocities = new UtilsDTW(listVelocitiesAuth, listVelocitiesStored);
-		UtilsDTW dtwAccelerations = new UtilsDTW(listAccelerationsAuth, listAccelerationsStored);
-		
-		DtwCoordinates = dtwCoords.getDistance();
-		DtwNormalizedCoordinatesSpatialDistance = dtwNormalizedSpatialDistance.getDistance();
-		DtwNormalizedCoordinates = dtwNormalizedCoords.getDistance();
-		DtwEvents = dtwEvents.getDistance();
-		DtwVelocities = dtwVelocities.getDistance();
-		DtwAccelerations = dtwAccelerations.getDistance();		
-		
-		DtwSpatialVelocityDistance = GetSpatialDtwScore(VectorSpatialVelocityDistanceAuth, VectorSpatialVelocityDistanceStored);
-		DtwSpatialAccelerationDistance = GetSpatialDtwScore(VectorSpatialAccelerationDistanceAuth, VectorSpatialAccelerationDistanceStored);
-		DtwSpatialRadialVelocityDistance = GetSpatialDtwScore(VectorSpatialRadialVelocityDistanceAuth, VectorSpatialRadialVelocityDistanceStored);
-		DtwSpatialRadialAccelerationDistance = GetSpatialDtwScore(VectorSpatialRadialAccelerationDistanceAuth, VectorSpatialRadialAccelerationDistanceStored);
-		DtwSpatialRadiusDistance = GetSpatialDtwScore(VectorSpatialRadiusDistanceAuth, VectorSpatialRadiusDistanceStored);
-		DtwSpatialTetaDistance = GetSpatialDtwScore(VectorSpatialTetaDistanceAuth, VectorSpatialTetaDistanceStored);
-		DtwSpatialDeltaTetaDistance = GetSpatialDtwScore(VectorSpatialDeltaTetaDistanceAuth, VectorSpatialDeltaTetaDistanceStored);
-		DtwSpatialAccumNormAreaDistance = GetSpatialDtwScore(VectorSpatialAccumNormAreaDistanceAuth, VectorSpatialAccumNormAreaDistanceStored);
-				
-		DtwSpatialVelocityTime = GetSpatialDtwScore(VectorSpatialVelocityTimeAuth, VectorSpatialVelocityTimeStored);
-		DtwSpatialAccelerationTime = GetSpatialDtwScore(VectorSpatialAccelerationTimeAuth, VectorSpatialAccelerationTimeStored);
-		DtwSpatialRadialVelocityTime = GetSpatialDtwScore(VectorSpatialRadialVelocityTimeAuth, VectorSpatialRadialVelocityTimeStored);
-		DtwSpatialRadialAccelerationTime = GetSpatialDtwScore(VectorSpatialRadialAccelerationTimeAuth, VectorSpatialRadialAccelerationTimeStored);
-		DtwSpatialRadiusTime = GetSpatialDtwScore(VectorSpatialRadiusTimeAuth, VectorSpatialRadiusTimeStored);
-		DtwSpatialTetaTime = GetSpatialDtwScore(VectorSpatialTetaTimeAuth, VectorSpatialTetaTimeStored);
-		DtwSpatialDeltaTetaTime = GetSpatialDtwScore(VectorSpatialDeltaTetaTimeAuth, VectorSpatialDeltaTetaTimeStored);
-		DtwSpatialAccumNormAreaTime = GetSpatialDtwScore(VectorSpatialAccumNormAreaTimeAuth, VectorSpatialAccumNormAreaTimeStored);
-		
-		UtilsDTW dtwSpatialVelocityDistance = new UtilsDTW(VectorSpatialVelocityDistanceAuth, VectorSpatialVelocityDistanceStored);
-		UtilsDTW dtwSpatialVelocityTime = new UtilsDTW(VectorSpatialVelocityTimeAuth, VectorSpatialVelocityTimeStored);
-		
-		DtwSpatialVelocityDistance = dtwSpatialVelocityDistance.getDistance();
-		DtwSpatialVelocityTime = dtwSpatialVelocityTime.getDistance();
-	}
+	}	
 	
 	protected double GetSpatialDtwScore(ArrayList<IDTWObj> vectorAuth, ArrayList<IDTWObj> vectorStored) {
 		UtilsDTW tempDtw = new UtilsDTW(vectorAuth, vectorStored);
@@ -669,8 +536,8 @@ public class StrokeComparer {
 		double middlePressureAuth = mStrokeAuthExtended.MiddlePressure;
 		double middleSurfaceAuth = mStrokeAuthExtended.MiddleSurface;
 		
-		CompareParameter(ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE, middlePressureAuth);
-		CompareParameter(ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE, middleSurfaceAuth);		
+		MiddlePressureScore = CompareParameter(ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE, middlePressureAuth);
+		MiddleSurfaceScore = CompareParameter(ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE, middleSurfaceAuth);		
 	}
 	
 	protected void CompareVelocities()
@@ -693,10 +560,10 @@ public class StrokeComparer {
 			totalWeights += mCompareResult.ListCompareResults.get(idx).GetWeight();
 		}
 		
-		mCompareResult.Score = avgScore / totalWeights;
+		mCompareResult.Score = avgScore / totalWeights;		
 		
-		StrokeSpatialScore = StrokeSpatialScore + 0.15;
-		mCompareResult.Score = (mCompareResult.Score + StrokeSpatialScore) / 2;
+		//StrokeSpatialScore = StrokeSpatialScore + 0.15;
+		mCompareResult.Score = (mCompareResult.Score + DtwSpatialVelocity) / 2;
 		
 		double strokeDistance = StrokeDistanceTotalScore + 0.3;
 		if(strokeDistance > 1) {
@@ -704,7 +571,11 @@ public class StrokeComparer {
 		}		
 		double strokeDistanceToRemove = 1 - strokeDistance;
 		
+		double maxPressureSurface = Utils.GetInstance().GetUtilsMath().GetMaxValue(MiddlePressureScore, MiddleSurfaceScore);
+		double removeMiddlePressureScore = (1 - maxPressureSurface) / 10;
+		
 		mCompareResult.Score -= strokeDistanceToRemove;
+//		mCompareResult.Score -= removeMiddlePressureScore;
 	}
 	
 	protected void CompareMinCosineDistance()
@@ -713,21 +584,7 @@ public class StrokeComparer {
 		double[] vectorAuth = mStrokeAuthExtended.SpatialSamplingVector;
 		
 		double minimumCosineDistanceScore = 
-				mUtilsVectors.MinimumCosineDistanceScore(vectorStored, vectorAuth);
-		
-		double score = 0;
-		if(minimumCosineDistanceScore > 1) {
-			score = 0.86;
-		}
-		if(minimumCosineDistanceScore > 1.5) {
-			score = 0.91;
-		}
-		if(minimumCosineDistanceScore > 2) {
-			score = 0.96;
-		}
-		if(minimumCosineDistanceScore > 2.5) {
-			score = 1;
-		}
+				mUtilsVectors.MinimumCosineDistanceScore(vectorStored, vectorAuth);	
 		
 		mMinCosineDistanceScore = minimumCosineDistanceScore;
 	}
@@ -757,12 +614,13 @@ public class StrokeComparer {
 		return mIsStrokesIdentical;
 	}
 
-	protected void CompareParameter(String paramName, double authValue) {
+	protected double CompareParameter(String paramName, double authValue) {
 		IStatEngineResult result = 
 				mStatEngine.CompareStrokeDoubleValues(mStrokeAuthExtended.GetInstruction(), paramName, mStrokeAuthExtended.GetStrokeIdx(), authValue, mStrokeStoredExtended.GetFeatureMeansHash());
 		
-		double finalScore = result.GetScore();
-		AddDoubleParameter(paramName, finalScore, result.GetZScore(), authValue);		
+		double finalScore = result.GetScore();		
+		AddDoubleParameter(paramName, finalScore, result.GetZScore(), authValue);
+		return finalScore;
 	}
 	
 	protected void AddDoubleParameter(String parameterName, double score, double weight, double originalValue)
@@ -792,4 +650,5 @@ public class StrokeComparer {
 		mCompareResult.ListCompareResults.add(compareResult);
 	}
 	/****************************/
+
 }

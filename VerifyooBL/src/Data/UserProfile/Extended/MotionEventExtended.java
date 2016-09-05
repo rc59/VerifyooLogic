@@ -40,7 +40,7 @@ public class MotionEventExtended extends MotionEventCompact {
 	public boolean IsStartOfStroke;
 	public boolean IsEndOfStroke;
 	
-	protected MotionEventExtended() {
+	public MotionEventExtended() {
 		
 	}
 	
@@ -78,6 +78,12 @@ public class MotionEventExtended extends MotionEventCompact {
 		tempEvent.IsEndOfStroke = IsEndOfStroke;
 		
 		tempEvent.RadialVelocity = RadialVelocity;
+		tempEvent.RadialAcceleration = RadialAcceleration;
+		
+		tempEvent.Radius = Radius;
+		tempEvent.Teta = Teta;
+		tempEvent.DeltaTeta = DeltaTeta;
+		tempEvent.AccumulatedNormalizedArea = AccumulatedNormalizedArea;
 		
 		return tempEvent;
 	}
@@ -86,28 +92,28 @@ public class MotionEventExtended extends MotionEventCompact {
 		double value = 0;
 		
 		switch (param) {
-		case ConstsParamNames.StrokeSpatial.VELOCITIES:
+		case ConstsParamNames.StrokeSampling.VELOCITIES:
 			value = Velocity;
 			break;
-		case ConstsParamNames.StrokeSpatial.ACCELERATIONS:
+		case ConstsParamNames.StrokeSampling.ACCELERATIONS:
 			value = Acceleration;
 			break;
-		case ConstsParamNames.StrokeSpatial.RADIAL_VELOCITIES:
+		case ConstsParamNames.StrokeSampling.RADIAL_VELOCITIES:
 			value = RadialVelocity;
 			break;
-		case ConstsParamNames.StrokeSpatial.RADIAL_ACCELERATION:
+		case ConstsParamNames.StrokeSampling.RADIAL_ACCELERATION:
 			value = RadialAcceleration;
 			break;
-		case ConstsParamNames.StrokeSpatial.RADIUS:
+		case ConstsParamNames.StrokeSampling.RADIUS:
 			value = Radius;
 			break;
-		case ConstsParamNames.StrokeSpatial.TETA:
+		case ConstsParamNames.StrokeSampling.TETA:
 			value = Teta;
 			break;
-		case ConstsParamNames.StrokeSpatial.DELTA_TETA:
+		case ConstsParamNames.StrokeSampling.DELTA_TETA:
 			value = DeltaTeta;
 			break;
-		case ConstsParamNames.StrokeSpatial.ACCUMULATED_NORM_AREA:
+		case ConstsParamNames.StrokeSampling.ACCUMULATED_NORM_AREA:
 			value = AccumulatedNormalizedArea;
 			break;
 		}

@@ -12,7 +12,7 @@ import Logic.Utils.DTW.IDTWObj;
 
 public interface IStatEngine {	
 	public ArrayList<IDTWObj> GetSpatialVector(String instruction, String paramName, int idxStroke, ArrayList<MotionEventExtended> listEvents, String spatialType);
-	public ArrayList<IStatEngineResult> CompareStrokeSpatial(String instruction, String paramName, int idxStroke, ArrayList<MotionEventExtended> listAuth, ArrayList<MotionEventExtended> listStored, String spatialType);
+	public ArrayList<IStatEngineResult> CompareStrokeSpatial(String instruction, String paramName, int idxStroke, ArrayList<MotionEventExtended> listAuth, String spatialType, HashMap<String, IFeatureMeanData> hashFeatureMeans);
 	
 	public IStatEngineResult CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans);
 	public IStatEngineResult CompareGestureDoubleValues(String instruction, String paramName, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans);

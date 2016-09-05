@@ -1,13 +1,7 @@
 package Consts;
 
-public class ConstsParamNames {
-	public class SpatialTypes
-	{
-		public static final String DISTANCE = "SpatialDistance";
-		public static final String TIME = "SpatialTime";
-	}
-	
-	public class StrokeSpatial
+public class ConstsParamNames {	
+	public class StrokeSampling
 	{
 		public static final String VELOCITIES = "SpatialVelocities";
 		public static final String ACCELERATIONS = "SpatialAccelerations";
@@ -41,6 +35,9 @@ public class ConstsParamNames {
 
 		public static final String STROKE_MIDDLE_PRESSURE = "StrokeMiddlePressure";
 		public static final String STROKE_MIDDLE_SURFACE = "StrokeMiddleSurface";
+		
+		public static final String STROKE_SPATIAL_SAMPLING = "StrokeSpatialSampling";
+		public static final String STROKE_TEMPORAL_SAMPLING = "StrokeTemporalSampling";
 	}
 	
 	public class Gesture

@@ -15,18 +15,18 @@ public class NormalizedStroke {
 	}
 	
 	public NormalizedStroke(StrokeExtended stroke) {
-		if(stroke.ListEventsSpatialByDistanceExtended != null) {
-			Vector = new double[stroke.ListEventsSpatialByDistanceExtended.size() * 2];		
+		if(stroke.ListEventsSpatialExtended != null) {
+			Vector = new double[stroke.ListEventsSpatialExtended.size() * 2];		
 			
 			ListCoords = new ArrayList<>();
 			
 			int idxVector = 0;
-			for(int idx = 0; idx < stroke.ListEventsSpatialByDistanceExtended.size(); idx++) {
-				ListCoords.add(new DTWObjCoordinate(stroke.ListEventsSpatialByDistanceExtended.get(idx).Xnormalized, stroke.ListEventsSpatialByDistanceExtended.get(idx).Ynormalized));			
+			for(int idx = 0; idx < stroke.ListEventsSpatialExtended.size(); idx++) {
+				ListCoords.add(new DTWObjCoordinate(stroke.ListEventsSpatialExtended.get(idx).Xnormalized, stroke.ListEventsSpatialExtended.get(idx).Ynormalized));			
 				
-				Vector[idxVector] = stroke.ListEventsSpatialByDistanceExtended.get(idx).Xnormalized;
+				Vector[idxVector] = stroke.ListEventsSpatialExtended.get(idx).Xnormalized;
 				idxVector++;
-				Vector[idxVector] = stroke.ListEventsSpatialByDistanceExtended.get(idx).Ynormalized;
+				Vector[idxVector] = stroke.ListEventsSpatialExtended.get(idx).Ynormalized;
 				idxVector++;
 			}	
 		}

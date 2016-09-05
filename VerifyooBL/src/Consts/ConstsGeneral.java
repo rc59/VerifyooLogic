@@ -5,4 +5,5 @@ public class ConstsGeneral {
 	public static final double GESTURE_SCORE_CALC_MIN_Z_SCORE = 2;
 	
 	public static final int SPATIAL_SAMPLING_SIZE = 32;
+	public static final int SAMPLING_MAX_SHIFT_INDEX = 6;
 }

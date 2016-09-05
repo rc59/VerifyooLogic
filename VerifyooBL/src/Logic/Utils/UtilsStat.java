@@ -61,7 +61,50 @@ public class UtilsStat {
 		}
 		
 		return score;
-	}		
+	}	
+	
+	public double CalculateScoreSpatial(double authValue, double populationMean, double populationSd, double internalMean, double internalSd) {
+		double boundary = internalMean * 0.15;
+		
+		double zScore = (internalMean - populationMean) / populationSd;
+		double weight = Math.abs(zScore);
+		if(weight > 2) {
+			weight = 2;
+		}
+		
+		double uniquenessFactor = 1;
+		
+		double twoUpperPopulationInternalSD = (internalMean + boundary * uniquenessFactor);
+		double twoLowerPopulationInternalSD = (internalMean - boundary * uniquenessFactor);
+		
+		double threeUpperPopulationInternalSD = (internalMean + 2 * boundary * uniquenessFactor);
+		double threeLowerPopulationInternalSD = (internalMean - 2 * boundary * uniquenessFactor);
+		double score;
+		if((authValue > twoLowerPopulationInternalSD) && (authValue < twoUpperPopulationInternalSD)) {
+			score = 1;
+		}
+		else {
+			if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)) {
+				if(authValue > twoLowerPopulationInternalSD) {
+					double u = Math.abs(threeUpperPopulationInternalSD - authValue);
+					double d = Math.abs(threeUpperPopulationInternalSD - twoUpperPopulationInternalSD);
+					
+					score = u/d;
+				}
+				else {
+					double u = Math.abs(threeLowerPopulationInternalSD - authValue);
+					double d = Math.abs(threeLowerPopulationInternalSD - twoLowerPopulationInternalSD);
+					
+					score = u/d;
+				}
+			}
+			else {
+				score = 0;
+			}
+		}
+		
+		return score;
+	}	
 	
 	public double CalcWeight(double internalMean, double internalSd, double popMean, double popSd) {
 		double lowerBound = internalMean - internalSd;

@@ -5,7 +5,27 @@ import java.util.ArrayList;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Raw.MotionEventCompact;
 
-public class UtilsVectors {
+public class UtilsVectors {	
+	public double[] GetVectorXpixelExtended(ArrayList<MotionEventExtended> listEvents) {
+		double[] vectorX = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vectorX[idx] = listEvents.get(idx).Xpixel;
+		}
+		
+		return vectorX;
+	}
+	
+	public double[] GetVectorYpixelExtended(ArrayList<MotionEventExtended> listEvents) {
+		double[] vectorY = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vectorY[idx] = listEvents.get(idx).Ypixel;
+		}
+		
+		return vectorY;
+	}
+	
 	public double[] GetVectorXpixel(ArrayList<MotionEventCompact> listEvents) {
 		double[] vectorX = new double[listEvents.size()];
 		
@@ -64,6 +84,16 @@ public class UtilsVectors {
 		}
 		
 		return vectorAcc;
+	}
+	
+	public double[] GetVectorTime(ArrayList<MotionEventExtended> listEvents) {
+		double[] vector = new double[listEvents.size()];
+		
+		for(int idx = 0; idx < listEvents.size(); idx++) {
+			vector[idx] = listEvents.get(idx).EventTime;
+		}
+		
+		return vector;
 	}
 	
 	public double[] GetVectorPressure(ArrayList<MotionEventExtended> listEvents) {
