@@ -52,6 +52,10 @@ public class MotionEventExtended extends MotionEventCompact {
 		tempEvent.EventTime = EventTime;
 		tempEvent.Xpixel = Xpixel;
 		tempEvent.Ypixel = Ypixel;
+		
+		tempEvent.XpixelRaw = XpixelRaw;
+		tempEvent.YpixelRaw = YpixelRaw;
+		
 		tempEvent.Pressure = Pressure;
 		tempEvent.TouchSurface = TouchSurface;
 		
@@ -130,6 +134,9 @@ public class MotionEventExtended extends MotionEventCompact {
 		
 		Xpixel = motionEvent.Xpixel;
 		Ypixel = motionEvent.Ypixel;
+		
+		XpixelRaw = motionEvent.XpixelRaw;
+		YpixelRaw = motionEvent.YpixelRaw;
 		
 		EventTime = motionEvent.EventTime;
 		Pressure = motionEvent.Pressure;

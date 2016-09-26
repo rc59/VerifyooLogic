@@ -11,6 +11,7 @@ public interface ICompareResult {
 	public double GetInternalSD();
 	public double GetInternalSdUserOnly();
 	public double GetZScore();
+	public double GetTemplateZScore();
 	
 	public void SetName(String name);
 	public void SetWeight(double weight);

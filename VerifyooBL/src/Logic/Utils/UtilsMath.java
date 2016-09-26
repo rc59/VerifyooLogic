@@ -59,6 +59,13 @@ public class UtilsMath {
         return value;
     }	
 	
+	public double CalcPitagoras(double value1, double value2, double value3) {
+        double value = value1 * value1 + value2 * value2 + value3 * value3;
+        value = Math.sqrt(value);
+
+        return value;
+    }	
+	
 	public double GetMaxValue(double value1, double value2) {
 		if(value1 > value2) {
 			return value1;
@@ -75,6 +82,13 @@ public class UtilsMath {
 		else {
 			return value2;
 		}
+	}
+	
+	public boolean IsBetween(double value, double lower, double upper) {
+		if(value > lower && value < upper) {
+			return true;
+		}
+		return false;
 	}
 	
 	public double GetRelativeDistanceBetween(double value, double lowerBound, double upperBound) {

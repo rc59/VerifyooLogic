@@ -35,6 +35,10 @@ public class FeatureMeanDataListEvents implements IFeatureMeanData {
 		mListOfListEvents = new ArrayList<ArrayList<MotionEventExtended>>();
 	}
 
+	public ArrayList<ArrayList<MotionEventExtended>> GetListOfListEvents() {
+		return mListOfListEvents;
+	}
+	
 	public double GetMinDtwDistance(ArrayList<MotionEventExtended> listAuth, String param) {
 		double result = 0;
 		
@@ -180,8 +184,8 @@ public class FeatureMeanDataListEvents implements IFeatureMeanData {
 		avgEvent.EventTime = event1.Ypixel + event2.Ypixel;
 		
 		return avgEvent;
-	}
-
+	}	
+	
 	@Override
 	public double GetMean() {
 		// TODO Auto-generated method stub

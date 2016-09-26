@@ -58,6 +58,10 @@ public abstract class CompareResultAbstract implements ICompareResult {
 		return ((OriginalValue - PopMean) / StandardDev);
 	}
 	
+	public double GetTemplateZScore() { 
+		return ((Mean - PopMean) / StandardDev);
+	}
+	
 	@Override
 	public void SetName(String name) {
 		Name = name;

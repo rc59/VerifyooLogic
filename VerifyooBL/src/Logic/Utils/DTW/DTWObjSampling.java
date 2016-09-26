@@ -62,7 +62,7 @@ public class DTWObjSampling implements IDTWObj {
 		
 		double internalMean = mValue;
 		
-		double result = (1 - Utils.GetInstance().GetUtilsStat().CalculateScoreSpatial(authObj.GetValue(), popMean, popSd, internalMean, internalSd));
+		double result = (1 - Utils.GetInstance().GetUtilsStat().CalculateScoreSpatial(authObj.GetValue(), popMean, popSd, internalMean, internalSd, mParam, mSamplingType));
 		
 		return Math.abs(result);
 	}

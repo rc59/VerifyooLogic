@@ -12,6 +12,12 @@ public class UtilsGeneral {
 		return key;
 	}
 	
+	public String GenerateStrokeMatrixMeanKey(String instruction, int strokeIdx)
+	{
+		String key = String.format("%s-%s-Matrix", instruction, String.valueOf(strokeIdx));
+		return key;
+	}
+	
 	public String GenerateStrokeFeatureMeanKey(String instruction, String paramName, int strokeIdx)
 	{
 		String key = String.format("%s-%s-%s", instruction, String.valueOf(strokeIdx) ,paramName);

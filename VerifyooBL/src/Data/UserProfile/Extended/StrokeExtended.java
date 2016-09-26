@@ -12,11 +12,14 @@ import Data.MetaData.ParameterAvgPoint;
 import Data.MetaData.IndexValue;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
+import Logic.Comparison.Stats.FeatureMatrix;
 import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.FeatureMeanDataListEvents;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Comparison.Stats.Norms.NormMgr;
+import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Utils.Complex;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsGeneral;
@@ -102,11 +105,30 @@ public class StrokeExtended extends Stroke {
 	public double StrokeDistanceEndToEnd;
 	
 	public double StrokeTransitionTime;
+	
+	public double StrokeAccMovX;
+	public double StrokeAccMovY;
+	public double StrokeAccMovZ;
+	public double StrokeAccMovTotal;
 
 	/****************************************/
 	
+	public double ZScoreTotal;
+	public double ZScoreCount;
+	public double ZScoreMostUnique;
+	
+	int mNumElementsInRow;
+	double[] mMatrixRow;	
+	
 	public StrokeExtended(Stroke stroke, HashMap<String, IFeatureMeanData> hashFeatureMeans, String instruction, int strokeIdx)
 	{		
+		mNumElementsInRow = 0;
+		mMatrixRow = new double[13];
+
+		ZScoreTotal = 0;
+		ZScoreCount = 0;
+		ZScoreMostUnique = 0;
+		
 		if(stroke.Length == 0) {
 			IsPoint = true;	
 		}
@@ -127,7 +149,7 @@ public class StrokeExtended extends Stroke {
 			Ydpi = stroke.Ydpi;
 			
 			ListEventsExtended = new ArrayList<>();
-				
+			
 			StrokePropertiesObj = new StrokeProperties(ListEvents.size());
 			ShapeDataObj = new ShapeData();
 			
@@ -137,7 +159,7 @@ public class StrokeExtended extends Stroke {
 			IsHasPressure = false;
 			IsHasTouchSurface = false;		
 						
-			InitFeatures();		
+			InitFeatures();
 		}
 	}
 	
@@ -280,8 +302,8 @@ public class StrokeExtended extends Stroke {
 	}
 
 	private void SpatialSampling() {
-		ListEventsSpatialExtended = mUtilsSpatialSampling.ConvertToVectorByDistance(ListEventsExtended, LengthPixel);
-		ListEventsTemporalExtended = mUtilsSpatialSampling.ConvertToVectorByTime(ListEventsExtended);
+		ListEventsSpatialExtended = mUtilsSpatialSampling.ConvertToVectorByDistance(ListEventsExtended, LengthPixel, Xdpi, Ydpi);
+		ListEventsTemporalExtended = mUtilsSpatialSampling.ConvertToVectorByTime(ListEventsExtended, Xdpi, Ydpi);
 		
 		AddStrokeListEvents(mInstruction, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, mStrokeIdx, ListEventsSpatialExtended);
 		AddStrokeListEvents(mInstruction, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, mStrokeIdx, ListEventsTemporalExtended);
@@ -375,6 +397,7 @@ public class StrokeExtended extends Stroke {
 		CalculateMiddlePressureAndSurface();
 		CalculateStrokeVelocityPeaks();
 		CalculateStrokeAccelerationPeaks();
+		CalculateStrokeAccelerometer();
 	}	
 
 	protected void ConvertToMotionEventExtended()
@@ -511,6 +534,32 @@ public class StrokeExtended extends Stroke {
 		StrokeAverageAcceleration = totalAcc / ListEventsExtended.size();
 	}
 	
+	protected void CalculateStrokeAccelerometer() {
+		double accMeanX = 0;
+		double accMeanY = 0;
+		double accMeanZ = 0;
+		double accMean = 0;
+		
+		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++) {
+			accMeanX += ListEventsExtended.get(idxEvent).AccelerometerX;
+			accMeanY += ListEventsExtended.get(idxEvent).AccelerometerY;
+			accMeanZ += ListEventsExtended.get(idxEvent).AccelerometerZ;
+			accMean += Utils.GetInstance().GetUtilsMath().CalcPitagoras(ListEventsExtended.get(idxEvent).AccelerometerX, ListEventsExtended.get(idxEvent).AccelerometerY, ListEventsExtended.get(idxEvent).AccelerometerZ);
+		}
+		
+		StrokeAccMovX = 0;
+		StrokeAccMovY = 0;
+		StrokeAccMovZ = 0;
+		StrokeAccMovTotal = 0;
+		
+		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++) {
+			StrokeAccMovX += Math.abs(accMeanX - ListEventsExtended.get(idxEvent).AccelerometerX);
+			StrokeAccMovY += Math.abs(accMeanY - ListEventsExtended.get(idxEvent).AccelerometerY);
+			StrokeAccMovZ += Math.abs(accMeanZ - ListEventsExtended.get(idxEvent).AccelerometerZ);
+			StrokeAccMovTotal += Math.abs(accMean - Utils.GetInstance().GetUtilsMath().CalcPitagoras(ListEventsExtended.get(idxEvent).AccelerometerX, ListEventsExtended.get(idxEvent).AccelerometerY, ListEventsExtended.get(idxEvent).AccelerometerZ));
+		}
+	}
+	
 	protected void CalculateStrokeAccelerationPeaks()
 	{
 		StrokeAccelerationPeakAvgPoint = mUtilsPeakCalc.CalculatePeaks(mAccelerations, StrokeAverageAcceleration);
@@ -610,12 +659,12 @@ public class StrokeExtended extends Stroke {
         PointMinXMM = (mPointMinX.Xpixel - StrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
         PointMaxXMM = (mPointMaxX.Xpixel - StrokeCenterXpixel) / Xdpi * ConstsMeasures.INCH_TO_MM;
         PointMinYMM = (mPointMinY.Ypixel - StrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
-        PointMaxYMM = (mPointMinY.Ypixel - StrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
+        PointMaxYMM = (mPointMaxY.Ypixel - StrokeCenterYpixel) / Ydpi * ConstsMeasures.INCH_TO_MM;
 	}
 	
 	protected void CalculateSpatialSamplingVector()
 	{
-		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListEventsExtended, LengthPixel);
+		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListEventsExtended, LengthPixel, Xdpi, Ydpi);
 	}
 	
 	protected MotionEventCompact GetMaxXpixel(MotionEventCompact pointA, MotionEventCompact pointB){
@@ -644,9 +693,11 @@ public class StrokeExtended extends Stroke {
 	
 	protected void AddStrokeValue(String instruction, String paramName, int strokeIdx, double value)
 	{
-		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
+		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);		
+		String keyMatrix = mUtilsGeneral.GenerateStrokeMatrixMeanKey(instruction, strokeIdx);
 		
 		IFeatureMeanData tempFeatureMeanData;
+		IFeatureMeanData tempFeatureMatrix;
 		
 		if(mHashFeatureMeans.containsKey(key)) {
 			tempFeatureMeanData = mHashFeatureMeans.get(key);
@@ -655,8 +706,41 @@ public class StrokeExtended extends Stroke {
 			tempFeatureMeanData = new FeatureMeanData(paramName, instruction);			
 			mHashFeatureMeans.put(key, tempFeatureMeanData);
 		}
+		tempFeatureMeanData.AddValue(value);
 		
-		tempFeatureMeanData.AddValue(value);		
+		if(paramName.compareTo("StrokeTransitionTime") != 0) {
+			if(mHashFeatureMeans.containsKey(keyMatrix)) {
+				tempFeatureMatrix = mHashFeatureMeans.get(keyMatrix);
+			}
+			else {
+				tempFeatureMatrix = new FeatureMatrix("FeatureMatrix", instruction);
+				mHashFeatureMeans.put(keyMatrix, tempFeatureMatrix);
+			}
+		
+			((FeatureMatrix)tempFeatureMatrix).AddValue(value, 12);
+		}
+		
+		try {
+			INormData normObj = NormMgr.GetInstance().GetNormDataByParamName(paramName, instruction, strokeIdx);
+			UpdateZScore(value, normObj);	
+		}
+		catch(Exception exc){
+			
+		}
+	}
+	
+	protected void UpdateZScore(double value, INormData normObj) {
+		if(normObj != null) {
+			double tempZScore = Math.abs((value - normObj.GetMean()) / normObj.GetStandardDev());
+			if(tempZScore > 2) {
+				tempZScore = 2;
+			}		
+			
+			ZScoreTotal+= tempZScore;
+			ZScoreCount++;
+			
+			ZScoreMostUnique = Utils.GetInstance().GetUtilsMath().GetMaxValue(ZScoreMostUnique, tempZScore);
+		}
 	}
 	
 	protected void AddStrokeListEvents(String instruction, String paramName, int idxStroke, ArrayList<MotionEventExtended> listEventsExtended)

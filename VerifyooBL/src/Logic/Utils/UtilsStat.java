@@ -1,10 +1,24 @@
 package Logic.Utils;
 
+import javax.swing.text.InternationalFormatter;
+
+import Consts.ConstsParamNames;
 import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
 
 public class UtilsStat {
 	public double CalculateScore1(double authValue, double populationMean, double populationSd, double internalMean, double internalSd) {
-		double boundary = internalMean * 0.2;
+		
+		double boundaryFactor = 0.2;
+		double zScore = Math.abs((internalMean - populationMean) / populationSd);
+		if(zScore > 2) {
+			zScore = 2;
+		}
+		if(zScore < 1) {
+			zScore = 1;
+		}
+		boundaryFactor = boundaryFactor * zScore;
+		
+		double boundary = internalMean * boundaryFactor;
 		
 		double lowerBound = internalMean - boundary;
 		double upperBound = internalMean + boundary;
@@ -21,9 +35,21 @@ public class UtilsStat {
 	}
 	
 	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd) {
-		double boundary = internalMean * 0.15;
-		
+		double boundaryFactor = 0.18;
 		double zScore = (internalMean - populationMean) / populationSd;
+			
+		double boundaryFactorMultiplier = Math.abs(zScore) - 1;
+		if(boundaryFactorMultiplier > 1) {
+			boundaryFactorMultiplier = 1;
+		}
+		if(boundaryFactorMultiplier < 0) {
+			boundaryFactorMultiplier = 0;
+		}
+		boundaryFactorMultiplier = boundaryFactorMultiplier * 0.1;
+		boundaryFactor += boundaryFactorMultiplier; 
+		
+		double boundary = internalMean * boundaryFactor;
+				
 		double weight = Math.abs(zScore);
 		if(weight > 2) {
 			weight = 2;
@@ -63,10 +89,80 @@ public class UtilsStat {
 		return score;
 	}	
 	
-	public double CalculateScoreSpatial(double authValue, double populationMean, double populationSd, double internalMean, double internalSd) {
-		double boundary = internalMean * 0.15;
+	public double CalculateScoreSpatial(double authValue, double populationMean, double populationSd, double internalMean, double internalSd, String paramName, String spatialType) {
+		double boundaryFactor = 1;
 		
+		if(spatialType.compareTo(ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING) == 0) {
+			switch(paramName) {
+			case ConstsParamNames.StrokeSampling.ACCELERATIONS:
+				boundaryFactor = 1.5;
+				break;
+			case ConstsParamNames.StrokeSampling.ACCUMULATED_NORM_AREA:
+				boundaryFactor = 1;			
+				break;
+			case ConstsParamNames.StrokeSampling.DELTA_TETA:
+				boundaryFactor = 1;
+				break;
+			case ConstsParamNames.StrokeSampling.RADIAL_ACCELERATION:
+				boundaryFactor = 1;
+				break;
+			case ConstsParamNames.StrokeSampling.RADIAL_VELOCITIES:
+				boundaryFactor = 1;
+				break;
+			case ConstsParamNames.StrokeSampling.RADIUS:
+				boundaryFactor = 1;
+				break;
+			case ConstsParamNames.StrokeSampling.TETA:
+				boundaryFactor = 1;
+				break;
+			case ConstsParamNames.StrokeSampling.VELOCITIES:
+				boundaryFactor = 0.18;
+				break;
+			}
+		}
+		if(spatialType.compareTo(ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING) == 0) {
+			switch(paramName) {
+			case ConstsParamNames.StrokeSampling.ACCELERATIONS:
+				boundaryFactor = 4;
+				break;
+			case ConstsParamNames.StrokeSampling.ACCUMULATED_NORM_AREA:
+				boundaryFactor = 0.3;		
+				break;
+			case ConstsParamNames.StrokeSampling.DELTA_TETA:
+				boundaryFactor = 3.5;
+				break;
+			case ConstsParamNames.StrokeSampling.RADIAL_ACCELERATION:
+				boundaryFactor = 3.5;
+				break;
+			case ConstsParamNames.StrokeSampling.RADIAL_VELOCITIES:
+				boundaryFactor = 3.5;
+				break;
+			case ConstsParamNames.StrokeSampling.RADIUS:
+				boundaryFactor = 0.15;
+				break;
+			case ConstsParamNames.StrokeSampling.TETA:
+				boundaryFactor = 4;
+				break;
+			case ConstsParamNames.StrokeSampling.VELOCITIES:
+				boundaryFactor = 0.18;
+				break;
+			}
+		}
+			
 		double zScore = (internalMean - populationMean) / populationSd;
+			
+		double boundaryFactorMultiplier = Math.abs(zScore) - 1;
+		if(boundaryFactorMultiplier > 1) {
+			boundaryFactorMultiplier = 1;
+		}
+		if(boundaryFactorMultiplier < 0) {
+			boundaryFactorMultiplier = 0;
+		}
+		boundaryFactorMultiplier = boundaryFactorMultiplier * 0.1;
+		boundaryFactor += boundaryFactorMultiplier; 
+		
+		double boundary = internalMean * boundaryFactor;
+				
 		double weight = Math.abs(zScore);
 		if(weight > 2) {
 			weight = 2;

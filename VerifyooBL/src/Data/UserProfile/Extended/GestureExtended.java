@@ -20,6 +20,8 @@ import Logic.Comparison.Stats.FeatureMeanDataAngle;
 import Logic.Comparison.Stats.StatEngine;
 import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Comparison.Stats.Norms.NormMgr;
+import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsGeneral;
 import Logic.Utils.UtilsLinearReg;
@@ -122,7 +124,15 @@ public class GestureExtended extends Gesture {
 	
 	public double GestureDelay;
 	
+	public double ZScoreMostUnique;
+	public double ZScoreTotal;
+	public double ZScoreCount;
+	
 	public GestureExtended(Gesture gesture, HashMap<String, IFeatureMeanData> hashFeatureMeans, int gestureIdx) {		
+		ZScoreTotal = 0;
+		ZScoreCount = 0;
+		ZScoreMostUnique = 0;
+		
 		Id = gesture.Id;
 		Instruction = gesture.Instruction;		
 		ListStrokes = gesture.ListStrokes;
@@ -225,21 +235,21 @@ public class GestureExtended extends Gesture {
 
 	protected void InitFeatures() {
 		CalculateListGestureEventsFeatures();
-		CalculateVelocityFeatures();
-		CalculateAccelerationFeatures();
+//		CalculateVelocityFeatures();
+//		CalculateAccelerationFeatures();
 		AddCalculatedFeatures();
 		CalculateSpatialSamplingVector();
 		CalculateGestureTotalTimeWithPauses();
-		CalculateGestureAvgVelocity();		
-		CalculateAccelerationAtStart();
-		CalculateAvgOfMiddlePressureAndSurface();
-		CalculateGestureVelocityPeaks();
-		CalculateGestureAccelerationPeaks();
-		CalculateAccumulatedDistanceByTime();
+//		CalculateGestureAvgVelocity();		
+//		CalculateAccelerationAtStart();
+//		CalculateAvgOfMiddlePressureAndSurface();
+//		CalculateGestureVelocityPeaks();
+//		CalculateGestureAccelerationPeaks();
+//		CalculateAccumulatedDistanceByTime();
 		//CalculateGestureStartMaxEndDirections();
-		CalculateAccumulatedDistanceLinearReg();		
-		CalculateAccelerations();
-		InitNormalizedGestures();		
+//		CalculateAccumulatedDistanceLinearReg();		
+//		CalculateAccelerations();
+		InitNormalizedGestures();
 	}
 	
 	private void InitNormalizedGestures() {
@@ -334,7 +344,7 @@ public class GestureExtended extends Gesture {
 			length += Utils.GetInstance().GetUtilsMath().CalcDistanceInPixels(eventCurr, eventNext);
 		}
 		
-		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListGestureEventsExtended, length);
+		SpatialSamplingVector = mUtilsSpatialSampling.PrepareDataSpatialSampling(ListGestureEventsExtended, length, ListStrokesExtended.get(0).Xdpi, ListStrokesExtended.get(0).Ydpi);
 	}
 	
 	protected void CalculateAccelerationAtStart()
@@ -740,8 +750,47 @@ public class GestureExtended extends Gesture {
 			mHashFeatureMeans.put(key, tempFeatureMeanData);
 		}
 		
+		try {
+			INormData normObj = NormMgr.GetInstance().GetNormDataByParamName(paramName, instruction);
+			UpdateZScore(value, normObj);
+		}
+		catch(Exception exc){
+			
+		}
 		
-		tempFeatureMeanData.AddValue(value);		
+		tempFeatureMeanData.AddValue(value);
+	}
+	
+	protected void UpdateZScore(double value, INormData normObj) {
+		if(normObj != null) {
+			double tempZScore = Math.abs((value - normObj.GetMean()) / normObj.GetStandardDev());
+			if(tempZScore > 2) {
+				tempZScore = 2;
+			}
+			
+			ZScoreTotal+= tempZScore;
+			ZScoreCount++;
+			
+			ZScoreMostUnique = Utils.GetInstance().GetUtilsMath().GetMaxValue(ZScoreMostUnique, tempZScore);
+		}		
+	}
+	
+	public double GetMostUniqueParameter() {
+		for(int idx = 0; idx < ListStrokesExtended.size(); idx++) {
+			ZScoreMostUnique = Utils.GetInstance().GetUtilsMath().GetMaxValue(ZScoreMostUnique, ListStrokesExtended.get(idx).ZScoreMostUnique);			
+		}
+		
+		return ZScoreMostUnique;
+	}
+	
+	public double GetGestureAvgZScore() {						
+		for(int idx = 0; idx < ListStrokesExtended.size(); idx++) {
+			ZScoreCount+= ListStrokesExtended.get(idx).ZScoreCount;
+			ZScoreTotal+= ListStrokesExtended.get(idx).ZScoreTotal;
+		}
+		
+		double avgZScore = ZScoreCount / ZScoreTotal;
+		return avgZScore;
 	}
 	
 	public HashMap<String, IFeatureMeanData> GetFeatureMeansHash() 

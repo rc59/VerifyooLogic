@@ -2,6 +2,7 @@ package Logic.Utils;
 
 import java.util.ArrayList;
 
+import Consts.ConstsMeasures;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Raw.MotionEventCompact;
 
@@ -14,8 +15,8 @@ public class UtilsSignalProcessing {
 	                (-Math.PI * 3 / 4), -Math.PI
 	    };
 	
-	public double[] PrepareDataSpatialSampling(ArrayList<MotionEventExtended> eventsList, double length) {
-        float[] pts = GetPoints(ConvertToVectorByDistance(eventsList, length));        
+	public double[] PrepareDataSpatialSampling(ArrayList<MotionEventExtended> eventsList, double length, double xdpi, double ydpi) {
+        float[] pts = GetPoints(ConvertToVectorByDistance(eventsList, length, xdpi, ydpi));        
         float[] center = ComputeCentroid(pts);
         float orientation = (float) Math.atan2(pts[1] - center[1], pts[0] - center[0]);
 
@@ -41,7 +42,7 @@ public class UtilsSignalProcessing {
         return ptsDouble;
     }
 	
-	public ArrayList<MotionEventExtended> ConvertToVectorByTime(ArrayList<MotionEventExtended> listEvents) {
+	public ArrayList<MotionEventExtended> ConvertToVectorByTime(ArrayList<MotionEventExtended> listEvents, double xdpi, double ydpi) {
         double timeInterval = listEvents.get(listEvents.size() - 1).EventTime - listEvents.get(0).EventTime; 
         String msg;
 		int minValue = -9999999;
@@ -95,6 +96,7 @@ public class UtilsSignalProcessing {
                 
                 double timeDiff = currentPointTime - lstPointTime;
                 if (timeSoFar + timeDiff >= increment) {
+                	
                 	double ratio = (increment - timeSoFar) / timeDiff;
                 	double nt = lstPointTime + ratio * timeDiff;
                     
@@ -104,7 +106,7 @@ public class UtilsSignalProcessing {
                     timeSoFar = 0;
                     
                     if(i + 1 < listEvents.size()) {
-                    	tempEventSpatial = CreateNewEvent(listEvents.get(i + 1), listEvents.get(i), ratio);
+                    	tempEventSpatial = CreateNewEvent(listEvents.get(i + 1), listEvents.get(i), ratio, xdpi, ydpi);
                     }
                     else {
                     	tempEventSpatial = listEvents.get(i).Clone();
@@ -174,7 +176,7 @@ public class UtilsSignalProcessing {
         return listEventsSpatial;
     }
 	
-	public ArrayList<MotionEventExtended> ConvertToVectorByDistance(ArrayList<MotionEventExtended> listEvents, double length) {
+	public ArrayList<MotionEventExtended> ConvertToVectorByDistance(ArrayList<MotionEventExtended> listEvents, double length, double xdpi, double ydpi) {
         int minValue = -9999999;
         int numPoints = NUM_TEMPORAL_SAMPLING_POINTS;
         int vectorLength = numPoints * 2;
@@ -243,7 +245,7 @@ public class UtilsSignalProcessing {
                     distanceSoFar = 0;
                     
                     if(i + 1 < listEvents.size()) {
-                    	tempEventSpatial = CreateNewEvent(listEvents.get(i + 1), listEvents.get(i), ratio);	
+                    	tempEventSpatial = CreateNewEvent(listEvents.get(i + 1), listEvents.get(i), ratio, xdpi, ydpi);	
                     }
                     else {
                     	tempEventSpatial = listEvents.get(i).Clone();                    	
@@ -267,56 +269,7 @@ public class UtilsSignalProcessing {
             }
         } catch (Exception exc) {
             msg = exc.getMessage();
-        }
-        
-        int idxTempVector = 0;
-        
-        double totalDistanceX = 0;
-        double totalDistanceY = 0;
-        double totalGyroX = 0;
-        double totalVelocityX = 0;
-        double totalVelocityY = 0;
-        double totalPressure = 0;
-        double totalSurface = 0;       
-        
-        double[] distances = new double[listEventsSpatial.size()];
-        
-        for(int idx = 0; idx < listEventsSpatial.size(); idx++) {        	        	
-        	listEventsSpatial.get(idx).Xpixel = vector[idxTempVector];
-        	idxTempVector++;
-        	listEventsSpatial.get(idx).Ypixel = vector[idxTempVector];
-        	idxTempVector++;
-        	
-        	if(idx > 0) {
-        		double deltaX = listEventsSpatial.get(idx).Xpixel - listEventsSpatial.get(idx - 1).Xpixel;
-        		double deltaY = listEventsSpatial.get(idx).Ypixel - listEventsSpatial.get(idx - 1).Ypixel;
-        		
-        		distances[idx - 1] = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        	}
-        	
-        	vectorX[idx] = listEventsSpatial.get(idx).Xpixel;
-        	vectorY[idx] = listEventsSpatial.get(idx).Ypixel;
-        	
-        	totalDistanceX += listEventsSpatial.get(idx).Xpixel; 
-        	totalDistanceY += listEventsSpatial.get(idx).Ypixel;
-        	totalGyroX += listEventsSpatial.get(idx).GyroX();
-        	totalVelocityX += listEventsSpatial.get(idx).VelocityX;
-        	totalVelocityY += listEventsSpatial.get(idx).VelocityY;
-        	totalPressure += listEventsSpatial.get(idx).Pressure;
-        	totalSurface += listEventsSpatial.get(idx).TouchSurface;   
-        }
-        
-        totalDistanceX = totalDistanceX / listEventsSpatial.size();
-        totalDistanceY = totalDistanceY / listEventsSpatial.size();
-        totalGyroX = totalGyroX / listEventsSpatial.size();
-        totalVelocityX = totalVelocityX / listEventsSpatial.size();
-        totalVelocityY = totalVelocityY / listEventsSpatial.size();
-        totalPressure = totalPressure / listEventsSpatial.size();
-        totalSurface = totalSurface / listEventsSpatial.size();
-                     
-        double timeDiff = listEventsSpatial.get(listEventsSpatial.size() - 1).EventTime - listEventsSpatial.get(0).EventTime;
-        double avgVelX = totalDistanceX / timeDiff;
-        double avgVelY = totalDistanceY / timeDiff;
+        }        
         
         return listEventsSpatial;
     }
@@ -334,7 +287,7 @@ public class UtilsSignalProcessing {
 		return pts;
 	}	
 	
-	private MotionEventExtended CreateNewEvent(MotionEventExtended eventNext, MotionEventExtended eventCurrent, double ratio) {
+	private MotionEventExtended CreateNewEvent(MotionEventExtended eventNext, MotionEventExtended eventCurrent, double ratio, double xdpi, double ydpi) {
 		MotionEventExtended tempEvent = eventCurrent.Clone();
 
 		tempEvent.Xpixel = GetSpatialValue(eventNext.Xpixel, eventCurrent.Xpixel, ratio);
@@ -342,6 +295,9 @@ public class UtilsSignalProcessing {
 		
 		tempEvent.Xmm = GetSpatialValue(eventNext.Xmm, eventCurrent.Xmm, ratio);
 		tempEvent.Ymm = GetSpatialValue(eventNext.Ymm, eventCurrent.Ymm, ratio);
+		
+//		tempEvent.Xmm = tempEvent.Xpixel / xdpi * ConstsMeasures.INCH_TO_MM;
+//		tempEvent.Ymm = tempEvent.Ypixel / ydpi * ConstsMeasures.INCH_TO_MM;
 		
 		tempEvent.EventTime = GetSpatialValue(eventNext.EventTime, eventCurrent.EventTime, ratio);
 		

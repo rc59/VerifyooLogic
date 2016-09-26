@@ -55,6 +55,9 @@ public class GestureComparer {
 	
 	protected HashMap<String, Double> mCompareFilters;	
 	
+	public double DtwScore;
+	public double PcaScore;
+	
 	public GestureComparer(boolean isSimilarDevices)
 	{	
 		mIsSimilarDevices = isSimilarDevices;
@@ -476,7 +479,7 @@ public class GestureComparer {
 			double gestureScore = totalScores / totalWeights;
 			double combinedScore = totalStrokeScore + gestureScore / 2;
 			
-			mCompareResultsGesture.Score = (combinedScore + velocityDTW) / 2;		
+			mCompareResultsGesture.Score = (combinedScore + velocityDTW) / 2;
 //			mCompareResultsGesture.Score = totalScores / totalWeights;
 			
 			CheckStrokesCosineAndStrokeDistance();
@@ -497,16 +500,27 @@ public class GestureComparer {
 		}
 				
 		ArrayList<ICompareResult> listScores = new ArrayList<>();
-		double dtwScore = 0;		
+		DtwScore = 0;		
+		PcaScore = 0;
 		
 		if(!mIsGesturesIdentical) {
 			double avgPressureScore = 0;
 			double avgSurfaceScore = 0;
 			
+			double tempDtwScore;
+			double tempPcaScore;
+			
 			for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {			
 				listScores.addAll(mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResults);
 				
-				dtwScore += mListStrokeComparers.get(idx).DtwSpatialTotalScore;
+				tempDtwScore = mListStrokeComparers.get(idx).DtwSpatialTotalScore;
+				tempPcaScore = mListStrokeComparers.get(idx).PcaScore;
+				
+				if(tempDtwScore < 0.85) {
+					tempDtwScore = tempDtwScore * tempDtwScore;
+				}
+				DtwScore += tempDtwScore;
+				PcaScore += Math.abs(tempPcaScore);
 				
 				avgPressureScore += mListStrokeComparers.get(idx).MiddlePressureScore;
 				avgSurfaceScore += mListStrokeComparers.get(idx).MiddleSurfaceScore;
@@ -518,8 +532,8 @@ public class GestureComparer {
 			double totalWeights = 0;
 
 			for(int idx = 0; idx < listScores.size(); idx++) {
-				totalScores += listScores.get(idx).GetValue();
-				totalWeights += listScores.get(idx).GetWeight();				
+				totalScores += listScores.get(idx).GetValue() * listScores.get(idx).GetWeight();
+				totalWeights += listScores.get(idx).GetWeight();
 			}
 			
 			double numStrokes = mListStrokeComparers.size();
@@ -527,11 +541,14 @@ public class GestureComparer {
 			avgPressureScore = avgPressureScore / numStrokes;
 			avgSurfaceScore = avgSurfaceScore / numStrokes;
 			
-			dtwScore = dtwScore / numStrokes;
+			DtwScore = DtwScore / numStrokes;
+			PcaScore = PcaScore / numStrokes;
 			
-			double paramsTotalScore = 2 * totalScores / totalWeights;
-			mCompareResultsGesture.Score = (paramsTotalScore + dtwScore) / 3;
-						
+			double paramsTotalScore = totalScores / totalWeights;
+			mCompareResultsGesture.Score = (3 * paramsTotalScore + DtwScore) / 4;
+					
+			UpdateScore(PcaScore, 3, 8, 0.2, true);
+			
 			double removeMiddlePressureScore = (1 - avgSurfaceScore * avgSurfaceScore) / 5;
 			mCompareResultsGesture.Score -= removeMiddlePressureScore;
 			
@@ -543,6 +560,26 @@ public class GestureComparer {
 		}
 	}	
 	
+	private void UpdateScore(double value, double lower, double upper, double weight, boolean isReverse) {
+		double updateValue = value - lower;
+		if(updateValue < 0) {
+			updateValue = 0;
+		}
+		double diff = upper - lower;
+		double finalScore = updateValue / diff;
+		if(finalScore > 1) {
+			finalScore = 1;			
+		}
+		if(finalScore < 0) {
+			finalScore = 0;			
+		}
+		
+		if(isReverse) {
+			finalScore = 1 - finalScore;
+		}
+		mCompareResultsGesture.Score = mCompareResultsGesture.Score * (1-weight) + finalScore * weight;
+	}
+
 	protected void CheckStrokesDistanceScore() {
 		mIsStrokeCosineDistanceValid = true;
 		for(int idxStrokeComparer = 0; idxStrokeComparer < mListStrokeComparers.size(); idxStrokeComparer++) {

@@ -98,7 +98,7 @@ public class NormContainerMgr {
 	}
 	
 	private String CheckInstruction(String instruction) {
-		if(instruction.compareTo("RLETTER") != 0 && instruction.compareTo("ALETTER") != 0) {
+		if(instruction.compareTo("RLETTER") != 0) {
 			instruction = "RLETTER";
 		}
 		return instruction;	

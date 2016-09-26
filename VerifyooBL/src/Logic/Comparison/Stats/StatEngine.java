@@ -211,7 +211,7 @@ public class StatEngine implements IStatEngine {
 			}		
 			valueAuth = listAuth.get(idxEvent).GetParamByName(paramName);
 			valueStored = listMean.get(idxEvent).GetParamByName(paramName);
-			tempValue = Utils.GetInstance().GetUtilsStat().CalculateScoreSpatial(valueAuth, popMean, popSd, valueStored, internalSd);
+			tempValue = Utils.GetInstance().GetUtilsStat().CalculateScoreSpatial(valueAuth, popMean, popSd, valueStored, internalSd, paramName, spatialType);
 			
 			listResults.add(new StatEngineResult(tempValue, 1, 1));
 		}

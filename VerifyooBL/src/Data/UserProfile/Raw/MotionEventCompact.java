@@ -7,6 +7,9 @@ public class MotionEventCompact {
 	public double Xpixel;
 	public double Ypixel;
 	
+	public double XpixelRaw;
+	public double YpixelRaw;
+	
 	public double Pressure;
 	
 	public double TouchSurface;	
@@ -14,13 +17,13 @@ public class MotionEventCompact {
 	protected double VelocityX;
 	protected double VelocityY;	
 	
-	protected double AccelerometerX;
-	protected double AccelerometerY;
-	protected double AccelerometerZ;
+	public double AccelerometerX;
+	public double AccelerometerY;
+	public double AccelerometerZ;
 	
-	protected double GyroX;
-	protected double GyroY;
-	protected double GyroZ;
+	public double GyroX;
+	public double GyroY;
+	public double GyroZ;
 	
 	public double VelocityX() {
 		return VelocityX;
@@ -85,6 +88,9 @@ public class MotionEventCompact {
 		
 		clonedEvent.Xpixel = Xpixel;
 		clonedEvent.Ypixel = Ypixel;
+		
+		clonedEvent.XpixelRaw = Xpixel;
+		clonedEvent.YpixelRaw = Ypixel;
 		
 		clonedEvent.Pressure = Pressure;
 		clonedEvent.TouchSurface = TouchSurface;

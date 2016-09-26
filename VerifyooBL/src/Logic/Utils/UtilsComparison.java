@@ -11,6 +11,7 @@ import Data.UserProfile.Raw.Gesture;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
 import Data.UserProfile.Raw.Template;
+import Logic.Comparison.Stats.FeatureMatrix;
 import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
 import Logic.Utils.DTW.DTWObjCoordinate;
 import Logic.Utils.DTW.IDTWObj;
@@ -26,6 +27,21 @@ public class UtilsComparison {
 		}
 		
 		return finalScore;
+	}
+	
+	public double[][] ConvertMatrix(FeatureMatrix featureMatrix) {
+		int columns = featureMatrix.MatrixFeature.size();
+		int rows = featureMatrix.MatrixFeature.get(0).size();
+		
+		double[][] matrix = new double[columns][rows];
+		
+		for(int idxColumn = 0; idxColumn < columns; idxColumn++) {
+			for(int idxRow = 0; idxRow < rows; idxRow++) {
+				matrix[idxColumn][idxRow] = featureMatrix.MatrixFeature.get(idxColumn).get(idxRow);
+			}	
+		}
+		
+		return matrix;		
 	}
 	
 	public ArrayList<MotionEventExtended> ListEventsToExtended(ArrayList<MotionEventCompact> listAvgVector, double length, double xdpi, double ydpi) {
