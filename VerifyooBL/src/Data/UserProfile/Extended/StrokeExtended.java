@@ -67,12 +67,14 @@ public class StrokeExtended extends Stroke {
 	
 	public double StrokeTimeInterval;
 		
+	public double StrokeMaxRadialVelocity;	
 	public double StrokeAverageVelocity;
 	public double StrokeMaxVelocity;	
 	public double StrokeMidVelocity;
 	
 	public IndexValue StrokeMaxVelocityWithIndex;
 
+	public double StrokeMaxRadialAcceleration;
 	public double StrokeAverageAcceleration;
 	public double StrokeMaxAcceleration;
 	public double StrokeAverageAccelerationNegative;
@@ -175,6 +177,7 @@ public class StrokeExtended extends Stroke {
 	{
 		PreCalculations();
 		CalculateFeatures();
+		//BiasData();
 	}
 	
 	protected void PreCalculations()
@@ -190,7 +193,7 @@ public class StrokeExtended extends Stroke {
 		ListEventsExtended = CalculateRadiusAndTeta(ListEventsExtended);
 		
 		SpatialSampling();
-		NormalizeSpatial();
+		NormalizeSpatial();		
 				
 		CalculateStartEndOfStroke();
 		PrepareData();
@@ -306,60 +309,26 @@ public class StrokeExtended extends Stroke {
 		ListEventsTemporalExtended = mUtilsSpatialSampling.ConvertToVectorByTime(ListEventsExtended, Xdpi, Ydpi);
 		
 		AddStrokeListEvents(mInstruction, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, mStrokeIdx, ListEventsSpatialExtended);
-		AddStrokeListEvents(mInstruction, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, mStrokeIdx, ListEventsTemporalExtended);
-		
-		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialExtended);
-		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialExtended);
-		
-		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsTemporalExtended);
-		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsTemporalExtended);
-		
-		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsTemporalExtended);
-		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsTemporalExtended);
-//		
-//		double[] vectorVel = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsExtended);
-//		double[] vectorVelDistance = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsSpatialByDistanceExtended);				
-//		double[] vectorVelTime = Utils.GetInstance().GetUtilsVectors().GetVectorVel(ListEventsSpatialByTimeExtended);
-//		
-//		double[] vectorAcc = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsExtended);
-//		double[] vectorAccDistance = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsSpatialByDistanceExtended);				
-//		double[] vectorAccTime = Utils.GetInstance().GetUtilsVectors().GetVectorAcc(ListEventsSpatialByTimeExtended);
-//		
-//		double[] vectorPressure = Utils.GetInstance().GetUtilsVectors().GetVectorPressure(ListEventsExtended);
-//		double[] vectorPressureDistance = Utils.GetInstance().GetUtilsVectors().GetVectorPressure(ListEventsSpatialByDistanceExtended);				
-//		double[] vectorPressureTime = Utils.GetInstance().GetUtilsVectors().GetVectorPressure(ListEventsSpatialByTimeExtended);
-//		
-//		double[] vectorSurface = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsExtended);
-//		double[] vectorSurfaceDistance = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsSpatialByDistanceExtended);				
-//		double[] vectorSurfaceTime = Utils.GetInstance().GetUtilsVectors().GetVectorSurface(ListEventsSpatialByTimeExtended);		
-//		
-//		double[] vectorRadialVelocity = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsExtended);
-//		double[] vectorRadialVelocityDistance = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsSpatialByDistanceExtended);
-//		double[] vectorRadialVelocityTime = Utils.GetInstance().GetUtilsVectors().GetVectorRadialVelocity(ListEventsSpatialByTimeExtended);		
-//		
-//		int size = vectorXDistance.length;
+		AddStrokeListEvents(mInstruction, ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING, mStrokeIdx, ListEventsTemporalExtended);		
 	}
 
 	private void CenterAndRotate() {
 		ListEvents = mUtilsSpatialSampling.CenterAndRotate(ListEvents);
 	}
-
+	
+	private void BiasData() {				
+		for(int idx = 1; idx < ListEventsTemporalExtended.size(); idx++) {
+			ListEventsTemporalExtended.get(idx).Velocity = ListEventsTemporalExtended.get(idx).Velocity - StrokeAverageVelocity; 
+		}
+	}
+	
 	private void NormalizeSpatial() {
 		ListEventsSpatialExtended = mUtilsSpatialSampling.Normalize(ListEventsSpatialExtended);
-		ListEventsTemporalExtended = mUtilsSpatialSampling.Normalize(ListEventsTemporalExtended);	
-		
-//		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsSpatialByDistanceExtended);
-//		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByDistanceExtended);
-//		
-//		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsSpatialByTimeExtended);
-//		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsSpatialByTimeExtended);		
+		ListEventsTemporalExtended = mUtilsSpatialSampling.Normalize(ListEventsTemporalExtended);		
 	}	
 	
 	private void Normalize() {
 		ListEventsExtended = mUtilsSpatialSampling.Normalize(ListEventsExtended);
-		
-//		double[] vectorX = Utils.GetInstance().GetUtilsVectors().GetVectorXnormalized(ListEventsExtended);
-//		double[] vectorY = Utils.GetInstance().GetUtilsVectors().GetVectorYnormalized(ListEventsExtended);		
 	}	
 	
 	protected void CalculateStartEndOfStroke()
@@ -394,6 +363,7 @@ public class StrokeExtended extends Stroke {
 		CalculateStrokeInterval();
 		CalculateAverageAndMaxVelocity();
 		CalculateAverageAndMaxAccelerations();
+		CalculateMaxRadial();
 		CalculateMiddlePressureAndSurface();
 		CalculateStrokeVelocityPeaks();
 		CalculateStrokeAccelerationPeaks();
@@ -404,14 +374,6 @@ public class StrokeExtended extends Stroke {
 	{			
 		ListEventsSpatialExtended = ListEventsCompactToExtended(ListEventsSpatial);
 		ListEventsTemporalExtended = ListEventsCompactToExtended(ListEventsTemporal);
-		
-//		double[] vectorXDistance = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByDistanceExtended);
-//		double[] vectorYDistance = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByDistanceExtended);
-//		
-//		double[] vectorXTime = Utils.GetInstance().GetUtilsVectors().GetVectorXmm(ListEventsSpatialByTimeExtended);
-//		double[] vectorYTime = Utils.GetInstance().GetUtilsVectors().GetVectorYmm(ListEventsSpatialByTimeExtended);
-//		
-//		int size = vectorXTime.length;
 	}
 	
 	protected ArrayList<MotionEventExtended> ListEventsCompactToExtended(ArrayList<MotionEventCompact> listEventsCompact)
@@ -614,6 +576,20 @@ public class StrokeExtended extends Stroke {
 		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY, mStrokeIdx, StrokeAverageVelocity);		
 		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_MAX_VELOCITY, mStrokeIdx, StrokeMaxVelocity);
 		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_MID_VELOCITY, mStrokeIdx, StrokeMidVelocity);
+	}
+	
+	protected void CalculateMaxRadial()
+	{
+		double maxRadVel = Double.MIN_VALUE;
+		double maxRadAcc = Double.MIN_VALUE;
+		
+		for(int idx = 0; idx < ListEventsExtended.size(); idx++) {
+			maxRadVel = Utils.GetInstance().GetUtilsMath().GetMaxValue(maxRadVel, Math.abs(ListEventsExtended.get(idx).RadialVelocity));
+			maxRadAcc = Utils.GetInstance().GetUtilsMath().GetMaxValue(maxRadAcc, Math.abs(ListEventsExtended.get(idx).RadialAcceleration));
+		}
+		
+		StrokeMaxRadialVelocity = maxRadVel;
+		StrokeMaxRadialAcceleration = maxRadAcc;
 	}
 	
 	protected void CalculateMiddlePressureAndSurface()

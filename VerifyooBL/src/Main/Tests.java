@@ -30,7 +30,7 @@ public class Tests {
 //			"57d6950e2f0e497411a02367"
 //			"57d695382f0e497411a0244a"
 						
-			score = t.CompareTemplatesById("57dc75422f0e497411a32364", "57dc76af2f0e497411a335f6");
+			score = t.CompareTemplatesById("57d7ee532f0e497411a0cf07", "57d7eef22f0e497411a0e042");
 			
 //			score = t.CompareTemplates("Roeeyshaked@gmail.com", "Roeeyshaked@gmail.com", 35);
 //			score = t.CompareTemplates("Roeeyshaked@gmail.com", "abuchnick@yahoo.com", 35);

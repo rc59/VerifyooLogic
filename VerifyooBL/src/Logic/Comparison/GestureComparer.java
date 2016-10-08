@@ -446,49 +446,49 @@ public class GestureComparer {
 		return mMinCosineDistanceScore;
 	}
 	
-	protected void CalculateFinalScoreFromStrokes()
-	{
-		double strokeScores = 0;
-		double strokeWeights = 0;
-		mIsGesturesIdentical = true;
-		double velocityDTW = 0;
-		
-		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {			
-			if(!mListStrokeComparers.get(idx).IsStrokesIdentical()) {
-				mIsGesturesIdentical = false;
-				strokeScores += mListStrokeComparers.get(idx).GetScore();
-				strokeWeights += mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResults.size();
-				velocityDTW += mListStrokeComparers.get(idx).DtwSpatialVelocity;
-			}
-		}
-		
-		velocityDTW = velocityDTW / mListStrokeComparers.size();
-				
-		ArrayList<ICompareResult> listScores = mCompareResultsGesture.ListCompareResults;		
-		
-		if(!mIsGesturesIdentical) {						
-			double totalScores = 0;
-			double totalWeights = 0;
-			
-			for(int idx = 0; idx < listScores.size(); idx++) {
-				totalScores += listScores.get(idx).GetValue();
-				totalWeights += listScores.get(idx).GetWeight();
-			}
-			
-			double totalStrokeScore = strokeScores / strokeWeights;
-			double gestureScore = totalScores / totalWeights;
-			double combinedScore = totalStrokeScore + gestureScore / 2;
-			
-			mCompareResultsGesture.Score = (combinedScore + velocityDTW) / 2;
-//			mCompareResultsGesture.Score = totalScores / totalWeights;
-			
-			CheckStrokesCosineAndStrokeDistance();
-		}		
-		else 
-		{
-			mCompareResultsGesture.Score = 1;
-		}
-	}
+//	protected void CalculateFinalScoreFromStrokes()
+//	{
+//		double strokeScores = 0;
+//		double strokeWeights = 0;
+//		mIsGesturesIdentical = true;
+//		double velocityDTW = 0;
+//		
+//		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {			
+//			if(!mListStrokeComparers.get(idx).IsStrokesIdentical()) {
+//				mIsGesturesIdentical = false;
+//				strokeScores += mListStrokeComparers.get(idx).GetScore();
+//				strokeWeights += mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResults.size();
+//				velocityDTW += mListStrokeComparers.get(idx).DtwSpatialVelocity;
+//			}
+//		}
+//		
+//		velocityDTW = velocityDTW / mListStrokeComparers.size();
+//				
+//		ArrayList<ICompareResult> listScores = mCompareResultsGesture.ListCompareResults;		
+//		
+//		if(!mIsGesturesIdentical) {						
+//			double totalScores = 0;
+//			double totalWeights = 0;
+//			
+//			for(int idx = 0; idx < listScores.size(); idx++) {
+//				totalScores += listScores.get(idx).GetValue();
+//				totalWeights += listScores.get(idx).GetWeight();
+//			}
+//			
+//			double totalStrokeScore = strokeScores / strokeWeights;
+//			double gestureScore = totalScores / totalWeights;
+//			double combinedScore = totalStrokeScore + gestureScore / 2;
+//			
+//			mCompareResultsGesture.Score = (combinedScore + velocityDTW) / 2;
+////			mCompareResultsGesture.Score = totalScores / totalWeights;
+//			
+//			CheckStrokesCosineAndStrokeDistance();
+//		}		
+//		else 
+//		{
+//			mCompareResultsGesture.Score = 1;
+//		}
+//	}
 	
 	protected void CalculateFinalScore()
 	{
@@ -512,13 +512,13 @@ public class GestureComparer {
 			
 			for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {			
 				listScores.addAll(mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResults);
+				listScores.addAll(mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResultsExtra);
 				
 				tempDtwScore = mListStrokeComparers.get(idx).DtwSpatialTotalScore;
 				tempPcaScore = mListStrokeComparers.get(idx).PcaScore;
 				
-				if(tempDtwScore < 0.85) {
-					tempDtwScore = tempDtwScore * tempDtwScore;
-				}
+				tempDtwScore = tempDtwScore * tempDtwScore;
+				
 				DtwScore += tempDtwScore;
 				PcaScore += Math.abs(tempPcaScore);
 				
@@ -545,9 +545,10 @@ public class GestureComparer {
 			PcaScore = PcaScore / numStrokes;
 			
 			double paramsTotalScore = totalScores / totalWeights;
-			mCompareResultsGesture.Score = (3 * paramsTotalScore + DtwScore) / 4;
-					
+			mCompareResultsGesture.Score = (paramsTotalScore + DtwScore) / 2;			
+			
 			UpdateScore(PcaScore, 3, 8, 0.2, true);
+			UpdateScore(DtwScore, 0.5, 0.85, 0.2, false);
 			
 			double removeMiddlePressureScore = (1 - avgSurfaceScore * avgSurfaceScore) / 5;
 			mCompareResultsGesture.Score -= removeMiddlePressureScore;

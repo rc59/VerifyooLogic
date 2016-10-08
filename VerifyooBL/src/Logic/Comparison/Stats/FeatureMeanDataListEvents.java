@@ -39,63 +39,77 @@ public class FeatureMeanDataListEvents implements IFeatureMeanData {
 		return mListOfListEvents;
 	}
 	
-	public double GetMinDtwDistance(ArrayList<MotionEventExtended> listAuth, String param) {
+	public double GetMinDtwDistance(ArrayList<MotionEventExtended> listAuth, String param, int idxShift) {
 		double result = 0;
 		
 		ArrayList<MotionEventExtended> listCurrent;
 		
 		double minDistance = Double.MAX_VALUE;
-		double numComparisons = mListOfListEvents.size() - 1;
 		
 		for(int idxList = 0; idxList < mListOfListEvents.size(); idxList++) {
 			listCurrent = mListOfListEvents.get(idxList);
-			minDistance = Utils.GetInstance().GetUtilsMath().GetMinValue(GetDtwScore(listCurrent, listAuth, param), minDistance);
+			minDistance = Utils.GetInstance().GetUtilsMath().GetMinValue(GetDtwScore(listCurrent, listAuth, param, idxShift), minDistance);
 		}
 					
 		return minDistance;
 	}
 	
-	public double GetAvgDtwDistance(ArrayList<MotionEventExtended> listAuth, String param) {
-		double result = 0;
-		
-		ArrayList<MotionEventExtended> listCurrent;
-		
-		double dtwTotal = 0;
-		double numComparisons = mListOfListEvents.size() - 1;
-		
-		for(int idxList = 0; idxList < mListOfListEvents.size(); idxList++) {
-			listCurrent = mListOfListEvents.get(idxList);
-			dtwTotal += GetDtwScore(listCurrent, listAuth, param);
-		}
-		
-		result = dtwTotal / numComparisons;		
-		return result;
-	}
+//	public double GetAvgDtwDistance(ArrayList<MotionEventExtended> listAuth, String param) {
+//		double result = 0;
+//		
+//		ArrayList<MotionEventExtended> listCurrent;
+//		
+//		double dtwTotal = 0;
+//		double numComparisons = mListOfListEvents.size() - 1;
+//		
+//		for(int idxList = 0; idxList < mListOfListEvents.size(); idxList++) {
+//			listCurrent = mListOfListEvents.get(idxList);
+//			dtwTotal += GetDtwScore(listCurrent, listAuth, param);
+//		}
+//		
+//		result = dtwTotal / numComparisons;		
+//		return result;
+//	}
 	
-	public double GetUserAvgDtwDistance(String param) {
-		double result = 0;
-		
-		ArrayList<MotionEventExtended> listBase = mListOfListEvents.get(0); 
-		ArrayList<MotionEventExtended> listCurrent;
-		
-		double dtwTotal = 0;
-		double numComparisons = mListOfListEvents.size() - 1;
-		
-		for(int idxList = 1; idxList < mListOfListEvents.size(); idxList++) {
-			listCurrent = mListOfListEvents.get(idxList);
-			dtwTotal += GetDtwScore(listCurrent, listBase, param);
-		}
-		
-		result = dtwTotal / numComparisons;		
-		return result;
-	}
+//	public double GetUserAvgDtwDistance(String param) {
+//		double result = 0;
+//		
+//		ArrayList<MotionEventExtended> listBase = mListOfListEvents.get(0); 
+//		ArrayList<MotionEventExtended> listCurrent;
+//		
+//		double dtwTotal = 0;
+//		double numComparisons = mListOfListEvents.size() - 1;
+//		
+//		for(int idxList = 1; idxList < mListOfListEvents.size(); idxList++) {
+//			listCurrent = mListOfListEvents.get(idxList);
+//			dtwTotal += GetDtwScore(listCurrent, listBase, param);
+//		}
+//		
+//		result = dtwTotal / numComparisons;		
+//		return result;
+//	}
 	
-	private double GetDtwScore(ArrayList<MotionEventExtended> listCurrent, ArrayList<MotionEventExtended> listBase, String param) {
+	private double GetDtwScore(ArrayList<MotionEventExtended> listCurrent, ArrayList<MotionEventExtended> listBase, String param, int idxShift) {
 		ArrayList<IDTWObj> listDtwCurrent = StatEngine.GetInstance().GetSpatialVector(mInstruction, param, mIdxStroke, listCurrent, mSamplingType);
 		ArrayList<IDTWObj> listDtwBase = StatEngine.GetInstance().GetSpatialVector(mInstruction, param, mIdxStroke, listBase, mSamplingType);
 		
-		UtilsDTW dtwVelocities = new UtilsDTW(listDtwCurrent, listDtwBase);
-		double distance = dtwVelocities.getDistance();
+		double distance;
+		if(idxShift > -1) {
+			ArrayList<IDTWObj> listDtwCurrentPartial = new ArrayList<>();
+			ArrayList<IDTWObj> listDtwBasePartial = new ArrayList<>();
+			
+			for(int idx = idxShift; idx < idxShift + 16; idx++) {
+				listDtwCurrentPartial.add(listDtwCurrent.get(idx));
+				listDtwBasePartial.add(listDtwBase.get(idx));
+			}
+			
+			UtilsDTW dtwVelocities = new UtilsDTW(listDtwCurrentPartial, listDtwBasePartial);
+			distance = dtwVelocities.getDistance();	
+		}
+		else {
+			UtilsDTW dtwVelocities = new UtilsDTW(listDtwCurrent, listDtwBase);
+			distance = dtwVelocities.getDistance();
+		}		
 		
 		return distance;
 	}

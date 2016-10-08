@@ -4,6 +4,8 @@ public class MotionEventCompact {
 	public String Id;
 	public double EventTime;
 	
+	public boolean IsHistory;
+	
 	public double Xpixel;
 	public double Ypixel;
 	
@@ -83,6 +85,7 @@ public class MotionEventCompact {
 		MotionEventCompact clonedEvent = new MotionEventCompact();
 		
 		clonedEvent.Id = Id;
+		clonedEvent.IsHistory = IsHistory;
 		
 		clonedEvent.EventTime = EventTime;
 		

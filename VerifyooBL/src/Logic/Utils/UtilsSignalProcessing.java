@@ -413,7 +413,7 @@ public class UtilsSignalProcessing {
     	listEventsProcessed = Translate(listEvents, -center[0], -center[1]);
     	
     	
-    	listEventsProcessed = Rotate(listEventsProcessed, adjustment);
+    	//listEventsProcessed = Rotate(listEventsProcessed, adjustment);
     	
     	return listEventsProcessed;
     }

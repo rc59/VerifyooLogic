@@ -62,6 +62,9 @@ public class StrokeComparer {
 	
 	public double PcaScore;
 	
+	public double RadialVelocityDiff;
+	public double RadialAccelerationDiff;
+	
 	public double DtwCoordinates;
 	public double DtwNormalizedCoordinates;
 	public double DtwNormalizedCoordinatesSpatialDistance;
@@ -81,6 +84,23 @@ public class StrokeComparer {
 	public double DtwSpatialAccumNormArea;
 	
 	public double DtwTemporalVelocity;
+	public double DtwTemporalVelocity0;
+	public double DtwTemporalVelocity1;
+	public double DtwTemporalVelocity2;
+	public double DtwTemporalVelocity3;
+	public double DtwTemporalVelocity4;
+	public double DtwTemporalVelocity5;
+	public double DtwTemporalVelocity6;
+	public double DtwTemporalVelocity7;
+	public double DtwTemporalVelocity8;
+	public double DtwTemporalVelocity9;
+	public double DtwTemporalVelocity10;
+	public double DtwTemporalVelocity11;
+	public double DtwTemporalVelocity12;
+	public double DtwTemporalVelocity13;
+	public double DtwTemporalVelocity14;
+	public double DtwTemporalVelocity15;
+	
 	public double DtwTemporalAcceleration;
 	public double DtwTemporalRadialVelocity;
 	public double DtwTemporalRadialAcceleration;
@@ -208,7 +228,8 @@ public class StrokeComparer {
 				ComparePressureAndSurface();
 				CompareAccelerometer();
 				CompareStrokeTransitionTimes();
-				CompareAccelerations();						
+				CompareAccelerations();
+				CompareRadials();
 				CalculateFinalScore();	
 				CheckFinalScore();
 			}
@@ -222,6 +243,21 @@ public class StrokeComparer {
 		}		
 	}			
 	
+	private void CompareRadials() {
+		RadialVelocityDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.StrokeMaxRadialVelocity, mStrokeStoredExtended.StrokeMaxRadialVelocity);
+		RadialAccelerationDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.StrokeMaxRadialAcceleration, mStrokeStoredExtended.StrokeMaxRadialAcceleration);
+		
+		ICompareResult compareResult = 
+				(ICompareResult) new CompareResultGeneric("RadialVelocity", RadialVelocityDiff, mStrokeAuthExtended.StrokeMaxRadialVelocity, mStrokeStoredExtended.StrokeMaxRadialVelocity, 0, 0, 0, 0);
+		compareResult.SetWeight(0.9);
+		mCompareResult.ListCompareResultsExtra.add(compareResult);
+		
+		compareResult = 
+				(ICompareResult) new CompareResultGeneric("RadialAcceleration", RadialAccelerationDiff, mStrokeAuthExtended.StrokeMaxRadialAcceleration, mStrokeStoredExtended.StrokeMaxRadialAcceleration, 0, 0, 0, 0);
+		compareResult.SetWeight(0.9);
+		mCompareResult.ListCompareResultsExtra.add(compareResult);
+	}
+
 	protected double CheckValues(double totalToRemove, double lowerBoundary, double upperBoundary, double value, boolean isHigherBetter) {
 		if(!isHigherBetter) {
 			value = -1 * value;
@@ -274,7 +310,7 @@ public class StrokeComparer {
 		}
 	}
 
-	private double CalculateDtwForSamplingVector(String paramName, String samplingType, double factor) {		
+	private double CalculateDtwForSamplingVector(String paramName, String samplingType, double factor, int idxShift) {		
 		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(mStrokeStoredExtended.GetInstruction(), samplingType, mStrokeStoredExtended.GetStrokeIdx());
 		FeatureMeanDataListEvents tempFeatureDtw = (FeatureMeanDataListEvents) mStrokeStoredExtended.GetFeatureMeansHash().get(key);
 		
@@ -290,7 +326,7 @@ public class StrokeComparer {
 			break;
 		}		
 		
-		double minDistance = tempFeatureDtw.GetMinDtwDistance(tempListEvents, paramName);
+		double minDistance = tempFeatureDtw.GetMinDtwDistance(tempListEvents, paramName, idxShift);
 		
 		double result = (1 - minDistance) * factor;
 		if(result > 1) {
@@ -382,8 +418,24 @@ public class StrokeComparer {
 		}		
 	}
 	
-	private void CreateSpatialVectorsForDtwAnalysis() {
-		DtwTemporalVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1);
+	private void CreateSpatialVectorsForDtwAnalysis() {		
+//		DtwTemporalVelocity = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, -1);
+//		DtwTemporalVelocity0 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 0);
+//		DtwTemporalVelocity1 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 1);
+//		DtwTemporalVelocity2 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 2);
+//		DtwTemporalVelocity3 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 3);
+//		DtwTemporalVelocity4 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 4);
+//		DtwTemporalVelocity5 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 5);
+		DtwTemporalVelocity6 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 6);
+//		DtwTemporalVelocity7 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 7);
+//		DtwTemporalVelocity8 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 8);
+//		DtwTemporalVelocity9 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 9);
+//		DtwTemporalVelocity10 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 10);
+//		DtwTemporalVelocity11 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 11);
+//		DtwTemporalVelocity12 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 12);
+//		DtwTemporalVelocity13 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 13);
+//		DtwTemporalVelocity14 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 14);
+//		DtwTemporalVelocity15 = CalculateDtwForSamplingVector(ConstsParamNames.StrokeSampling.VELOCITIES, ConstsParamNames.Stroke.STROKE_SPATIAL_SAMPLING, 1, 15);		
 		
 		double timeDiff = mStrokeAuthExtended.ListEventsTemporalExtended.get(1).EventTime - mStrokeAuthExtended.ListEventsTemporalExtended.get(0).EventTime; 
 		double velocityDiff;
@@ -447,7 +499,7 @@ public class StrokeComparer {
 //		
 //		listScores.remove(0);
 				
-		DtwSpatialTotalScore = DtwTemporalVelocity;
+		DtwSpatialTotalScore = DtwTemporalVelocity6;
 	}
 	
 	private ArrayList<IDTWObj> CreateSpatialVectorsByParamName(String paramName, StrokeExtended stroke) {

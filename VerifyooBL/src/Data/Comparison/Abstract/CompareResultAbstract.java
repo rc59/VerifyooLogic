@@ -31,6 +31,9 @@ public abstract class CompareResultAbstract implements ICompareResult {
 	
 	@Override
 	public double GetWeight() { 
+		if(Double.isNaN(Weight)) {
+			Weight = 0.9;
+		}
 		return Weight;
 	}
 	
@@ -69,7 +72,7 @@ public abstract class CompareResultAbstract implements ICompareResult {
 
 	@Override
 	public void SetWeight(double weight) {
-		weight = Weight;
+		Weight = weight;
 	}
 
 	@Override
