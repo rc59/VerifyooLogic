@@ -62,4 +62,51 @@ public class UtilsGeneral {
 		
 		return gestureTotalTime;
 	}
+
+	public double GetBoundaryAdj(String paramName) {
+		double boundary;
+		switch(paramName) {
+			default:
+				boundary = 0.18;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MID_VELOCITY:
+				boundary = 0.25;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY:
+				boundary = 0.23;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA:
+				boundary = 0.22;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_TIME_INTERVAL:
+				boundary = 0.18;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_NUM_EVENTS:
+				boundary = 0.18;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE:
+				boundary = 0.18;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE:
+				boundary = 0.18;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MAX_VELOCITY:
+				boundary = 0.22;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MAX_RADIAL_VELOCITY:
+				boundary = 0.20;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MAX_RADIAL_ACCELERATION:
+				boundary = 0.22;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MAX_ACCELERATION:
+				boundary = 0.24;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY:
+				boundary = 0.22;
+				break;
+		}
+		
+		return boundary;
+	}
 }

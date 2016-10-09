@@ -228,7 +228,6 @@ public class StrokeExtended extends Stroke {
 				listEvents.get(idx).RadialVelocity = listEvents.get(idx - 1).RadialVelocity; 
 				listEvents.get(idx).RadialAcceleration = listEvents.get(idx - 1).RadialAcceleration;
 			}			
-			//RadialAcceleration = 
 		}
 		
 		return listEvents;
@@ -590,6 +589,9 @@ public class StrokeExtended extends Stroke {
 		
 		StrokeMaxRadialVelocity = maxRadVel;
 		StrokeMaxRadialAcceleration = maxRadAcc;
+		
+		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_MAX_RADIAL_VELOCITY, mStrokeIdx, StrokeMaxRadialVelocity);		
+		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_MAX_RADIAL_ACCELERATION, mStrokeIdx, StrokeMaxRadialAcceleration);		
 	}
 	
 	protected void CalculateMiddlePressureAndSurface()
@@ -693,7 +695,7 @@ public class StrokeExtended extends Stroke {
 				mHashFeatureMeans.put(keyMatrix, tempFeatureMatrix);
 			}
 		
-			((FeatureMatrix)tempFeatureMatrix).AddValue(value, 12);
+			((FeatureMatrix)tempFeatureMatrix).AddValue(value, Consts.ConstsFeatures.NUM_STROKE_PARAMS);
 		}
 		
 		try {

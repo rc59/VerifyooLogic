@@ -34,8 +34,8 @@ public class UtilsStat {
 		return score;
 	}
 	
-	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd) {
-		double boundaryFactor = 0.18;
+	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd, double boundaryAdj) {
+		double boundaryFactor = boundaryAdj;
 		double zScore = (internalMean - populationMean) / populationSd;
 			
 		double boundaryFactorMultiplier = Math.abs(zScore) - 1;
@@ -212,9 +212,13 @@ public class UtilsStat {
 		double lowerBoundProb = ConvertZToProbabilityCheckNegative(lowerBoundZ);
 		double upperBoundProb = ConvertZToProbabilityCheckNegative(upperBoundZ);
 		
-		double weight = 1 - Math.abs(upperBoundProb - lowerBoundProb);
+		double weight = 1 - Math.abs(upperBoundProb - lowerBoundProb);		
+		double zScore = Math.abs(CalculateZScore(internalMean, popMean, popSd));
+		if(zScore > 2) {
+			zScore = 2;
+		}
 		
-		return weight;
+		return weight * zScore;
 	}
 		
 	protected double CalculateProbability(double authValue, double internalMean, double internalSd, boolean isAbs) {

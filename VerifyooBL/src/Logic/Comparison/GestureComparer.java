@@ -13,6 +13,7 @@ import Consts.Enums.PointStatus;
 import Data.Comparison.CompareResultGeneric;
 import Data.Comparison.CompareResultSummary;
 import Data.Comparison.Interfaces.ICompareResult;
+import Data.MetaData.ValueFreq;
 import Data.UserProfile.Extended.GestureExtended;
 import Data.UserProfile.Extended.StrokeExtended;
 import Logic.Comparison.Stats.FeatureMeanData;
@@ -528,16 +529,29 @@ public class GestureComparer {
 
 			listScores.addAll(mCompareResultsGesture.ListCompareResults);
 			
-			double totalScores = 0;
-			double totalWeights = 0;
-
-			for(int idx = 0; idx < listScores.size(); idx++) {
-				totalScores += listScores.get(idx).GetValue() * listScores.get(idx).GetWeight();
-				totalWeights += listScores.get(idx).GetWeight();
-			}
+			Collections.sort(listScores, new Comparator<ICompareResult>() {
+	            @Override
+	            public int compare(ICompareResult value1, ICompareResult value2) {
+	                if (Math.abs(value1.GetValue()) > Math.abs(value2.GetValue())) {
+	                    return 1;
+	                }
+	                if (Math.abs(value1.GetValue()) < Math.abs(value2.GetValue())) {
+	                    return -1;
+	                }
+	                return 0;
+	            }
+	        });
 			
 			double numStrokes = mListStrokeComparers.size();
 			
+			double totalScores = 0;
+			double totalWeights = 0;
+
+			for(int idx = (2 * mListStrokeComparers.size()); idx < listScores.size(); idx++) {
+				totalScores += listScores.get(idx).GetValue() * listScores.get(idx).GetWeight();
+				totalWeights += listScores.get(idx).GetWeight();
+			}
+						
 			avgPressureScore = avgPressureScore / numStrokes;
 			avgSurfaceScore = avgSurfaceScore / numStrokes;
 			
@@ -545,10 +559,10 @@ public class GestureComparer {
 			PcaScore = PcaScore / numStrokes;
 			
 			double paramsTotalScore = totalScores / totalWeights;
-			mCompareResultsGesture.Score = (paramsTotalScore + DtwScore) / 2;			
+			mCompareResultsGesture.Score = (paramsTotalScore * 3 + DtwScore) / 4;			
 			
 			UpdateScore(PcaScore, 3, 8, 0.2, true);
-			UpdateScore(DtwScore, 0.5, 0.85, 0.2, false);
+//			UpdateScore(DtwScore, 0.5, 0.85, 0.2, false);
 			
 			double removeMiddlePressureScore = (1 - avgSurfaceScore * avgSurfaceScore) / 5;
 			mCompareResultsGesture.Score -= removeMiddlePressureScore;

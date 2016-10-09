@@ -38,6 +38,9 @@ public class ConstsParamNames {
 		
 		public static final String STROKE_SPATIAL_SAMPLING = "StrokeSpatialSampling";
 		public static final String STROKE_TEMPORAL_SAMPLING = "StrokeTemporalSampling";
+		
+		public static final String STROKE_MAX_RADIAL_VELOCITY = "StrokeMaxRadialVelocity";
+		public static final String STROKE_MAX_RADIAL_ACCELERATION = "StrokeMaxRadialAcceleration";
 	}
 	
 	public class Gesture

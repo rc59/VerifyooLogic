@@ -222,6 +222,7 @@ public class StrokeComparer {
 				PcaAnalysis();
 				CompareMinCosineDistance();
 				CompareStrokeAreas();
+				CompareLengths();
 				CompareTimeInterval();
 				CompareNumEvents();
 				CompareVelocities();
@@ -244,18 +245,11 @@ public class StrokeComparer {
 	}			
 	
 	private void CompareRadials() {
-		RadialVelocityDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.StrokeMaxRadialVelocity, mStrokeStoredExtended.StrokeMaxRadialVelocity);
-		RadialAccelerationDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.StrokeMaxRadialAcceleration, mStrokeStoredExtended.StrokeMaxRadialAcceleration);
+		double maxRadialVelocityAuth = mStrokeAuthExtended.StrokeMaxRadialVelocity;
+		double maxRadialAccelerationAuth = mStrokeAuthExtended.StrokeMaxRadialAcceleration;
 		
-		ICompareResult compareResult = 
-				(ICompareResult) new CompareResultGeneric("RadialVelocity", RadialVelocityDiff, mStrokeAuthExtended.StrokeMaxRadialVelocity, mStrokeStoredExtended.StrokeMaxRadialVelocity, 0, 0, 0, 0);
-		compareResult.SetWeight(0.9);
-		mCompareResult.ListCompareResultsExtra.add(compareResult);
-		
-		compareResult = 
-				(ICompareResult) new CompareResultGeneric("RadialAcceleration", RadialAccelerationDiff, mStrokeAuthExtended.StrokeMaxRadialAcceleration, mStrokeStoredExtended.StrokeMaxRadialAcceleration, 0, 0, 0, 0);
-		compareResult.SetWeight(0.9);
-		mCompareResult.ListCompareResultsExtra.add(compareResult);
+		CompareParameter(ConstsParamNames.Stroke.STROKE_MAX_RADIAL_VELOCITY, maxRadialVelocityAuth);
+		CompareParameter(ConstsParamNames.Stroke.STROKE_MAX_RADIAL_ACCELERATION, maxRadialAccelerationAuth);		
 	}
 
 	protected double CheckValues(double totalToRemove, double lowerBoundary, double upperBoundary, double value, boolean isHigherBetter) {
