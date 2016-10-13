@@ -186,11 +186,12 @@ public class StrokeExtended extends Stroke {
 		CenterAndRotate();
 		ListEventsExtended = ListEventsCompactToExtended(ListEvents);		
 		MedianFilters();
-		ListEventsExtended = CalculateAccelerationsForEventsList(ListEventsExtended);		
-		ListEventsExtended = CalculateRadialVelocityForEventsList(ListEventsExtended);
-				
+		
 		Normalize();
 		ListEventsExtended = CalculateRadiusAndTeta(ListEventsExtended);
+		
+		ListEventsExtended = CalculateAccelerationsForEventsList(ListEventsExtended);		
+		ListEventsExtended = CalculateRadialVelocityForEventsList(ListEventsExtended);
 		
 		SpatialSampling();
 		NormalizeSpatial();		
@@ -215,7 +216,7 @@ public class StrokeExtended extends Stroke {
 			complexPrev = new Complex(listEvents.get(idx - 1).Xmm, listEvents.get(idx - 1).Ymm);		
 			
 			complexDiff = complexPrev.divides(complexCurrent);
-			diffPhase = complexDiff.phase();
+			diffPhase = listEvents.get(idx).Teta - listEvents.get(idx - 1).Teta;
 			
 			diffTime = listEvents.get(idx).EventTime - listEvents.get(idx - 1).EventTime; 
 			

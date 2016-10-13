@@ -231,7 +231,7 @@ public class StrokeComparer {
 				CompareStrokeTransitionTimes();
 				CompareAccelerations();
 				CompareRadials();
-				CalculateFinalScore();	
+				CalculateFinalScore();
 				CheckFinalScore();
 			}
 		}

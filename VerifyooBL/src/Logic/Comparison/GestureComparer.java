@@ -511,17 +511,23 @@ public class GestureComparer {
 			double tempDtwScore;
 			double tempPcaScore;
 			
+			double[] listDtw = new double[mListStrokeComparers.size()];
+			double[] listPCA = new double[mListStrokeComparers.size()];
+			
 			for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {			
 				listScores.addAll(mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResults);
 				listScores.addAll(mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResultsExtra);
 				
 				tempDtwScore = mListStrokeComparers.get(idx).DtwSpatialTotalScore;
-				tempPcaScore = mListStrokeComparers.get(idx).PcaScore;
+				tempPcaScore = Math.abs(mListStrokeComparers.get(idx).PcaScore);
+				
+				listDtw[idx] = tempDtwScore;
+				listPCA[idx] = tempPcaScore;
 				
 				tempDtwScore = tempDtwScore * tempDtwScore;
 				
 				DtwScore += tempDtwScore;
-				PcaScore += Math.abs(tempPcaScore);
+				PcaScore += tempPcaScore;
 				
 				avgPressureScore += mListStrokeComparers.get(idx).MiddlePressureScore;
 				avgSurfaceScore += mListStrokeComparers.get(idx).MiddleSurfaceScore;
@@ -559,10 +565,16 @@ public class GestureComparer {
 			PcaScore = PcaScore / numStrokes;
 			
 			double paramsTotalScore = totalScores / totalWeights;
-			mCompareResultsGesture.Score = (paramsTotalScore * 3 + DtwScore) / 4;			
+//			mCompareResultsGesture.Score = (paramsTotalScore * 3 + DtwScore) / 4;
+			mCompareResultsGesture.Score = paramsTotalScore;
 			
-			UpdateScore(PcaScore, 3, 8, 0.2, true);
-//			UpdateScore(DtwScore, 0.5, 0.85, 0.2, false);
+//			double weight = 0.2 / (double)listPCA.length;
+//			for(int idx = 0; idx < listPCA.length; idx++) {
+//				UpdateScore(listPCA[idx], 2.5, 8, weight, true);
+//				UpdateScore(listDtw[idx], 0.2, 0.75, weight, false);
+//			}
+			UpdateScore(PcaScore, 2.5, 8, 0.2, true);
+			UpdateScore(DtwScore, 0.3, 0.55, 0.2, false);
 			
 			double removeMiddlePressureScore = (1 - avgSurfaceScore * avgSurfaceScore) / 5;
 			mCompareResultsGesture.Score -= removeMiddlePressureScore;
