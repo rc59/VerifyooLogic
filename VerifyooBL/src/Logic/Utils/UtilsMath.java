@@ -5,7 +5,8 @@ import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Raw.MotionEventCompact;
 
 public class UtilsMath {
-//calculate alpha-beta
+
+	//calculate alpha-beta
 	public double CalcAbsAngleDifference(double alpha, double beta)
 	{
 		double phi = Math.abs(beta - alpha) % (2*Math.PI);       

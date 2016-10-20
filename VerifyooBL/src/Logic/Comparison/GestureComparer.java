@@ -58,6 +58,9 @@ public class GestureComparer {
 	
 	public double DtwScore;
 	public double PcaScore;
+	public double InterestPointScore;
+	
+	public double ExtraParamsValue;
 	
 	public GestureComparer(boolean isSimilarDevices)
 	{	
@@ -433,7 +436,7 @@ public class GestureComparer {
 			tempStrokeAuth = mGestureAuth.ListStrokesExtended.get(idxStroke);
 			
 			strokeComparer.CompareStrokes(tempStrokeStored, tempStrokeAuth);
-			mListStrokeComparers.add(strokeComparer);			
+			mListStrokeComparers.add(strokeComparer);
 		}
 	}
 	
@@ -503,6 +506,7 @@ public class GestureComparer {
 		ArrayList<ICompareResult> listScores = new ArrayList<>();
 		DtwScore = 0;		
 		PcaScore = 0;
+		InterestPointScore = 0;
 		
 		if(!mIsGesturesIdentical) {
 			double avgPressureScore = 0;
@@ -510,30 +514,51 @@ public class GestureComparer {
 			
 			double tempDtwScore;
 			double tempPcaScore;
+			double tempInterestPointScore;
 			
-			double[] listDtw = new double[mListStrokeComparers.size()];
-			double[] listPCA = new double[mListStrokeComparers.size()];
+			ArrayList<Double> listExtraParams = new ArrayList<>();
 			
 			for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {			
 				listScores.addAll(mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResults);
-				listScores.addAll(mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResultsExtra);
+				listScores.addAll(mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResultsExtra);				
 				
-				tempDtwScore = mListStrokeComparers.get(idx).DtwSpatialTotalScore;
-				tempPcaScore = Math.abs(mListStrokeComparers.get(idx).PcaScore);
-				
-				listDtw[idx] = tempDtwScore;
-				listPCA[idx] = tempPcaScore;
-				
-				tempDtwScore = tempDtwScore * tempDtwScore;
-				
-				DtwScore += tempDtwScore;
-				PcaScore += tempPcaScore;
+				listExtraParams.add(mListStrokeComparers.get(idx).DtwSpatialTotalScoreFinal);
+				listExtraParams.add(mListStrokeComparers.get(idx).PcaScoreFinal);
+				listExtraParams.add(mListStrokeComparers.get(idx).InterestPointScoreFinal);
+							
+				DtwScore += mListStrokeComparers.get(idx).DtwSpatialTotalScore;
+				PcaScore += Math.abs(mListStrokeComparers.get(idx).PcaScore);
+				InterestPointScore += mListStrokeComparers.get(idx).InterestPointScore;
 				
 				avgPressureScore += mListStrokeComparers.get(idx).MiddlePressureScore;
 				avgSurfaceScore += mListStrokeComparers.get(idx).MiddleSurfaceScore;
 			}
 
 			listScores.addAll(mCompareResultsGesture.ListCompareResults);
+			
+			Collections.sort(listExtraParams, new Comparator<Double>() {
+	            @Override
+	            public int compare(Double value1, Double value2) {
+	                if (Math.abs(value1) < Math.abs(value2)) {
+	                    return 1;
+	                }
+	                if (Math.abs(value1) > Math.abs(value2)) {
+	                    return -1;
+	                }
+	                return 0;
+	            }
+	        });
+			
+//			for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {
+//				listExtraParams.remove(0);
+//			}			
+//			listExtraParams.remove(0);
+			
+			ExtraParamsValue = 0;
+			for(int idx = 0; idx < listExtraParams.size(); idx++) {
+				ExtraParamsValue += listExtraParams.get(idx);
+			}
+			ExtraParamsValue = ExtraParamsValue / listExtraParams.size(); 
 			
 			Collections.sort(listScores, new Comparator<ICompareResult>() {
 	            @Override
@@ -553,7 +578,7 @@ public class GestureComparer {
 			double totalScores = 0;
 			double totalWeights = 0;
 
-			for(int idx = (2 * mListStrokeComparers.size()); idx < listScores.size(); idx++) {
+			for(int idx = (3 * mListStrokeComparers.size()); idx < listScores.size(); idx++) {
 				totalScores += listScores.get(idx).GetValue() * listScores.get(idx).GetWeight();
 				totalWeights += listScores.get(idx).GetWeight();
 			}
@@ -563,18 +588,24 @@ public class GestureComparer {
 			
 			DtwScore = DtwScore / numStrokes;
 			PcaScore = PcaScore / numStrokes;
+			InterestPointScore = InterestPointScore / numStrokes;
 			
 			double paramsTotalScore = totalScores / totalWeights;
 //			mCompareResultsGesture.Score = (paramsTotalScore * 3 + DtwScore) / 4;
 			mCompareResultsGesture.Score = paramsTotalScore;
+//			mCompareResultsGesture.Score -= 0.2 * DtwScore;
+//			mCompareResultsGesture.Score -= 0.2 * PcaScore;
+//			mCompareResultsGesture.Score -= 0.2 * InterestPointScore;
 			
 //			double weight = 0.2 / (double)listPCA.length;
 //			for(int idx = 0; idx < listPCA.length; idx++) {
 //				UpdateScore(listPCA[idx], 2.5, 8, weight, true);
 //				UpdateScore(listDtw[idx], 0.2, 0.75, weight, false);
 //			}
-			UpdateScore(PcaScore, 2.5, 8, 0.2, true);
-			UpdateScore(DtwScore, 0.3, 0.55, 0.2, false);
+			
+			UpdateScore2(PcaScore, 2.5, 8, 0.2, true);
+			UpdateScore2(DtwScore, 0.3, 0.55, 0.2, false);
+//			UpdateScore2(InterestPointScore, 0.8, 0.89, 0.2, false);
 			
 			double removeMiddlePressureScore = (1 - avgSurfaceScore * avgSurfaceScore) / 5;
 			mCompareResultsGesture.Score -= removeMiddlePressureScore;
@@ -587,7 +618,11 @@ public class GestureComparer {
 		}
 	}	
 	
-	private void UpdateScore(double value, double lower, double upper, double weight, boolean isReverse) {
+	private void UpdateScore(double score, double weight) {
+		mCompareResultsGesture.Score = mCompareResultsGesture.Score * (1 - weight) + score * weight;
+	}
+	
+	private void UpdateScore2(double value, double lower, double upper, double weight, boolean isReverse) {
 		double updateValue = value - lower;
 		if(updateValue < 0) {
 			updateValue = 0;
@@ -604,7 +639,8 @@ public class GestureComparer {
 		if(isReverse) {
 			finalScore = 1 - finalScore;
 		}
-		mCompareResultsGesture.Score = mCompareResultsGesture.Score * (1-weight) + finalScore * weight;
+		
+		mCompareResultsGesture.Score = mCompareResultsGesture.Score * (1 - weight) + finalScore * weight;
 	}
 
 	protected void CheckStrokesDistanceScore() {

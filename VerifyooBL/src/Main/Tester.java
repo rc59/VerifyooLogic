@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.bson.types.ObjectId;
@@ -377,14 +378,19 @@ public class Tester {
 	}
 	
 	public double CompareTemplatesById(String id1, String id2)
-	{		
+	{	
+		
+		
 		Template template1 = GetFromDBById(id1, true);		
 		Template template2 = GetFromDBById(id2, true);
 		
 		TemplateComparer comparer = new TemplateComparer();			
 		
+		long start = System.currentTimeMillis();
 		TemplateExtended templateBase = new TemplateExtended(template1);
 		TemplateExtended templateAuth = new TemplateExtended(template2);
+		long end = System.currentTimeMillis();		
+		long diff = end - start;
 		
 		comparer.CompareTemplates(templateBase, templateAuth);
 		double score = comparer.GetScore();
@@ -393,7 +399,7 @@ public class Tester {
 		if(score < 0.9) {
 			result = false;
 		}		
-		
+				
 		return score;
 	}
 	

@@ -85,10 +85,10 @@ public class UtilsGeneral {
 				boundary = 0.18;
 				break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE:
-				boundary = 0.18;
+				boundary = 0.12;
 				break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE:
-				boundary = 0.18;
+				boundary = 0.10;
 				break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_VELOCITY:
 				boundary = 0.22;

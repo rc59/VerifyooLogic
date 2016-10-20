@@ -237,7 +237,7 @@ public class GestureExtended extends Gesture {
 		CalculateListGestureEventsFeatures();
 //		CalculateVelocityFeatures();
 //		CalculateAccelerationFeatures();
-		AddCalculatedFeatures();
+//		AddCalculatedFeatures();
 		CalculateSpatialSamplingVector();
 		CalculateGestureTotalTimeWithPauses();
 //		CalculateGestureAvgVelocity();		

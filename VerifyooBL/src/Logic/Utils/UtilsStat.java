@@ -34,7 +34,7 @@ public class UtilsStat {
 		return score;
 	}
 	
-	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd, double boundaryAdj) {
+	public double CalculateBoundaryFactor(double populationMean, double populationSd, double internalMean, double boundaryAdj) {
 		double boundaryFactor = boundaryAdj;
 		double zScore = (internalMean - populationMean) / populationSd;
 			
@@ -49,34 +49,34 @@ public class UtilsStat {
 		boundaryFactor += boundaryFactorMultiplier; 
 		
 		double boundary = internalMean * boundaryFactor;
-				
-		double weight = Math.abs(zScore);
-		if(weight > 2) {
-			weight = 2;
-		}
+		return boundary;
+	}
+	
+	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd, double boundaryAdj) {
+		double boundary = CalculateBoundaryFactor(populationMean, populationSd, internalMean, boundaryAdj);	
 		
 		double uniquenessFactor = 1;
 		
-		double twoUpperPopulationInternalSD = (internalMean + boundary * uniquenessFactor);
-		double twoLowerPopulationInternalSD = (internalMean - boundary * uniquenessFactor);
+		double firstUpperPopulationInternalSD = (internalMean + boundary * uniquenessFactor);
+		double firstLowerPopulationInternalSD = (internalMean - boundary * uniquenessFactor);
 		
-		double threeUpperPopulationInternalSD = (internalMean + 2 * boundary * uniquenessFactor);
-		double threeLowerPopulationInternalSD = (internalMean - 2 * boundary * uniquenessFactor);
+		double secondUpperPopulationInternalSD = (internalMean + 2 * boundary * uniquenessFactor);
+		double secondLowerPopulationInternalSD = (internalMean - 2 * boundary * uniquenessFactor);
 		double score;
-		if((authValue > twoLowerPopulationInternalSD) && (authValue < twoUpperPopulationInternalSD)) {
+		if((authValue > firstLowerPopulationInternalSD) && (authValue < firstUpperPopulationInternalSD)) {
 			score = 1;
 		}
 		else {
-			if((authValue > threeLowerPopulationInternalSD) && (authValue < threeUpperPopulationInternalSD)) {
-				if(authValue > twoLowerPopulationInternalSD) {
-					double u = Math.abs(threeUpperPopulationInternalSD - authValue);
-					double d = Math.abs(threeUpperPopulationInternalSD - twoUpperPopulationInternalSD);
+			if((authValue > secondLowerPopulationInternalSD) && (authValue < secondUpperPopulationInternalSD)) {
+				if(authValue > firstLowerPopulationInternalSD) {
+					double u = Math.abs(secondUpperPopulationInternalSD - authValue);
+					double d = Math.abs(secondUpperPopulationInternalSD - firstUpperPopulationInternalSD);
 					
 					score = u/d;
 				}
 				else {
-					double u = Math.abs(threeLowerPopulationInternalSD - authValue);
-					double d = Math.abs(threeLowerPopulationInternalSD - twoLowerPopulationInternalSD);
+					double u = Math.abs(secondLowerPopulationInternalSD - authValue);
+					double d = Math.abs(secondLowerPopulationInternalSD - firstLowerPopulationInternalSD);
 					
 					score = u/d;
 				}
@@ -202,9 +202,11 @@ public class UtilsStat {
 		return score;
 	}	
 	
-	public double CalcWeight(double internalMean, double internalSd, double popMean, double popSd) {
-		double lowerBound = internalMean - internalSd;
-		double upperBound = internalMean + internalSd;
+	public double CalcWeight(double internalMean, double internalSd, double popMean, double popSd, double adjFactor) {
+		double boundary = CalculateBoundaryFactor(popMean, popSd, internalMean, adjFactor);
+		
+		double lowerBound = internalMean - boundary;
+		double upperBound = internalMean + boundary;
 		
 		double lowerBoundZ = CalculateZScore(lowerBound, popMean, popSd);
 		double upperBoundZ = CalculateZScore(upperBound, internalMean, internalSd);
@@ -212,13 +214,16 @@ public class UtilsStat {
 		double lowerBoundProb = ConvertZToProbabilityCheckNegative(lowerBoundZ);
 		double upperBoundProb = ConvertZToProbabilityCheckNegative(upperBoundZ);
 		
-		double weight = 1 - Math.abs(upperBoundProb - lowerBoundProb);		
+		double weight = 1 - Math.abs(upperBoundProb - lowerBoundProb);
 		double zScore = Math.abs(CalculateZScore(internalMean, popMean, popSd));
 		if(zScore > 2) {
 			zScore = 2;
 		}
+		if(zScore < 1) {
+			zScore = 1;
+		}
 		
-		return weight * zScore;
+		return (weight + zScore / 2) / 2;
 	}
 		
 	protected double CalculateProbability(double authValue, double internalMean, double internalSd, boolean isAbs) {

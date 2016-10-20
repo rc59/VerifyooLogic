@@ -41,6 +41,17 @@ public class ConstsParamNames {
 		
 		public static final String STROKE_MAX_RADIAL_VELOCITY = "StrokeMaxRadialVelocity";
 		public static final String STROKE_MAX_RADIAL_ACCELERATION = "StrokeMaxRadialAcceleration";
+		
+		public class InterestPoints
+		{
+			public static final String STROKE_MAX_INTEREST_POINT_INDEX = "StrokeMaxInterestPointIndex";
+			public static final String STROKE_MAX_INTEREST_POINT_DENSITY = "StrokeMaxInterestPointDensity";
+			public static final String STROKE_MAX_INTEREST_POINT_LOCATION = "StrokeMaxInterestPointLocation";
+			public static final String STROKE_MAX_INTEREST_POINT_PRESSURE = "StrokeMaxInterestPointPressure";
+			public static final String STROKE_MAX_INTEREST_POINT_SURFACE = "StrokeMaxInterestPointSurface";
+			public static final String STROKE_MAX_INTEREST_POINT_VELOCITY = "StrokeMaxInterestPointVelocity";
+			public static final String STROKE_MAX_INTEREST_POINT_ACCELERATION = "StrokeMaxInterestPointAcceleration";
+		}
 	}
 	
 	public class Gesture

@@ -97,8 +97,8 @@ public class NormContainerMgr {
 		return HashMapNumericNormsSds.get(param).GetMean(instruction);
 	}
 	
-	private String CheckInstruction(String instruction) {		
+	private String CheckInstruction(String instruction) {
 		instruction = "RLETTER";
-		return instruction;	
+		return "RLETTER";	
 	}
 }

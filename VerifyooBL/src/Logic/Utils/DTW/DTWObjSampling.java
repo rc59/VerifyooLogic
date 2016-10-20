@@ -58,7 +58,7 @@ public class DTWObjSampling implements IDTWObj {
 				popSd = normMgr.NormContainerMgr.GetSpatialPopSdTime(mInstruction, mParam, mIdxStroke, mIdxSampling);	
 				internalSd = normMgr.NormContainerMgr.GetSpatialInternalSdTime(mInstruction, mParam, mIdxStroke, mIdxSampling);							
 			break;
-		}		
+		}
 		
 		double internalMean = mValue;
 		

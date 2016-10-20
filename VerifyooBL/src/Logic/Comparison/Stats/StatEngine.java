@@ -114,7 +114,7 @@ public class StatEngine implements IStatEngine {
 		
 		double score = Utils.GetInstance().GetUtilsStat().CalculateScore(authValue, popMean, popSd, internalMean, internalSd, boundaryAdj);
 		
-		weight = Utils.GetInstance().GetUtilsStat().CalcWeight(internalMean, internalSd, popMean, popSd);
+		weight = Utils.GetInstance().GetUtilsStat().CalcWeight(internalMean, internalSd, popMean, popSd, boundaryAdj);
 		IStatEngineResult statResult = new StatEngineResult(score, zScore, weight);
 		return statResult;
 	}
