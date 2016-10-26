@@ -5,7 +5,7 @@ public class Utils {
 	
 	protected static UtilsComparison mUtilsComparison;
 	protected static UtilsMath mUtilsMath;
-	protected static UtilsSignalProcessing mUtilsSpatialSampling;
+	protected static UtilsSignalProcessing mUtilsSignalProcessing;
 	protected static UtilsStat mUtilsStat;
 	protected static UtilsVectors mUtilsVectors;
 	protected static UtilsLinearReg mUtilsLinearReg;
@@ -23,7 +23,7 @@ public class Utils {
 			
 			mUtilsComparison = new UtilsComparison();
 			mUtilsMath = new UtilsMath();
-			mUtilsSpatialSampling = new UtilsSignalProcessing();
+			mUtilsSignalProcessing = new UtilsSignalProcessing();
 			mUtilsStat = new UtilsStat();
 			mUtilsVectors = new UtilsVectors();		
 			mUtilsLinearReg = new UtilsLinearReg();
@@ -39,8 +39,8 @@ public class Utils {
 	public UtilsMath GetUtilsMath() {
 		return mUtilsMath;
 	}
-	public UtilsSignalProcessing GetUtilsSpatialSampling() {
-		return mUtilsSpatialSampling;
+	public UtilsSignalProcessing GetUtilsSignalProcessing() {
+		return mUtilsSignalProcessing;
 	}
 	public UtilsStat GetUtilsStat() {
 		return mUtilsStat;

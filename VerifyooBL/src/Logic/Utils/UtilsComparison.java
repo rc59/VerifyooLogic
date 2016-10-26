@@ -37,7 +37,9 @@ public class UtilsComparison {
 		
 		for(int idxColumn = 0; idxColumn < columns; idxColumn++) {
 			for(int idxRow = 0; idxRow < rows; idxRow++) {
-				matrix[idxColumn][idxRow] = featureMatrix.MatrixFeature.get(idxColumn).get(idxRow);
+				if(idxColumn < featureMatrix.MatrixFeature.size() && idxRow < featureMatrix.MatrixFeature.get(idxColumn).size()) {
+					matrix[idxColumn][idxRow] = featureMatrix.MatrixFeature.get(idxColumn).get(idxRow);	
+				}				
 			}	
 		}
 		

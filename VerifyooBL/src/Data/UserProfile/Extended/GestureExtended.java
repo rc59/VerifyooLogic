@@ -151,7 +151,7 @@ public class GestureExtended extends Gesture {
 
 	protected void InitUtils() {
 		mUtilsLinearReg = Utils.GetInstance().GetUtilsLinearReg();
-		mUtilsSpatialSampling = Utils.GetInstance().GetUtilsSpatialSampling();
+		mUtilsSpatialSampling = Utils.GetInstance().GetUtilsSignalProcessing();
 		mUtilsMath = Utils.GetInstance().GetUtilsMath();
 		mUtilsGeneral = Utils.GetInstance().GetUtilsGeneral();
 	}
