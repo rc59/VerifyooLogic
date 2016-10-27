@@ -3,6 +3,7 @@ package Logic.Utils;
 import java.util.ArrayList;
 
 import Consts.ConstsMeasures;
+import Data.MetaData.IndexBoundary;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Raw.MotionEventCompact;
 
@@ -641,4 +642,30 @@ public class UtilsSignalProcessing {
 
         return listEvents;
     }    
+    
+    public IndexBoundary FindInterestPointBoundary(int idxInterestPoint, ArrayList<MotionEventExtended> listEvents) {				
+    	int upperBoundary = 0;
+		int lowerBoundary = 0;
+		
+    	for(int idx = idxInterestPoint; idx < listEvents.size(); idx++) {
+			if(listEvents.get(idx).EventDensity <= 1) {				
+				upperBoundary = (idx - 1);
+				break;
+			}
+		}
+		for(int idx = idxInterestPoint - 1; idx >=0; idx--) {
+			if(listEvents.get(idx).EventDensity <= 1) {				
+				lowerBoundary = (idx + 1);
+				break;
+			}
+		}
+		
+		/*if(lowerBoundary >= upperBoundary) {
+			lowerBoundary = idxInterestPoint - 1;
+			upperBoundary = idxInterestPoint + 1;
+		}*/
+		
+		IndexBoundary indexBoundary = new IndexBoundary(lowerBoundary, upperBoundary);
+		return indexBoundary;
+	}
 }

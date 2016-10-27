@@ -199,10 +199,10 @@ public class UtilsGeneral {
 				threashold = 0.5;
 			break;
 			case "InterestPointDeltaTeta":
-				threashold = 0.5;
+				threashold = 0.001;
 			break;
 			case "InterestPointAvgVelocity":
-				threashold = 0.5;
+				threashold = 0.04;
 			break;
 			
 		}
@@ -211,71 +211,80 @@ public class UtilsGeneral {
 	}
 	
 	public double GetWeight(String paramName) {
-		double weight = 0.5;
+		double weight = 1;
 	
 		switch(paramName) {
 			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERVAL:
-				weight = 0.592;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA_MINX_MINY:
-				weight = 0.66;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA:
-				weight = 0.696;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY:
-				weight = 0.574;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_LENGTH:
-				weight = 0.611;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_ACCELERATION:
-				weight = 0.621;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_RADIAL_ACCELERATION:
-				weight = 0.177;
+				weight = 1;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_RADIAL_VELOCITY:
-				weight = 0.209;
+				weight = 1;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_VELOCITY:
-				weight = 0.545;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE:
-				weight = 0.112;
+				weight = 1;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE:
-				weight = 0.566;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_NUM_EVENTS:
-				weight = 0.552;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_TIME_INTERVAL:
-				weight = 0.55;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA:
-				weight = 0.545;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY:
-				weight = 0.473;
+				weight = 2;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_TRANSITION_TIME:
-				weight = 0.49;
+				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MID_VELOCITY:
-				weight = 0.46;
+				weight = 2;
 			break;
 			case "DtwScore":
-				weight = 0.858;
+				weight = 3;
 			break;
 			case "PcaScore":
-				weight = 0.839;
+				weight = 3;
 			break;
 			case "InterestPointDensity":
 				weight = 0.768;
 			case "InterestPointLocation":
 				weight = 0.724;
 			break;
+			case "InterestPointIndex":
+				weight = 2;
+			break;
+			case "InterestPointDeltaTeta":
+				weight = 2;
+			break;
+			case "InterestPointVelocity":
+				weight = 2;
+			break;			
 		}
 		
 		return 1;

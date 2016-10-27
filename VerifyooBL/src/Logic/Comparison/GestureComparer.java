@@ -514,6 +514,8 @@ public class GestureComparer {
 		InterestPointDensity = 0;
 		InterestPointLocation = 0;
 		
+		double interestPointPenalty = 0;
+		
 		if(!mIsGesturesIdentical) {
 			double avgPressureScore = 0;
 			double avgSurfaceScore = 0;
@@ -545,27 +547,37 @@ public class GestureComparer {
 				
 				tempBooleanParam = new BooleanParam("PcaScore", mListStrokeComparers.get(idx).PcaScore, 1);
 				listBooleanParams.add(tempBooleanParam);
+//				
+//				tempBooleanParam = new BooleanParam("InterestPointDensity", mListStrokeComparers.get(idx).MaxInterestPointDensity, 1);
+//				listBooleanParams.add(tempBooleanParam);
+//				
+//				tempBooleanParam = new BooleanParam("InterestPointLocation", mListStrokeComparers.get(idx).MaxInterestPointLocation, 1);
+//				listBooleanParams.add(tempBooleanParam);
+//				
+//				tempBooleanParam = new BooleanParam("InterestPointVelocity", mListStrokeComparers.get(idx).MaxInterestPointVelocity, 1);
+//				listBooleanParams.add(tempBooleanParam);
+//				
+//				tempBooleanParam = new BooleanParam("InterestPointAcceleration", mListStrokeComparers.get(idx).MaxInterestPointAcceleration, 1);
+//				listBooleanParams.add(tempBooleanParam);
+//				
+//				tempBooleanParam = new BooleanParam("InterestPointIndex", mListStrokeComparers.get(idx).MaxInterestPointIndex, 1);
+//				listBooleanParams.add(tempBooleanParam);
+//				
+//				tempBooleanParam = new BooleanParam("InterestPointAvgVelocity", mListStrokeComparers.get(idx).MaxInterestPointAvgVelocity, 1);
+//				listBooleanParams.add(tempBooleanParam);
+//				
+//				tempBooleanParam = new BooleanParam("InterestPointDeltaTeta", mListStrokeComparers.get(idx).MaxInterestPointDeltaTeta, 1);
+//				listBooleanParams.add(tempBooleanParam);
+//				
+//				tempBooleanParam = new BooleanParam("InterestPointMaxVelocity", mListStrokeComparers.get(idx).MaxInterestPointMaxVelocity, 1);
+//				listBooleanParams.add(tempBooleanParam);
+//				
+//				tempBooleanParam = new BooleanParam("InterestPointMaxAcceleration", mListStrokeComparers.get(idx).MaxInterestPointMaxAcceleration, 1);
+//				listBooleanParams.add(tempBooleanParam);
 				
-				tempBooleanParam = new BooleanParam("InterestPointDensity", mListStrokeComparers.get(idx).MaxInterestPointDensity, 1);
-				listBooleanParams.add(tempBooleanParam);
-				
-				tempBooleanParam = new BooleanParam("InterestPointLocation", mListStrokeComparers.get(idx).MaxInterestPointLocation, 1);
-				listBooleanParams.add(tempBooleanParam);
-				
-				tempBooleanParam = new BooleanParam("InterestPointVelocity", mListStrokeComparers.get(idx).MaxInterestPointVelocity, 1);
-				listBooleanParams.add(tempBooleanParam);
-				
-				tempBooleanParam = new BooleanParam("InterestPointAcceleration", mListStrokeComparers.get(idx).MaxInterestPointAcceleration, 1);
-				listBooleanParams.add(tempBooleanParam);
-				
-				tempBooleanParam = new BooleanParam("InterestPointIndex", mListStrokeComparers.get(idx).MaxInterestPointIndex, 1);
-				listBooleanParams.add(tempBooleanParam);
-				
-				tempBooleanParam = new BooleanParam("InterestPointDeltaTeta", mListStrokeComparers.get(idx).MaxInterestPointDeltaTeta, 1);
-				listBooleanParams.add(tempBooleanParam);
-				
-				tempBooleanParam = new BooleanParam("InterestPointAvgVelocity", mListStrokeComparers.get(idx).MaxInterestPointAvgVelocity, 1);
-				listBooleanParams.add(tempBooleanParam);
+//				if(!mListStrokeComparers.get(idx).IsInterestPointFound) {
+//					interestPointPenalty += 0.2;
+//				}
 			}
 
 			listScores.addAll(mCompareResultsGesture.ListCompareResults);			
@@ -659,6 +671,8 @@ public class GestureComparer {
 			mCompareResultsGesture.Score = paramsTotalScore;
 			
 			mCompareResultsGesture.Score = Utils.GetInstance().GetUtilsMath().GetMinValue(BooleanParamsScore, NormalizedParamsScore);
+			mCompareResultsGesture.Score -= interestPointPenalty;
+			
 			double removeMiddlePressureScore = (1 - avgSurfaceScore * avgSurfaceScore) / 5;
 			mCompareResultsGesture.Score -= removeMiddlePressureScore;
 			

@@ -9,6 +9,7 @@ import Consts.ConstsParamNames;
 import Data.MetaData.ShapeData;
 import Data.MetaData.StrokeProperties;
 import Data.MetaData.ParameterAvgPoint;
+import Data.MetaData.IndexBoundary;
 import Data.MetaData.IndexValue;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
@@ -64,6 +65,7 @@ public class StrokeExtended extends Stroke {
 	public ParameterAvgPoint StrokeAccelerationPeakAvgPoint;
 	
 	public ArrayList<MotionEventExtended> ListEventsExtended; 
+	public ArrayList<MotionEventExtended> ListEventsExtendedInterestZone;
 	
 	public double StrokeTimeInterval;
 		
@@ -121,6 +123,8 @@ public class StrokeExtended extends Stroke {
 	public int MaxInterestPointIndex;
 	
 	public double MaxInterestPointAvgVelocity;
+	public double MaxInterestPointMaxVelocity;
+	public double MaxInterestPointMaxAcceleration;
 	public double MaxInterestPointDeltaTeta;
 	public double MaxInterestPointLocation;
 	public double MaxInterestPointDensity;
@@ -193,7 +197,7 @@ public class StrokeExtended extends Stroke {
 	{
 		PreCalculations();
 		CalculateFeatures();
-		//BiasData();
+		BiasData();
 	}
 	
 	protected void PreCalculations()
@@ -409,15 +413,29 @@ public class StrokeExtended extends Stroke {
 		MaxInterestPointLocation = (double)MaxInterestPointIndex / (double) ListEventsExtended.size();
 	}
 	
+	protected int GetDensityStartIndex() {
+		int startIndex = 0;
+		for(int idx = 0; idx < ListEventsExtended.size(); idx++) {
+			if(ListEventsExtended.get(idx).EventDensity == Consts.ConstsMeasures.MIN_DENSITY) {
+				startIndex = idx;
+				break;
+			}
+		}
+		
+		return startIndex;
+	}
+	
 	protected void CalculateEventDensity() {
 		boolean isReachedDistance;
 		double maxDistance = 1;
 		double currentDistance;
-		int idxCurrent;
-		int eventDensity;
-		MaxInterestPointDensity = Double.MIN_VALUE;
+		double eventDensity;
 		
-		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++) {			
+		int idxCurrent;
+		
+		MaxInterestPointDensity = Double.MIN_VALUE;		
+		
+		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++) {
 			currentDistance = 0;
 			eventDensity = 0;			
 			isReachedDistance = false;
@@ -438,12 +456,20 @@ public class StrokeExtended extends Stroke {
 				}
 			}
 				
+			
+			ListEventsExtended.get(idxEvent).EventDensity = eventDensity;
+		}
+		
+		int startIndex = GetDensityStartIndex();
+		for(int idxEvent = startIndex; idxEvent < ListEventsExtended.size(); idxEvent++) {
+			eventDensity = ListEventsExtended.get(idxEvent).EventDensity;
 			if(eventDensity > MaxInterestPointDensity) {
 				MaxInterestPointDensity = eventDensity;
 				MaxInterestPointIndex = idxEvent;
-			}
-			ListEventsExtended.get(idxEvent).EventDensity = eventDensity;
+			}			
 		}
+		
+		
 		
 		FindInterestPointBoundary(MaxInterestPointIndex);
 		ExtractInterestPointFeatures(MaxInterestPointBoundaryMin, MaxInterestPointBoundaryMax);
@@ -466,34 +492,33 @@ public class StrokeExtended extends Stroke {
 
 	private void ExtractInterestPointFeatures(int idxMin, int idxMax) {
 		MaxInterestPointDeltaTeta = Double.MIN_VALUE;
+		MaxInterestPointMaxVelocity = Double.MIN_VALUE;
+		MaxInterestPointMaxAcceleration = Double.MIN_VALUE;
 		MaxInterestPointAvgVelocity = 0;
 		
 		MotionEventExtended tempEvent;
 		double numEvents = idxMax - idxMax + 1;
+
+		ListEventsExtendedInterestZone = new ArrayList<>();
 		
 		for(int idx = idxMin; idx <= idxMax; idx++) {
 			tempEvent = ListEventsExtended.get(idx);
-						
-			MaxInterestPointDeltaTeta = Utils.GetInstance().GetUtilsMath().GetMaxValue(tempEvent.DeltaTeta, MaxInterestPointDeltaTeta);
+			ListEventsExtendedInterestZone.add(tempEvent);
+			
+			MaxInterestPointDeltaTeta = Utils.GetInstance().GetUtilsMath().GetMaxValue(Math.abs(tempEvent.DeltaTeta), MaxInterestPointDeltaTeta);
 			MaxInterestPointAvgVelocity += tempEvent.Velocity;
+			MaxInterestPointMaxVelocity = Utils.GetInstance().GetUtilsMath().GetMaxValue(tempEvent.Velocity, MaxInterestPointMaxVelocity);
+			MaxInterestPointMaxAcceleration = Utils.GetInstance().GetUtilsMath().GetMaxValue(Math.abs(tempEvent.Acceleration), MaxInterestPointMaxAcceleration);
 		}
 		
 		MaxInterestPointAvgVelocity = MaxInterestPointAvgVelocity / numEvents;
 	}
 
-	private void FindInterestPointBoundary(int idxInterestPoint) {		
-		for(int idx = idxInterestPoint; idx < ListEventsExtended.size(); idx++) {
-			if(ListEventsExtended.get(idx).EventDensity <= 1) {				
-				MaxInterestPointBoundaryMax = (idx - 1);
-				break;
-			}
-		}
-		for(int idx = idxInterestPoint - 1; idx >=0; idx--) {
-			if(ListEventsExtended.get(idx).EventDensity <= 1) {				
-				MaxInterestPointBoundaryMin = (idx + 1);
-				break;
-			}
-		}
+	private void FindInterestPointBoundary(int idxInterestPoint) {				
+		IndexBoundary indexBoundary = Utils.GetInstance().GetUtilsSignalProcessing().FindInterestPointBoundary(idxInterestPoint, ListEventsExtended);
+		
+		MaxInterestPointBoundaryMax = indexBoundary.UpperBoundary;
+		MaxInterestPointBoundaryMin = indexBoundary.LowerBoundary;		
 	}
 
 	protected void ConvertToMotionEventExtended()

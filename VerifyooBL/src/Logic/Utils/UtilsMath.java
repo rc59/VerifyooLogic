@@ -146,6 +146,11 @@ public class UtilsMath {
         {
             return 1;
         }
+            
+        if((value1 == 0 && value2 != 0) || (value1 != 0 && value2 == 0))
+        {
+        	return 0;
+        }
 
         value1 = Math.abs(value1);
         value2 = Math.abs(value2);

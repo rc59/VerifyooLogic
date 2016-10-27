@@ -17,6 +17,7 @@ import Data.Comparison.CompareResultGeneric;
 import Data.Comparison.CompareResultParamVectors;
 import Data.Comparison.CompareResultSummary;
 import Data.Comparison.Interfaces.ICompareResult;
+import Data.MetaData.IndexBoundary;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Extended.StrokeExtended;
 import Data.UserProfile.Raw.Stroke;
@@ -126,9 +127,15 @@ public class StrokeComparer {
 	
 	public double StrokeDistanceTotalScore;
 	
+	public boolean IsInterestPointFound;
+	
+	public double MaxInterestPointDTWCoords;
 	public double MaxInterestPointIndex;
 	public double MaxInterestPointDeltaTeta;
 	public double MaxInterestPointAvgVelocity;
+	public double MaxInterestPointDTWVelocity;
+	public double MaxInterestPointMaxVelocity;
+	public double MaxInterestPointMaxAcceleration;
 	public double MaxInterestPointDensity;
 	public double MaxInterestPointLocation;
 	public double MaxInterestPointPressure;
@@ -365,21 +372,23 @@ public class StrokeComparer {
 		double minLocationDiff = 1;
 		double currentLocationDiff;
 		
+		int idxFound = idxBase;
+		
 		for(int idx = lowerBound; idx < upperBound; idx++) {
-			if(densityAreasAuth[idx] > 0) {
-				isFound = true;				
+			if(idx < densityAreasAuth.length && densityAreasAuth[idx] > 0) {
+				isFound = true;
 				currentLocationDiff = Math.abs(mStrokeStoredExtended.MaxInterestPointLocation - ((((double)idx) / ((double)densityAreasAuth.length))));
 				
 				if(currentLocationDiff < minLocationDiff) {
 					minLocationDiff = currentLocationDiff;
 					//densityDiff = 1 - Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.ListEventsExtended.get(idx).EventDensity, mStrokeStoredExtended.MaxInterestPointDensity);
 					densityDiff = 1 - Utils.GetInstance().GetUtilsMath().GetPercentageDiff(densityAreasAuth[idx], storedMaxPointStrength);
+					idxFound = idx;
 				}
 			}
 		}
-
-		MaxInterestPointDeltaTeta = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.MaxInterestPointDeltaTeta, mStrokeStoredExtended.MaxInterestPointDeltaTeta);
-		MaxInterestPointAvgVelocity = Math.abs(mStrokeAuthExtended.MaxInterestPointAvgVelocity - mStrokeStoredExtended.MaxInterestPointAvgVelocity);
+		
+		CompareInterestPointFeatures(idxFound);
 		
 		MaxInterestPointDensity = 1 - densityDiff;
 		MaxInterestPointLocation = 1 - minLocationDiff;
@@ -389,6 +398,78 @@ public class StrokeComparer {
 		MaxInterestPointAcceleration = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.MaxInterestPointAcceleration, mStrokeStoredExtended.MaxInterestPointAcceleration);
 	}
 	
+	private void CompareInterestPointFeatures(int authIdxIntPoint) {
+		ArrayList<MotionEventExtended> listEvents = mStrokeAuthExtended.ListEventsExtended;
+		
+		IndexBoundary indexBoundary = Utils.GetInstance().GetUtilsSignalProcessing().FindInterestPointBoundary(authIdxIntPoint, listEvents);
+		double authMaxIntPointDeltaTeta = Double.MIN_VALUE;
+		double authMaxIntPointAvgVelocity = 0;
+		
+		double authMaxIntPointMaxVelocity = Double.MIN_VALUE;
+		double authMaxIntPointMaxAcceleration = Double.MIN_VALUE;
+		
+		double numEvents = indexBoundary.UpperBoundary - indexBoundary.LowerBoundary + 1;
+		
+		ArrayList<MotionEventExtended> listAuthInterestZone = new ArrayList<>();
+		
+		for(int idx = indexBoundary.LowerBoundary; idx <= indexBoundary.UpperBoundary; idx++) {
+			listAuthInterestZone.add(listEvents.get(idx));
+			
+			authMaxIntPointAvgVelocity += listEvents.get(idx).Velocity;
+			authMaxIntPointDeltaTeta = Utils.GetInstance().GetUtilsMath().GetMaxValue(listEvents.get(idx).DeltaTeta, authMaxIntPointDeltaTeta);
+			authMaxIntPointMaxVelocity = Utils.GetInstance().GetUtilsMath().GetMaxValue(listEvents.get(idx).Velocity, authMaxIntPointMaxVelocity);
+			authMaxIntPointMaxAcceleration = Utils.GetInstance().GetUtilsMath().GetMaxValue(Math.abs(listEvents.get(idx).Acceleration), authMaxIntPointMaxAcceleration);
+		}
+				
+		if(numEvents > 0) {
+			authMaxIntPointAvgVelocity = authMaxIntPointAvgVelocity / numEvents;		
+			MaxInterestPointAvgVelocity = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.MaxInterestPointAvgVelocity, authMaxIntPointAvgVelocity);
+			IsInterestPointFound = true;
+		}
+		else {
+			MaxInterestPointAvgVelocity = 0;
+			IsInterestPointFound = false;
+		}
+		
+		DtwOnInterestZone(listAuthInterestZone, mStrokeStoredExtended.ListEventsExtendedInterestZone);
+		
+		MaxInterestPointAvgVelocity = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.MaxInterestPointAvgVelocity, authMaxIntPointAvgVelocity);
+		MaxInterestPointMaxVelocity = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.MaxInterestPointMaxVelocity, authMaxIntPointMaxVelocity);
+		MaxInterestPointMaxAcceleration = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.MaxInterestPointMaxAcceleration, authMaxIntPointMaxAcceleration);
+		MaxInterestPointDeltaTeta = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.MaxInterestPointDeltaTeta, authMaxIntPointDeltaTeta);		
+	}
+	
+	private void DtwOnInterestZone(ArrayList<MotionEventExtended> listEventsAuth, ArrayList<MotionEventExtended> listEventsStored) {
+		IDTWObj tempObj;
+		ArrayList<IDTWObj> listDTWAuthVelocities = new ArrayList<>();
+		ArrayList<IDTWObj> listDTWStoredVelocities = new ArrayList<>();
+		
+		ArrayList<IDTWObj> listDTWAuthCoords = new ArrayList<>();
+		ArrayList<IDTWObj> listDTWStoredCoords= new ArrayList<>();
+		
+		for(int idx = 0; idx < listEventsAuth.size(); idx++) {
+			tempObj = new DTWObjDouble(listEventsAuth.get(idx).Velocity);
+			listDTWAuthVelocities.add(tempObj);
+			
+			tempObj = new DTWObjCoordinate(listEventsAuth.get(idx).Xnormalized, listEventsAuth.get(idx).Ynormalized);
+			listDTWAuthCoords.add(tempObj);
+		}
+		
+		for(int idx = 0; idx < listEventsStored.size(); idx++) {
+			tempObj = new DTWObjDouble(listEventsStored.get(idx).Velocity);
+			listDTWStoredVelocities.add(tempObj);
+			
+			tempObj = new DTWObjCoordinate(listEventsStored.get(idx).Xnormalized, listEventsStored.get(idx).Ynormalized);
+			listDTWStoredCoords.add(tempObj);
+		}
+		
+		UtilsDTW dtwVelocities = new UtilsDTW(listDTWAuthVelocities, listDTWStoredVelocities);
+		MaxInterestPointDTWVelocity = dtwVelocities.getDistance();
+		
+		UtilsDTW dtwCoords = new UtilsDTW(listDTWAuthCoords, listDTWStoredCoords);
+		MaxInterestPointDTWCoords = dtwCoords.getDistance();
+	}
+
 	private void CompareInterestPoints2() {		
 		MaxInterestPointIndex = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.MaxInterestPointIndex, mStrokeStoredExtended.MaxInterestPointIndex);
 		MaxInterestPointDensity = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.MaxInterestPointDensity, mStrokeStoredExtended.MaxInterestPointDensity);
@@ -558,56 +639,7 @@ public class StrokeComparer {
 		PcaScore = PcaScore / maxValue;
 		PcaScore = 1 - PcaScore;
 	}
-	
-	private void PcaAnalysis2() {
-		try {
-			int idxStroke = mStrokeStoredExtended.GetStrokeIdx();
-			String instruction = mStrokeStoredExtended.GetInstruction();
-			String param = ConstsParamNames.Stroke.STROKE_TEMPORAL_SAMPLING;
-			
-			String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, param, idxStroke);
-			FeatureMeanDataListEvents featureMeanDataListEvents = (FeatureMeanDataListEvents) mStrokeStoredExtended.GetFeatureMeansHash().get(key);
-			
-			ArrayList<ArrayList<MotionEventExtended>> listOfLists = featureMeanDataListEvents.GetListOfListEvents();
-			ArrayList<MotionEventExtended> listEventsTemp;
-			
-			double[][] matrixTraining = new double[listOfLists.size()][ConstsGeneral.SPATIAL_SAMPLING_SIZE];
-			double[][] matrixTest     = new double[1][ConstsGeneral.SPATIAL_SAMPLING_SIZE];
-			
-			for(int idx = 0; idx < listOfLists.size(); idx++) {
-				listEventsTemp = listOfLists.get(idx);
-				
-				for(int idxEvent = 0; idxEvent < ConstsGeneral.SPATIAL_SAMPLING_SIZE; idxEvent++) {
-					matrixTraining[idx][idxEvent] = listEventsTemp.get(idxEvent).Velocity;			
-				}			
-			}
-						
-			for(int idxEvent = 0; idxEvent < ConstsGeneral.SPATIAL_SAMPLING_SIZE; idxEvent++) {
-				matrixTest[0][idxEvent] = mStrokeAuthExtended.ListEventsTemporalExtended.get(idxEvent).Velocity;	
-			}
-			
-			Matrix trainingData = new Matrix(matrixTraining);
-			Matrix testData = new Matrix(matrixTest);
-			
-			PCA pca = new PCA(trainingData);
-			Matrix transformedData = pca.transform(testData, PCA.TransformationType.WHITENING);			
-						
-			PcaScore = transformedData.get(0, 0);
-			
-//			for(int r = 0; r < transformedData.getRowDimension(); r++){
-//				for(int c = 0; c < transformedData.getColumnDimension(); c++){
-//					System.out.print(transformedData.get(r, c));
-//					if (c == transformedData.getColumnDimension()-1) continue;
-//					System.out.print(", ");
-//				}
-//				System.out.println("");
-//			}
-		}
-		catch(Exception exc) {
-			String msg = exc.getMessage();
-		}		
-	}
-	
+		
 	private void CreateSpatialVectorsForDtwAnalysis() {
 
 		DTWObjVelocity tempVelocity;

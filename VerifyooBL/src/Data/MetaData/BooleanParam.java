@@ -22,7 +22,7 @@ public class BooleanParam {
 				
 		NormalizedScore = value / threashold;
 		NormalizedScore = NormalizedScore * NormalizedScore;
-		Weight = weight;
-//		Weight = Utils.GetInstance().GetUtilsGeneral().GetWeight(name);
+//		Weight = weight;
+		Weight = Utils.GetInstance().GetUtilsGeneral().GetWeight(name);
 	}
 }
