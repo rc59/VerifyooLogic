@@ -440,34 +440,36 @@ public class StrokeComparer {
 	}
 	
 	private void DtwOnInterestZone(ArrayList<MotionEventExtended> listEventsAuth, ArrayList<MotionEventExtended> listEventsStored) {
-		IDTWObj tempObj;
-		ArrayList<IDTWObj> listDTWAuthVelocities = new ArrayList<>();
-		ArrayList<IDTWObj> listDTWStoredVelocities = new ArrayList<>();
-		
-		ArrayList<IDTWObj> listDTWAuthCoords = new ArrayList<>();
-		ArrayList<IDTWObj> listDTWStoredCoords= new ArrayList<>();
-		
-		for(int idx = 0; idx < listEventsAuth.size(); idx++) {
-			tempObj = new DTWObjDouble(listEventsAuth.get(idx).Velocity);
-			listDTWAuthVelocities.add(tempObj);
+		if(listEventsAuth.size() > 0 && listEventsStored.size() > 0) {
+			IDTWObj tempObj;
+			ArrayList<IDTWObj> listDTWAuthVelocities = new ArrayList<>();
+			ArrayList<IDTWObj> listDTWStoredVelocities = new ArrayList<>();
 			
-			tempObj = new DTWObjCoordinate(listEventsAuth.get(idx).Xnormalized, listEventsAuth.get(idx).Ynormalized);
-			listDTWAuthCoords.add(tempObj);
-		}
-		
-		for(int idx = 0; idx < listEventsStored.size(); idx++) {
-			tempObj = new DTWObjDouble(listEventsStored.get(idx).Velocity);
-			listDTWStoredVelocities.add(tempObj);
+			ArrayList<IDTWObj> listDTWAuthCoords = new ArrayList<>();
+			ArrayList<IDTWObj> listDTWStoredCoords= new ArrayList<>();
 			
-			tempObj = new DTWObjCoordinate(listEventsStored.get(idx).Xnormalized, listEventsStored.get(idx).Ynormalized);
-			listDTWStoredCoords.add(tempObj);
+			for(int idx = 0; idx < listEventsAuth.size(); idx++) {
+				tempObj = new DTWObjDouble(listEventsAuth.get(idx).Velocity);
+				listDTWAuthVelocities.add(tempObj);
+				
+				tempObj = new DTWObjCoordinate(listEventsAuth.get(idx).Xnormalized, listEventsAuth.get(idx).Ynormalized);
+				listDTWAuthCoords.add(tempObj);
+			}
+			
+			for(int idx = 0; idx < listEventsStored.size(); idx++) {
+				tempObj = new DTWObjDouble(listEventsStored.get(idx).Velocity);
+				listDTWStoredVelocities.add(tempObj);
+				
+				tempObj = new DTWObjCoordinate(listEventsStored.get(idx).Xnormalized, listEventsStored.get(idx).Ynormalized);
+				listDTWStoredCoords.add(tempObj);
+			}
+			
+			UtilsDTW dtwVelocities = new UtilsDTW(listDTWAuthVelocities, listDTWStoredVelocities);
+			MaxInterestPointDTWVelocity = dtwVelocities.getDistance();
+			
+			UtilsDTW dtwCoords = new UtilsDTW(listDTWAuthCoords, listDTWStoredCoords);
+			MaxInterestPointDTWCoords = dtwCoords.getDistance();	
 		}
-		
-		UtilsDTW dtwVelocities = new UtilsDTW(listDTWAuthVelocities, listDTWStoredVelocities);
-		MaxInterestPointDTWVelocity = dtwVelocities.getDistance();
-		
-		UtilsDTW dtwCoords = new UtilsDTW(listDTWAuthCoords, listDTWStoredCoords);
-		MaxInterestPointDTWCoords = dtwCoords.getDistance();
 	}
 
 	private void CompareInterestPoints2() {		
@@ -925,7 +927,7 @@ public class StrokeComparer {
 		double middleSurfaceAuth = mStrokeAuthExtended.MiddleSurface;
 		
 		MiddlePressureScore = CompareParameter(ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE, middlePressureAuth);
-		MiddleSurfaceScore = CompareParameter(ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE, middleSurfaceAuth);		
+		MiddleSurfaceScore = CompareParameter(ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE, middleSurfaceAuth);
 	}
 	
 	protected void CompareVelocities()

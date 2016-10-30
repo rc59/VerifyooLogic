@@ -31,7 +31,7 @@ public class Tests {
 //			"57d695382f0e497411a0244a"
 						
 //			score = t.CompareTemplatesById("57d668052f0e4974119f7373", "57d669c32f0e4974119f966e");
-			score = t.CompareTemplatesById("57d668052f0e4974119f7373", "57d6685d2f0e4974119f7e01");
+			score = t.CompareTemplatesById("57d668d62f0e4974119f8085", "57d6a8872f0e497411a04773");
 			
 //			score = t.CompareTemplates("Roeeyshaked@gmail.com", "Roeeyshaked@gmail.com", 35);
 //			score = t.CompareTemplates("Roeeyshaked@gmail.com", "abuchnick@yahoo.com", 35);

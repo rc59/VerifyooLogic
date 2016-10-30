@@ -2,13 +2,13 @@ package Data.MetaData;
 
 import Logic.Utils.Utils;
 
-public class BooleanParam {
+public class PropParam {
 	public String Name;
 	public boolean IsValid;
 	public double NormalizedScore;
 	public double Weight;
 	
-	public BooleanParam(String name, double value, double weight) {
+	public PropParam(String name, double value, double weight) {
 		double threashold = Utils.GetInstance().GetUtilsGeneral().GetThreashold(name);
 		
 		IsValid = false;
@@ -19,7 +19,7 @@ public class BooleanParam {
 		if(value > threashold) {
 			value = threashold;
 		}
-		
+				
 		NormalizedScore = value / threashold;
 		NormalizedScore = NormalizedScore * NormalizedScore;
 //		Weight = weight;

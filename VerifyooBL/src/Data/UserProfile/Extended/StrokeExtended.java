@@ -131,7 +131,10 @@ public class StrokeExtended extends Stroke {
 	public double MaxInterestPointVelocity;
 	public double MaxInterestPointAcceleration;
 	public double MaxInterestPointPressure;
-	public double MaxInterestPointSurface;	
+	public double MaxInterestPointSurface;
+	
+	public int InterestPointsStartIndex;
+	public int InterestPointsEndIndex;
 	
 	/****************************************/
 	
@@ -416,7 +419,7 @@ public class StrokeExtended extends Stroke {
 	protected int GetDensityStartIndex() {
 		int startIndex = 0;
 		for(int idx = 0; idx < ListEventsExtended.size(); idx++) {
-			if(ListEventsExtended.get(idx).EventDensity == Consts.ConstsMeasures.MIN_DENSITY) {
+			if(ListEventsExtended.get(idx).EventDensity <= Consts.ConstsMeasures.MIN_DENSITY) {
 				startIndex = idx;
 				break;
 			}
@@ -425,15 +428,27 @@ public class StrokeExtended extends Stroke {
 		return startIndex;
 	}
 	
+	protected int GetDensityEndIndex() {
+		int endIndex = 0;
+		for(int idx = ListEventsExtended.size() - 3; idx >= 0; idx--) {
+			if(ListEventsExtended.get(idx).EventDensity <= Consts.ConstsMeasures.MIN_DENSITY) {
+				endIndex = idx;
+				break;
+			}
+		}
+		
+		return endIndex;
+	}
+	
 	protected void CalculateEventDensity() {
 		boolean isReachedDistance;
-		double maxDistance = 1;
+		double maxDistance = 0.7;
 		double currentDistance;
 		double eventDensity;
 		
 		int idxCurrent;
 		
-		MaxInterestPointDensity = Double.MIN_VALUE;		
+		MaxInterestPointDensity = Double.MIN_VALUE;
 		
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++) {
 			currentDistance = 0;
@@ -455,22 +470,20 @@ public class StrokeExtended extends Stroke {
 					eventDensity++;
 				}
 			}
-				
-			
+							
 			ListEventsExtended.get(idxEvent).EventDensity = eventDensity;
 		}
 		
-		int startIndex = GetDensityStartIndex();
-		for(int idxEvent = startIndex; idxEvent < ListEventsExtended.size(); idxEvent++) {
+		InterestPointsStartIndex = GetDensityStartIndex();
+		InterestPointsEndIndex = GetDensityEndIndex();
+		for(int idxEvent = InterestPointsStartIndex; idxEvent <= InterestPointsEndIndex; idxEvent++) {
 			eventDensity = ListEventsExtended.get(idxEvent).EventDensity;
 			if(eventDensity > MaxInterestPointDensity) {
 				MaxInterestPointDensity = eventDensity;
 				MaxInterestPointIndex = idxEvent;
 			}			
 		}
-		
-		
-		
+
 		FindInterestPointBoundary(MaxInterestPointIndex);
 		ExtractInterestPointFeatures(MaxInterestPointBoundaryMin, MaxInterestPointBoundaryMax);
 				

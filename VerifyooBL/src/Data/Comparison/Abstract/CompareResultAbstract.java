@@ -13,7 +13,7 @@ public abstract class CompareResultAbstract implements ICompareResult {
 	public double PopMean;
 	public double StandardDev;
 	public double InternalStandardDev;
-	public double InternalStandardDevUserOnly;
+	public double InternalStandardDevUserOnly;	
 		
 	@Override
 	public String GetName() {
@@ -35,7 +35,7 @@ public abstract class CompareResultAbstract implements ICompareResult {
 			Weight = 0.9;
 		}
 		return Weight;
-	}
+	}	
 	
 	public double GetMean() { 
 		return Mean;
@@ -78,7 +78,7 @@ public abstract class CompareResultAbstract implements ICompareResult {
 	@Override
 	public void SetValue(double value) {
 		Value = value;
-	}
+	}	
 	
 	public void SetOriginalValue(double originalValue) {
 		OriginalValue = originalValue;
