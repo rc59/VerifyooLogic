@@ -1,9 +1,14 @@
 package Logic.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import Data.MetaData.NormStroke;
 import Data.UserProfile.Extended.GestureExtended;
 import Data.UserProfile.Extended.MotionEventExtended;
+import Data.UserProfile.Extended.StrokeExtended;
+import Logic.Utils.DTW.DTWObjCoordinate;
+import Logic.Utils.DTW.IDTWObj;
 
 public class UtilsGeneral {
 	public String GenerateGestureFeatureMeanKey(String instruction, String paramName)
@@ -28,6 +33,18 @@ public class UtilsGeneral {
 	{
 		String key = String.format("%s-%s-%s-%s", instruction, String.valueOf(strokeIdx) , paramName, samplingType);
 		return key;
+	}
+	
+	public ArrayList<IDTWObj> ConvertStrokeToDTWObj(StrokeExtended stroke) {
+		ArrayList<IDTWObj> listDTWCoords = new ArrayList<>();		
+		
+		IDTWObj tempObj;
+		for(int idx = 0; idx < stroke.ListEventsExtended.size(); idx++) {
+			tempObj = new DTWObjCoordinate(stroke.ListEventsExtended.get(idx).Xnormalized, stroke.ListEventsExtended.get(idx).Ynormalized);
+			listDTWCoords.add(tempObj);
+		}
+		
+		return listDTWCoords;
 	}
 	
 	public String GenerateContainerKeySafe(String instruction, int idxStroke, HashMap hashNorms) {
@@ -69,54 +86,57 @@ public class UtilsGeneral {
 			default:
 				boundary = 0.18;
 				break;
-			case Consts.ConstsParamNames.Stroke.STROKE_MID_VELOCITY:
+			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERVAL:
+				boundary = 0.22;
+				break;			
+			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA_MINX_MINY:
 				boundary = 0.3;
 				break;
-			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA_MINX_MINY:
-				boundary = 0.25;
-				break;
 			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA:
-				boundary = 0.25;
+				boundary = 0.3;
 				break;
 			case Consts.ConstsParamNames.Stroke.STROKE_LENGTH:
-				boundary = 0.15;
-				break;
-			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY:
 				boundary = 0.25;
 				break;
-			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA:
-				boundary = 0.22;
-				break;
-			case Consts.ConstsParamNames.Stroke.STROKE_TIME_INTERVAL:
-				boundary = 0.18;
-				break;
-			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERVAL:
-				boundary = 0.16;
-				break;
-			case Consts.ConstsParamNames.Stroke.STROKE_NUM_EVENTS:
-				boundary = 0.16;
-				break;
-			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE:
-				boundary = 0.16;
-				break;
-			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE:
-				boundary = 0.10;
+			case Consts.ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY:
+				boundary = 0.25;
 				break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_VELOCITY:
 				boundary = 0.22;
 				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MID_VELOCITY:
+				boundary = 0.35;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MAX_ACCELERATION:
+				boundary = 0.35;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_AVERAGE_ACCELERATION:
+				boundary = 0.35;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_NUM_EVENTS:
+				boundary = 0.2;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_TIME_INTERVAL:
+				boundary = 0.23;
+				break;			
+			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY:
+				boundary = 0.30;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA:
+				boundary = 0.30;
+				break;			
+			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE:
+				boundary = 0.14;
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE:
+				boundary = 0.9;
+				break;			
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_RADIAL_VELOCITY:
 				boundary = 0.28;
 				break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_RADIAL_ACCELERATION:
 				boundary = 0.3;
-				break;
-			case Consts.ConstsParamNames.Stroke.STROKE_MAX_ACCELERATION:
-				boundary = 0.3;
-				break;
-			case Consts.ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY:
-				boundary = 0.22;
-				break;
+				break;			
 		}
 		
 		return boundary;
@@ -127,62 +147,71 @@ public class UtilsGeneral {
 	
 		switch(paramName) {
 			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERVAL:
-				threashold = 0.829;
+				threashold = 0.87;
 			break;
 			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA_MINX_MINY:
-				threashold = 0.718;
+				threashold = 0.62;
 			break;
 			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA:
-				threashold = 0.792;
-			break;
-			case Consts.ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY:
-				threashold = 0.755;
+				threashold = 0.66;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_LENGTH:
-				threashold = 0.81;
+				threashold = 0.77;
+			break;
+			case Consts.ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY:
+				threashold = 0.71;
+			break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MAX_VELOCITY:
+				threashold = 0.75;
+			break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MID_VELOCITY:
+				threashold = 0.78;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_ACCELERATION:
-				threashold = 0.621;
+				threashold = 0.68;
 			break;
+			case Consts.ConstsParamNames.Stroke.STROKE_AVERAGE_ACCELERATION:
+				threashold = 0.68;
+			break;
+			case Consts.ConstsParamNames.Stroke.STROKE_TIME_INTERVAL:
+				threashold = 0.85;
+			break;
+			case Consts.ConstsParamNames.Stroke.STROKE_NUM_EVENTS:
+				threashold = 0.77;
+			break;
+			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA:
+				threashold = 0.75;
+			break;
+			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY:
+				threashold = 0.758;
+			break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE:
+				threashold = 0.876;
+			break;
+			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE:
+				threashold = 0.95;
+			break;			
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_RADIAL_ACCELERATION:
 				threashold = 0.388;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_RADIAL_VELOCITY:
-				threashold = 0.686;
-			break;
-			case Consts.ConstsParamNames.Stroke.STROKE_MAX_VELOCITY:
-				threashold = 0.818;
-			break;
-			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE:
-				threashold = 0.945;
-			break;
-			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE:
-				threashold = 0.751;
-			break;
-			case Consts.ConstsParamNames.Stroke.STROKE_NUM_EVENTS:
-				threashold = 0.822;
-			break;
-			case Consts.ConstsParamNames.Stroke.STROKE_TIME_INTERVAL:
-				threashold = 0.788;
-			break;
-			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA:
-				threashold = 0.794;
-			break;
-			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY:
-				threashold = 0.776;
-			break;
+				threashold = 0.55;
+			break;						
 			case Consts.ConstsParamNames.Stroke.STROKE_TRANSITION_TIME:
-				threashold = 0.589;
-			break;
-			case Consts.ConstsParamNames.Stroke.STROKE_MID_VELOCITY:
-				threashold = 0.698;
+				threashold = 0.47;
+			break;			
+			case "DtwSpatialVelocity":
+				threashold = 1;
 			break;
 			case "DtwScore":
-				threashold = 0.874;
+				threashold = 0.845;
 			break;
 			case "PcaScore":
-				threashold = 0.857;
+				threashold = 0.66;
 			break;
+			case "InterestPoints":
+				threashold = 0.71;
+			break;			
 			case "InterestPointDensity":
 				threashold = 0.25;
 			break;
@@ -288,5 +317,33 @@ public class UtilsGeneral {
 		}
 		
 		return 1;
+	}
+	
+	public String NormStrokeListToString(ArrayList<NormStroke> listNormStrokes) {
+		StringBuilder output = new StringBuilder();
+		
+		for(int idx = 0; idx < listNormStrokes.size(); idx++) {
+			output.append(listNormStrokes.get(idx).ToString());
+			if(idx + 1 < listNormStrokes.size()) {
+				output.append(";");	
+			}			
+		}
+		
+		return output.toString();
+	}
+	
+	public ArrayList<NormStroke> NormStrokeListFromString(String input) {
+		ArrayList<NormStroke> listNormStrokes = new ArrayList<>(); 
+		
+		
+		NormStroke tempNormStroke;
+		String[] listStrNormStrokes = input.split(";");
+		for(int idx = 0; idx < listStrNormStrokes.length; idx++) {
+			tempNormStroke = new NormStroke();
+			tempNormStroke.FromString(listStrNormStrokes[idx]);
+			listNormStrokes.add(tempNormStroke);
+		}
+		
+		return listNormStrokes;
 	}
 }

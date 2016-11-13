@@ -1,6 +1,8 @@
 package Data.UserProfile.Extended;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import Consts.ConstsFeatures;
@@ -8,7 +10,10 @@ import Consts.ConstsMeasures;
 import Consts.ConstsParamNames;
 import Data.MetaData.ShapeData;
 import Data.MetaData.StrokeProperties;
+import Data.MetaData.ValueFreq;
+import Data.MetaData.ValueFreqContainer;
 import Data.MetaData.ParameterAvgPoint;
+import Data.Comparison.Interfaces.ICompareResult;
 import Data.MetaData.IndexBoundary;
 import Data.MetaData.IndexValue;
 import Data.UserProfile.Raw.MotionEventCompact;
@@ -32,6 +37,7 @@ public class StrokeExtended extends Stroke {
 	/************** Private Members **************/
 	private String mInstruction;
 	private int mStrokeIdx;
+	private int mStrokeKey;
 	
 	private UtilsSignalProcessing mUtilsSpatialSampling;
 	private UtilsMath mUtilsMath;
@@ -121,6 +127,9 @@ public class StrokeExtended extends Stroke {
 	public int MaxInterestPointBoundaryMin;
 	public int MaxInterestPointBoundaryMax;
 	public int MaxInterestPointIndex;
+	public int MaxInterestPointGestureStrengthIndex;
+	
+	public double MaxInterestPointGestureStrengthLocation;
 	
 	public double MaxInterestPointAvgVelocity;
 	public double MaxInterestPointMaxVelocity;
@@ -132,24 +141,28 @@ public class StrokeExtended extends Stroke {
 	public double MaxInterestPointAcceleration;
 	public double MaxInterestPointPressure;
 	public double MaxInterestPointSurface;
+	public double InterestPointsMostFreqDensity;
 	
 	public int InterestPointsStartIndex;
-	public int InterestPointsEndIndex;
+	public int InterestPointsEndIndex;	
+	
+	public double InterestPointDensityStrengthsParam;
+	public double InterestPointDensityStrengthsParamWithEdges;
 	
 	/****************************************/
 	
 	public double ZScoreTotal;
 	public double ZScoreCount;
 	public double ZScoreMostUnique;
+		
+	protected double mNumEvents;
 	
-	int mNumElementsInRow;
-	double[] mMatrixRow;	
+	int mNumElementsInRow;	
 	
 	public StrokeExtended(Stroke stroke, HashMap<String, IFeatureMeanData> hashFeatureMeans, String instruction, int strokeIdx)
 	{		
 		mNumElementsInRow = 0;
-		mMatrixRow = new double[13];
-
+	
 		ZScoreTotal = 0;
 		ZScoreCount = 0;
 		ZScoreMostUnique = 0;
@@ -169,6 +182,8 @@ public class StrokeExtended extends Stroke {
 			for(int idx = 0; idx < stroke.ListEvents.size(); idx++) {
 				ListEvents.add(stroke.ListEvents.get(idx).Clone());
 			}			
+			
+			mNumEvents = (double)stroke.ListEvents.size();
 			
 			Xdpi = stroke.Xdpi;		
 			Ydpi = stroke.Ydpi;
@@ -382,8 +397,10 @@ public class StrokeExtended extends Stroke {
 	}
 
 	protected void CalculateFeatures()
-	{
+	{		
 		CalculateSpatialSamplingVector();
+		CalculateStrokeKey();
+		StoreFeatures();
 		CalculateStrokeInterval();
 		CalculateAverageAndMaxVelocity();
 		CalculateAverageAndMaxAccelerations();
@@ -395,7 +412,23 @@ public class StrokeExtended extends Stroke {
 		CalculateEventDensity();
 		CalculateDensityArea();
 	}	
-	
+
+	private void CalculateStrokeKey() {
+		try {
+		mStrokeKey = NormMgr.GetInstance().GetStrokeKey(this);
+		}
+		catch(Exception exc) {
+			mStrokeKey = mStrokeIdx;
+		}
+	}
+
+	private void StoreFeatures() {
+		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_LENGTH, mStrokeIdx, StrokePropertiesObj.LengthMM);
+		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_NUM_EVENTS, mStrokeIdx, ListEventsExtended.size());
+		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_TOTAL_AREA, mStrokeIdx, ShapeDataObj.ShapeArea);
+		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY, mStrokeIdx, ShapeDataObj.ShapeAreaMinXMinY);
+	}
+
 	protected void CalculateDensityArea() {
 		double[] densityAreas = new double[ListEventsExtended.size()];
 		
@@ -405,11 +438,41 @@ public class StrokeExtended extends Stroke {
 		
 		double[] listSignalStrengths = Utils.GetInstance().GetUtilsSignalProcessing().CalculateSignalStrength(densityAreas);
 		
+		ArrayList<MotionEventExtended> listEventsStrengths = new ArrayList<>();
+		
 		MaxInterestPointDensity = Double.MIN_VALUE;
+		double totalStrengths = 0;
+		
 		for(int idx = 0; idx < listSignalStrengths.length; idx++) {
 			ListEventsExtended.get(idx).EventDensitySignalStrength = listSignalStrengths[idx];
+			
+			if(ListEventsExtended.get(idx).EventDensitySignalStrength > 0) {
+				totalStrengths += ListEventsExtended.get(idx).EventDensitySignalStrength;
+				listEventsStrengths.add(ListEventsExtended.get(idx));
+			}
 			if(ListEventsExtended.get(idx).EventDensitySignalStrength > MaxInterestPointDensity) {
-				MaxInterestPointDensity = ListEventsExtended.get(idx).EventDensity;				
+				MaxInterestPointDensity = ListEventsExtended.get(idx).EventDensity;
+				MaxInterestPointGestureStrengthIndex = idx;
+			}
+		}
+		
+		MaxInterestPointGestureStrengthLocation = ((double)MaxInterestPointGestureStrengthIndex) / mNumEvents;
+		
+		if(listEventsStrengths.size() > 2) {									
+			double numEvents = ListEventsExtended.size();
+			double tempWeight;
+			double tempLocation;
+			InterestPointDensityStrengthsParam = 0;
+			InterestPointDensityStrengthsParamWithEdges = 0;
+			
+			for(int idx = 0; idx < listEventsStrengths.size(); idx++) {
+				tempWeight = listEventsStrengths.get(idx).EventDensitySignalStrength / totalStrengths;
+				tempLocation = listEventsStrengths.get(idx).Index / numEvents;
+				InterestPointDensityStrengthsParamWithEdges += tempWeight * tempLocation;
+				
+				if(idx > 0 && idx < (listEventsStrengths.size() - 1)) {
+					InterestPointDensityStrengthsParam += tempWeight * tempLocation;
+				}
 			}
 		}
 		
@@ -442,13 +505,15 @@ public class StrokeExtended extends Stroke {
 	
 	protected void CalculateEventDensity() {
 		boolean isReachedDistance;
-		double maxDistance = 0.7;
+		double maxDistance = 0.9;
 		double currentDistance;
 		double eventDensity;
 		
 		int idxCurrent;
 		
 		MaxInterestPointDensity = Double.MIN_VALUE;
+		
+		ValueFreqContainer valueFreqContainer = new ValueFreqContainer();
 		
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++) {
 			currentDistance = 0;
@@ -470,13 +535,24 @@ public class StrokeExtended extends Stroke {
 					eventDensity++;
 				}
 			}
-							
+						
+			valueFreqContainer.AddValue(eventDensity);
 			ListEventsExtended.get(idxEvent).EventDensity = eventDensity;
+		}		
+		
+		InterestPointsMostFreqDensity = valueFreqContainer.GetMostFreq();
+		if(InterestPointsMostFreqDensity > 3) {
+			InterestPointsMostFreqDensity = 3;
 		}
 		
+		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++) {
+			ListEventsExtended.get(idxEvent).EventDensityRaw = ListEventsExtended.get(idxEvent).EventDensity;
+			ListEventsExtended.get(idxEvent).EventDensity = ListEventsExtended.get(idxEvent).EventDensity - (InterestPointsMostFreqDensity - 1); //Utils.GetInstance().GetUtilsMath().GetMaxValue((ListEventsExtended.get(idxEvent).EventDensity - InterestPointsMostFreqDensity - 1), 0);
+		}
+			
 		InterestPointsStartIndex = GetDensityStartIndex();
 		InterestPointsEndIndex = GetDensityEndIndex();
-		for(int idxEvent = InterestPointsStartIndex; idxEvent <= InterestPointsEndIndex; idxEvent++) {
+		for(int idxEvent = InterestPointsStartIndex; idxEvent <= InterestPointsEndIndex; idxEvent++) {						
 			eventDensity = ListEventsExtended.get(idxEvent).EventDensity;
 			if(eventDensity > MaxInterestPointDensity) {
 				MaxInterestPointDensity = eventDensity;
@@ -647,16 +723,10 @@ public class StrokeExtended extends Stroke {
 			ListEventsExtended.get(idxEvent-1).AngleDiff = mUtilsMath.CalcAbsAngleDifference(ListEventsExtended.get(idxEvent).Angle, ListEventsExtended.get(idxEvent - 1).Angle);
 			totalAcc += mAccelerations[idxEvent];			
 		}
-		
-		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_LENGTH, mStrokeIdx, StrokePropertiesObj.LengthMM);
-		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_NUM_EVENTS, mStrokeIdx, ListEventsExtended.size());
-		
+				
 		ShapeDataObj.ShapeArea = Math.sqrt(ShapeDataObj.ShapeArea);
 		ShapeDataObj.ShapeAreaMinXMinY = Math.sqrt(ShapeDataObj.ShapeAreaMinXMinY);
 		
-		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_TOTAL_AREA, mStrokeIdx, ShapeDataObj.ShapeArea);
-		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY, mStrokeIdx, ShapeDataObj.ShapeAreaMinXMinY);
-				
 		StrokeAverageAcceleration = totalAcc / ListEventsExtended.size();
 	}
 	
@@ -835,8 +905,8 @@ public class StrokeExtended extends Stroke {
     }
 	
 	protected void AddStrokeValue(String instruction, String paramName, int strokeIdx, double value)
-	{
-		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);		
+	{		
+		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, paramName, mStrokeIdx);		
 		String keyMatrix = mUtilsGeneral.GenerateStrokeMatrixMeanKey(instruction, strokeIdx);
 		
 		IFeatureMeanData tempFeatureMeanData;
@@ -860,7 +930,12 @@ public class StrokeExtended extends Stroke {
 				mHashFeatureMeans.put(keyMatrix, tempFeatureMatrix);
 			}
 		
-			((FeatureMatrix)tempFeatureMatrix).AddValue(value, Consts.ConstsFeatures.NUM_STROKE_PARAMS);
+			if(paramName.compareTo("StrokeMiddleSurface") == 0) {
+				((FeatureMatrix)tempFeatureMatrix).AddValue(value, true);
+			}
+			else {
+				((FeatureMatrix)tempFeatureMatrix).AddValue(value, false);
+			}
 		}
 		
 		try {
@@ -919,6 +994,11 @@ public class StrokeExtended extends Stroke {
 	public int GetStrokeIdx()
 	{
 		return mStrokeIdx;
+	}
+	
+	public int GetStrokeKey()
+	{
+		return mStrokeKey;
 	}
 	
 	public String GetInstruction(){

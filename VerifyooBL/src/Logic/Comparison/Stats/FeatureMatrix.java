@@ -21,15 +21,14 @@ public class FeatureMatrix extends FeatureMeanDataAbstract {
 		Instruction = instruction; 
 	}
 
-	public void AddValue(double value, int limit) {
+	public void AddValue(double value, boolean isLastParam) {
 		int currentCount = MatrixFeature.size();
+		MatrixFeature.get(currentCount - 1).add(value);
 		
-		if(MatrixFeature.get(currentCount - 1).size() >= limit) {
+		if(isLastParam) {
 			MatrixFeature.add(new ArrayList<Double>());
 			currentCount = MatrixFeature.size();
 		}
-
-		MatrixFeature.get(currentCount - 1).add(value);
 	}
 	
 	@Override

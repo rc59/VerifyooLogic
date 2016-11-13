@@ -36,8 +36,15 @@ public class UtilsStat {
 	
 	public double CalculateBoundaryFactor(double populationMean, double populationSd, double internalMean, double boundaryAdj) {
 		double boundaryFactor = boundaryAdj;
-		double zScore = (internalMean - populationMean) / populationSd;
+		double zScore = Math.abs((internalMean - populationMean) / populationSd);
 			
+		if(zScore > 2) {
+			zScore = 2;
+		}
+		if(zScore < 1) {
+			zScore = 1;
+		}		
+		
 		double boundaryFactorMultiplier = Math.abs(zScore) - 1;
 		if(boundaryFactorMultiplier > 1) {
 			boundaryFactorMultiplier = 1;
@@ -46,10 +53,11 @@ public class UtilsStat {
 			boundaryFactorMultiplier = 0;
 		}
 		boundaryFactorMultiplier = boundaryFactorMultiplier * 0.1;
-		boundaryFactor += boundaryFactorMultiplier; 
+		boundaryFactor += boundaryFactorMultiplier;
 		
 		double boundary = internalMean * boundaryFactor;
-		return boundary;
+		return (boundaryAdj * zScore);
+		//		return boundary;
 	}
 	
 	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd, double boundaryAdj) {
@@ -57,33 +65,55 @@ public class UtilsStat {
 		
 		double uniquenessFactor = 1;
 		
-		double firstUpperPopulationInternalSD = (internalMean + boundary * uniquenessFactor);
-		double firstLowerPopulationInternalSD = (internalMean - boundary * uniquenessFactor);
+		double b = internalMean * boundary;
 		
-		double secondUpperPopulationInternalSD = (internalMean + 2 * boundary * uniquenessFactor);
-		double secondLowerPopulationInternalSD = (internalMean - 2 * boundary * uniquenessFactor);
+		double firstUpperPopulationInternalSD = (internalMean + b);
+		double firstLowerPopulationInternalSD = (internalMean - b);
+		
+		double secondUpperPopulationInternalSD = (internalMean + 2 * b);
+		double secondLowerPopulationInternalSD = (internalMean - 2 * b);
 		double score;
-		if((authValue > firstLowerPopulationInternalSD) && (authValue < firstUpperPopulationInternalSD)) {
+		
+		double boundaryMaxScore = 0.9;		
+		
+		double internalBoundaryLower = internalMean - internalSd;
+		double internalBoundaryUpper = internalMean + internalSd;
+		
+		if(authValue > internalBoundaryLower && authValue < internalBoundaryUpper) {
 			score = 1;
 		}
 		else {
-			if((authValue > secondLowerPopulationInternalSD) && (authValue < secondUpperPopulationInternalSD)) {
-				if(authValue > firstLowerPopulationInternalSD) {
-					double u = Math.abs(secondUpperPopulationInternalSD - authValue);
-					double d = Math.abs(secondUpperPopulationInternalSD - firstUpperPopulationInternalSD);
-					
-					score = u/d;
-				}
-				else {
-					double u = Math.abs(secondLowerPopulationInternalSD - authValue);
-					double d = Math.abs(secondLowerPopulationInternalSD - firstLowerPopulationInternalSD);
-					
-					score = u/d;
+			if((authValue > firstLowerPopulationInternalSD) && (authValue < firstUpperPopulationInternalSD)) {
+				score = 0.95;
+				if(authValue != internalMean) {
+					score = Math.abs(authValue - internalMean) / b;
+					score = 1 - (1 - boundaryMaxScore) * (1 - score);
 				}
 			}
 			else {
-				score = 0;
-			}
+				if((authValue > secondLowerPopulationInternalSD) && (authValue < secondUpperPopulationInternalSD)) {
+					if(authValue > firstLowerPopulationInternalSD) {
+						double u = Math.abs(secondUpperPopulationInternalSD - authValue);
+						double d = Math.abs(secondUpperPopulationInternalSD - firstUpperPopulationInternalSD);
+						
+						score = u/d;
+					}
+					else {
+						double u = Math.abs(secondLowerPopulationInternalSD - authValue);
+						double d = Math.abs(secondLowerPopulationInternalSD - firstLowerPopulationInternalSD);
+						
+						score = u/d;
+					}
+					
+					score -= (1 - boundaryMaxScore);
+					if(score < 0 ) {
+						score = 0;
+					}
+				}
+				else {
+					score = 0;
+				}
+			}			
 		}
 		
 		return score;
@@ -203,27 +233,40 @@ public class UtilsStat {
 	}	
 	
 	public double CalcWeight(double internalMean, double internalSd, double popMean, double popSd, double adjFactor) {
-		double boundary = CalculateBoundaryFactor(popMean, popSd, internalMean, adjFactor);
+//		double boundary = CalculateBoundaryFactor(popMean, popSd, internalMean, adjFactor);
+//		
+//		double lowerBound = internalMean - boundary;
+//		double upperBound = internalMean + boundary;
+//		
+//		double lowerBoundZ = CalculateZScore(lowerBound, popMean, popSd);
+//		double upperBoundZ = CalculateZScore(upperBound, internalMean, internalSd);
+//		
+//		double lowerBoundProb = ConvertZToProbabilityCheckNegative(lowerBoundZ);
+//		double upperBoundProb = ConvertZToProbabilityCheckNegative(upperBoundZ);
+//		
+//		double weight = 1 - Math.abs(upperBoundProb - lowerBoundProb);
+//		double zScore = Math.abs(CalculateZScore(internalMean, popMean, popSd));
+//		if(zScore > 2) {
+//			zScore = 2;
+//		}
+//		if(zScore < 1) {
+//			zScore = 1;
+//		}
 		
-		double lowerBound = internalMean - boundary;
-		double upperBound = internalMean + boundary;
+//		return (weight + zScore / 2) / 2;
 		
-		double lowerBoundZ = CalculateZScore(lowerBound, popMean, popSd);
-		double upperBoundZ = CalculateZScore(upperBound, internalMean, internalSd);
-		
-		double lowerBoundProb = ConvertZToProbabilityCheckNegative(lowerBoundZ);
-		double upperBoundProb = ConvertZToProbabilityCheckNegative(upperBoundZ);
-		
-		double weight = 1 - Math.abs(upperBoundProb - lowerBoundProb);
+		double weight = 1;
 		double zScore = Math.abs(CalculateZScore(internalMean, popMean, popSd));
-		if(zScore > 2) {
-			zScore = 2;
-		}
-		if(zScore < 1) {
-			zScore = 1;
+		if(zScore <= 0.5) {
+			weight = 0;
 		}
 		
-		return (weight + zScore / 2) / 2;
+		if(zScore > 0.5 && zScore < 2) {
+			weight = zScore - 0.5;
+			weight = weight / 1.5;
+		}
+		
+		return weight;
 	}
 		
 	protected double CalculateProbability(double authValue, double internalMean, double internalSd, boolean isAbs) {

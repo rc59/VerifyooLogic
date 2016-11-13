@@ -40,6 +40,7 @@ public class MotionEventExtended extends MotionEventCompact {
 	public boolean IsStartOfStroke;
 	public boolean IsEndOfStroke;
 
+	public double EventDensityRaw;
 	public double EventDensity;
 	public double EventDensitySignalStrength;
 	public double EventDistance;
@@ -52,6 +53,7 @@ public class MotionEventExtended extends MotionEventCompact {
 	{
 		MotionEventExtended tempEvent = new MotionEventExtended();
 		
+		tempEvent.EventDensityRaw = EventDensityRaw;
 		tempEvent.EventDensity = EventDensity;
 		tempEvent.EventDistance = EventDistance;
 		tempEvent.EventDensitySignalStrength = EventDensitySignalStrength;

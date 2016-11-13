@@ -35,7 +35,12 @@ public class UtilsAccumulator {
      * @return the sample variance of the data values
      */
     public double Var() {
-        return Sum / (N - 1);
+    	if(N > 1) {
+    		return Sum / (N - 1);	
+    	}
+    	else {
+    		return (Sum / 2);
+    	}
     }
 
     /**

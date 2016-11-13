@@ -38,7 +38,7 @@ public class NumericNormContainer {
 	
 	public double GetMean(String instruction, int idxStroke) {
 		String key = Utils.GetInstance().GetUtilsGeneral().GenerateContainerKeySafe(instruction, idxStroke, HashNorms);
-		return HashNorms.get(key).Mean();		
+		return HashNorms.get(key).Mean();
 	}
 	
 	public double GetStd(String instruction, int idxStroke) {
@@ -46,11 +46,11 @@ public class NumericNormContainer {
 		return HashNorms.get(key).Stddev();
 	}
 	
-	public double GetMean(String instruction) {			
-		return HashNorms.get(instruction).Mean();		
+	public double GetMean(String instruction) {
+		return HashNorms.get(instruction).Mean();
 	}
 	
-	public double GetStd(String instruction) {		
+	public double GetStd(String instruction) {
 		return HashNorms.get(instruction).Stddev();
 	}
 }

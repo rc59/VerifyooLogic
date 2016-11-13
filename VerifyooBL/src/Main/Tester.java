@@ -18,6 +18,7 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 import Data.Comparison.Interfaces.ICompareResult;
+import Data.MetaData.NormStroke;
 import Data.UserProfile.Extended.GestureExtended;
 import Data.UserProfile.Extended.TemplateExtended;
 import Data.UserProfile.Raw.Gesture;
@@ -25,7 +26,12 @@ import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
 import Data.UserProfile.Raw.Template;
 import Logic.Comparison.TemplateComparer;
+import Logic.Comparison.Stats.Norms.NormContainerMgr;
+import Logic.Comparison.Stats.Norms.NormMgr;
+import Logic.Comparison.Stats.Norms.Interfaces.INormMgr;
+import Logic.Utils.Utils;
 import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
 
 public class Tester {	
 	public Template GetFromDB(String userName, boolean isFromTemplateDemos)
@@ -377,10 +383,32 @@ public class Tester {
 		return score;
 	}
 	
+	public void GetNorms(String id1) {
+		Template template1 = GetFromDBById(id1, true);
+		TemplateExtended templateBase = new TemplateExtended(template1);
+		
+		ArrayList<NormStroke> listNormStrokes = new ArrayList<>();
+		
+		int count = 0;
+		for(int idxGesture = 0; idxGesture < templateBase.ListGestureExtended.size(); idxGesture++) {
+			for(int idxStroke = 0; idxStroke < templateBase.ListGestureExtended.get(idxGesture).ListStrokesExtended.size(); idxStroke++) {
+				count++;
+				listNormStrokes.add(new NormStroke(templateBase.ListGestureExtended.get(idxGesture).ListStrokesExtended.get(idxStroke), count));
+			}
+		}		
+		
+		String toString = listNormStrokes.get(0).ToString();
+		NormStroke temp = new NormStroke();
+		temp.FromString(toString);
+		
+		String normStrokes = Utils.GetInstance().GetUtilsGeneral().NormStrokeListToString(listNormStrokes);
+		ArrayList<NormStroke> listNormStrokes2 = Utils.GetInstance().GetUtilsGeneral().NormStrokeListFromString(normStrokes);
+		
+		int size = listNormStrokes.size();
+	}
+	
 	public double CompareTemplatesById(String id1, String id2)
-	{	
-		
-		
+	{			
 		Template template1 = GetFromDBById(id1, true);		
 		Template template2 = GetFromDBById(id2, true);
 		
@@ -393,6 +421,16 @@ public class Tester {
 		long diff = end - start;
 		
 		comparer.CompareTemplates(templateBase, templateAuth);
+		
+		NormMgr normMgr = (NormMgr)NormMgr.GetInstance();
+		NormContainerMgr normContainerMgr = normMgr.NormContainerMgr;
+		
+		for(int idxGesture = 0; idxGesture < templateBase.ListGestureExtended.size(); idxGesture++) {
+			for(int idxStroke = 0; idxStroke < templateBase.ListGestureExtended.get(idxGesture).ListStrokesExtended.size(); idxStroke++) {
+				normContainerMgr.GetStrokeIndex(templateBase.ListGestureExtended.get(idxGesture).ListStrokesExtended.get(idxStroke));
+			}
+		}
+		
 		double score = comparer.GetScore();
 		boolean result = true;
 		//double score = GetFinalScore(listScores);

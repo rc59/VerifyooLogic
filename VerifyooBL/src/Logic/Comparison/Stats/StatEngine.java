@@ -76,9 +76,9 @@ public class StatEngine implements IStatEngine {
 		return statResult;
 	}
 	
-	public IStatEngineResult CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
+	public IStatEngineResult CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, int strokeKey, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
 	{		
-		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction, strokeIdx);
+		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction, strokeKey);
 				
 		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
 				

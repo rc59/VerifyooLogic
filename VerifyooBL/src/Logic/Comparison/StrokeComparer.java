@@ -32,6 +32,7 @@ import Logic.Comparison.Stats.Norms.NormData;
 import Logic.Comparison.Stats.Norms.NormMgr;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Utils.Complex;
+import Logic.Utils.DSP;
 import Logic.Utils.FFT;
 import Logic.Utils.Utils;
 import Logic.Utils.UtilsComparison;
@@ -48,6 +49,7 @@ public class StrokeComparer {
 	protected boolean mIsStrokesIdentical;
 	
 	protected IStatEngine mStatEngine;
+	protected int mStoredStrokeKey;
 	
 	protected UtilsGeneral mUtilsGeneral;
 	protected UtilsVectors mUtilsVectors;	
@@ -59,6 +61,8 @@ public class StrokeComparer {
 	protected StrokeExtended mStrokeAuthExtended;		
 	protected double mMinCosineDistanceScore;
 	protected boolean mIsSimilarDevices;
+	
+	public boolean IsStrokeTypesValid;
 	
 	public double InterestPointScore;
 	public double InterestPointScoreFinal;
@@ -142,6 +146,12 @@ public class StrokeComparer {
 	public double MaxInterestPointSurface;
 	public double MaxInterestPointVelocity;
 	public double MaxInterestPointAcceleration;
+	public double MaxInterestPointConvolution;
+	
+	public double InterestPointDensityStrengthsDiff;
+	public double InterestPointDensityStrengthsWithEdgesDiff;
+	
+	public double VelocitiesConvolution;
 	
 	/*********************************** Spatial Scores ***********************************/
 	
@@ -243,26 +253,28 @@ public class StrokeComparer {
 			
 			CheckIfStrokesAreIdentical();
 			
-			if(!mIsStrokesIdentical) {				
-				CompareStrokeDistances();
+			if(!mIsStrokesIdentical) {
+				CheckStoredStrokeKey();
+//				CompareStrokeDistances();
 				DtwVelocities();
 				CreateSpatialVectorsForDtwAnalysis();
 				PcaAnalysis();
-				CompareMinCosineDistance();
+ 				CompareMinCosineDistance();
 				CompareStrokeAreas();
 				CompareLengths();
 				CompareTimeInterval();
 				CompareNumEvents();
 				CompareVelocities();
 				ComparePressureAndSurface();
-				CompareAccelerometer();
+//				CompareAccelerometer();
 				CompareStrokeTransitionTimes();
 				CompareAccelerations();
-				CompareRadials();
+//				CompareRadials();				
 				CompareInterestPoints();
-				CalculateFinalScoresToDtwPcaInterestPoints();
-				CalculateFinalScore();
-				CheckFinalScore();
+//				CalculateFinalScoresToDtwPcaInterestPoints();
+//				CheckStrokeTypes();
+//				CalculateFinalScore();
+//				CheckFinalScore();
 			}
 		}
 		
@@ -274,6 +286,21 @@ public class StrokeComparer {
 		}		
 	}			
 	
+	private void CheckStrokeTypes() {
+		IsStrokeTypesValid = true;
+		if(mStrokeAuthExtended.GetStrokeKey() != mStrokeStoredExtended.GetStrokeKey()) {
+			IsStrokeTypesValid = false;
+		}
+	}
+
+	private void CheckStoredStrokeKey() {
+		mStoredStrokeKey = NormMgr.GetInstance().GetStrokeKey(mStrokeStoredExtended);
+	}
+	
+	public int GetStoredStrokeKey() {
+		return mStoredStrokeKey;
+	}
+
 	private double GetFinalScore(double value, double lower, double upper, boolean isReverse) {
 		double updateValue = value - lower;
 		if(updateValue < 0) {
@@ -298,13 +325,19 @@ public class StrokeComparer {
 	
 	private void CalculateFinalScoresToDtwPcaInterestPoints() {		
 		InterestPointScoreFinal = GetFinalScore(InterestPointScore, 0.25, 0.45, false);		
-		DtwSpatialTotalScoreFinal = GetFinalScore(DtwSpatialTotalScore, 0.55, 0.7, false);
-		PcaScoreFinal = GetFinalScore(Math.abs(PcaScore), 2.5, 8, true);
+		DtwSpatialTotalScoreFinal = GetFinalScore(DtwSpatialTotalScore, 0.55, 0.7, false);		
 	}
 	
 	private void DtwVelocities() {
 		double[] velAuth = Utils.GetInstance().GetUtilsVectors().GetVectorVel(mStrokeAuthExtended.ListEventsSpatialExtended); 
 		double[] velStored = Utils.GetInstance().GetUtilsVectors().GetVectorVel(mStrokeStoredExtended.ListEventsSpatialExtended);
+		
+		double[] result = DSP.conv(velAuth, velStored);
+		double maxValue = Double.MIN_VALUE;
+		for(int idx = 0; idx < result.length; idx++) {
+			maxValue = Utils.GetInstance().GetUtilsMath().GetMaxValue(result[idx], maxValue);
+		}
+		VelocitiesConvolution = maxValue;
 		
 		IDTWObj tempObj;
 		ArrayList<IDTWObj> listAuth = new ArrayList<IDTWObj>(); 
@@ -347,16 +380,29 @@ public class StrokeComparer {
 		return listSignalStrengths;
 	}
 	
+	private double[] GetDensityVector(StrokeExtended stroke) {
+		double[] densityVectors = new double[stroke.ListEventsExtended.size()];
+		
+		for(int idx = 0; idx < stroke.ListEventsExtended.size(); idx++) {
+			densityVectors[idx] = stroke.ListEventsExtended.get(idx).EventDensity;
+		}
+		
+		return densityVectors;
+	}
+	
 	private void CompareInterestPoints() {
 		
 		double[] densityAreasAuth = GetDensityAreas(mStrokeAuthExtended);
 		double[] densityAreasStored = GetDensityAreas(mStrokeStoredExtended);
-
-		double storedMaxPointStrength = densityAreasStored[mStrokeStoredExtended.MaxInterestPointIndex];
+		
+		double[] densityVectorAuth = GetDensityVector(mStrokeAuthExtended);
+		double[] densityVectorStored = GetDensityVector(mStrokeStoredExtended);
+		
+		double storedMaxPointStrength = densityAreasStored[mStrokeStoredExtended.MaxInterestPointGestureStrengthIndex];
 		
 		double dev = 0.25;
 		
-		int idxBase = (int) (mStrokeStoredExtended.MaxInterestPointLocation * mStrokeAuthExtended.ListEventsExtended.size());
+		int idxBase = (int) (mStrokeStoredExtended.MaxInterestPointGestureStrengthLocation * mStrokeAuthExtended.ListEventsExtended.size());
 		int upperBound = idxBase + (int)(dev * mStrokeAuthExtended.ListEventsExtended.size());
 		if(upperBound > mStrokeAuthExtended.ListEventsExtended.size()) {
 			upperBound = mStrokeAuthExtended.ListEventsExtended.size();
@@ -372,7 +418,7 @@ public class StrokeComparer {
 		double minLocationDiff = 1;
 		double currentLocationDiff;
 		
-		int idxFound = idxBase;
+		int idxFound = -1;
 		
 		for(int idx = lowerBound; idx < upperBound; idx++) {
 			if(idx < densityAreasAuth.length && densityAreasAuth[idx] > 0) {
@@ -388,14 +434,54 @@ public class StrokeComparer {
 			}
 		}
 		
-		CompareInterestPointFeatures(idxFound);
+		IsInterestPointFound = true;
 		
-		MaxInterestPointDensity = 1 - densityDiff;
-		MaxInterestPointLocation = 1 - minLocationDiff;
-		InterestPointScore = ((MaxInterestPointDensity + MaxInterestPointLocation) / 2);
-		MaxInterestPointIndex = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.MaxInterestPointIndex, mStrokeStoredExtended.MaxInterestPointIndex);
-		MaxInterestPointVelocity = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.MaxInterestPointVelocity, mStrokeStoredExtended.MaxInterestPointVelocity);
-		MaxInterestPointAcceleration = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.MaxInterestPointAcceleration, mStrokeStoredExtended.MaxInterestPointAcceleration);
+		InterestPointDensityStrengthsDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.InterestPointDensityStrengthsParam, mStrokeStoredExtended.InterestPointDensityStrengthsParam);
+		InterestPointDensityStrengthsWithEdgesDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.InterestPointDensityStrengthsParamWithEdges, mStrokeStoredExtended.InterestPointDensityStrengthsParamWithEdges);
+		
+		if(idxFound == -1) {
+			IsInterestPointFound = false;
+			InterestPointScoreFinal = 0;
+		}
+		else {
+			RunConv(densityVectorAuth, lowerBound, upperBound ,densityVectorStored, mStrokeStoredExtended.InterestPointsStartIndex, mStrokeStoredExtended.InterestPointsEndIndex);		
+			
+			CompareInterestPointFeatures(idxFound);
+			
+			MaxInterestPointDensity = 1 - densityDiff;
+			MaxInterestPointLocation = 1 - minLocationDiff;
+			InterestPointScore = ((MaxInterestPointDensity + MaxInterestPointLocation) / 2);
+			MaxInterestPointIndex = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.MaxInterestPointIndex, mStrokeStoredExtended.MaxInterestPointIndex);
+			MaxInterestPointVelocity = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.MaxInterestPointVelocity, mStrokeStoredExtended.MaxInterestPointVelocity);
+			MaxInterestPointAcceleration = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeAuthExtended.MaxInterestPointAcceleration, mStrokeStoredExtended.MaxInterestPointAcceleration);
+						
+			InterestPointScoreFinal = InterestPointDensityStrengthsDiff;
+		}		
+	}
+	
+	private void RunConv(double[] vector1, int idxStart1, int idxEnd1, double[] vector2, int idxStart2, int idxEnd2) {
+		double[] subVector1 = new double[idxEnd1 - idxStart1 + 1];
+		double[] subVector2 = new double[idxEnd2 - idxStart2 + 1];
+		
+		int idxCurr = 0;
+		for(int idx = idxStart1; idx < idxEnd1; idx++) {
+			subVector1[idxCurr] = vector1[idx];
+			idxCurr++;
+		}
+		
+		idxCurr = 0;
+		for(int idx = idxStart2; idx < idxEnd2; idx++) {
+			subVector2[idxCurr] = vector2[idx];
+			idxCurr++;
+		}
+		
+		double[] result = DSP.conv(subVector1, subVector2);
+		double maxValue = Double.MIN_VALUE;
+		for(int idx = 0; idx < result.length; idx++) {
+			maxValue = Utils.GetInstance().GetUtilsMath().GetMaxValue(result[idx], maxValue);
+		}
+		
+		MaxInterestPointConvolution = maxValue;
 	}
 	
 	private void CompareInterestPointFeatures(int authIdxIntPoint) {
@@ -423,12 +509,10 @@ public class StrokeComparer {
 				
 		if(numEvents > 0) {
 			authMaxIntPointAvgVelocity = authMaxIntPointAvgVelocity / numEvents;		
-			MaxInterestPointAvgVelocity = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.MaxInterestPointAvgVelocity, authMaxIntPointAvgVelocity);
-			IsInterestPointFound = true;
+			MaxInterestPointAvgVelocity = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.MaxInterestPointAvgVelocity, authMaxIntPointAvgVelocity);			
 		}
 		else {
-			MaxInterestPointAvgVelocity = 0;
-			IsInterestPointFound = false;
+			MaxInterestPointAvgVelocity = 0;			
 		}
 		
 		DtwOnInterestZone(listAuthInterestZone, mStrokeStoredExtended.ListEventsExtendedInterestZone);
@@ -468,7 +552,7 @@ public class StrokeComparer {
 			MaxInterestPointDTWVelocity = dtwVelocities.getDistance();
 			
 			UtilsDTW dtwCoords = new UtilsDTW(listDTWAuthCoords, listDTWStoredCoords);
-			MaxInterestPointDTWCoords = dtwCoords.getDistance();	
+			MaxInterestPointDTWCoords = dtwCoords.getDistance();
 		}
 	}
 
@@ -619,6 +703,7 @@ public class StrokeComparer {
 	
 	
 	private void PcaAnalysis() {
+		
 		String keyMatrix = mUtilsGeneral.GenerateStrokeMatrixMeanKey(mStrokeStoredExtended.GetInstruction(), mStrokeStoredExtended.GetStrokeIdx());
 		
 		FeatureMatrix featureMatrixStored = (FeatureMatrix) mStrokeStoredExtended.GetFeatureMeansHash().get(keyMatrix);
@@ -633,13 +718,15 @@ public class StrokeComparer {
 		PCA pca = new PCA(matrixStored);
 		Matrix transformedData = pca.transform(matrixAuth, PCA.TransformationType.WHITENING);
 		
-		PcaScore = Math.abs(transformedData.get(0, 0));
-		double maxValue = 20;
-		if(PcaScore > maxValue) {
-			PcaScore = maxValue;
+		PcaScore = Math.abs(transformedData.get(0, 0));	
+		
+		double maxValue = 2;
+		PcaScoreFinal = PcaScore;
+		if(PcaScoreFinal > maxValue) {
+			PcaScoreFinal = maxValue;
 		}		
-		PcaScore = PcaScore / maxValue;
-		PcaScore = 1 - PcaScore;
+		PcaScoreFinal = PcaScoreFinal / maxValue;
+		PcaScoreFinal = 1 - PcaScoreFinal;
 	}
 		
 	private void CreateSpatialVectorsForDtwAnalysis() {
@@ -878,9 +965,9 @@ public class StrokeComparer {
 	protected void CompareStrokeAreas()
 	{
 		double areaAuth = mStrokeAuthExtended.ShapeDataObj.ShapeArea;
-		double areaAuthMinXMinY = mStrokeAuthExtended.ShapeDataObj.ShapeAreaMinXMinY;
-				
-		CompareParameter(ConstsParamNames.Stroke.STROKE_TOTAL_AREA, areaAuth);
+		double areaAuthMinXMinY = mStrokeAuthExtended.ShapeDataObj.ShapeAreaMinXMinY;				
+		
+		CompareParameter(ConstsParamNames.Stroke.STROKE_TOTAL_AREA, areaAuth);		
 		CompareParameter(ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY, areaAuthMinXMinY);		
 	}	
 	
@@ -904,8 +991,10 @@ public class StrokeComparer {
 	
 	protected void CompareAccelerations() {		
 		double maxAccelerationAuth = mStrokeAuthExtended.StrokeMaxAcceleration;
+		double avgAccelerationAuth = mStrokeAuthExtended.StrokeAverageAcceleration;
 		
 		CompareParameter(ConstsParamNames.Stroke.STROKE_MAX_ACCELERATION, maxAccelerationAuth);
+//		CompareParameter(ConstsParamNames.Stroke.STROKE_AVERAGE_ACCELERATION, avgAccelerationAuth);
 	}
 	
 	protected void CompareStrokeTransitionTimes() {
@@ -938,7 +1027,7 @@ public class StrokeComparer {
 		
 		CompareParameter(ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY, avgVelocityAuth);
 		CompareParameter(ConstsParamNames.Stroke.STROKE_MAX_VELOCITY, maxVelocityAuth);
-		CompareParameter(ConstsParamNames.Stroke.STROKE_MID_VELOCITY, midVelocityAuth);		
+		CompareParameter(ConstsParamNames.Stroke.STROKE_MID_VELOCITY, midVelocityAuth);
 	}
 	
 	protected void CalculateFinalScore()
@@ -1005,12 +1094,18 @@ public class StrokeComparer {
 	}
 
 	protected double CompareParameter(String paramName, double authValue) {
+		int strokeKey = mStoredStrokeKey;
+		
 		IStatEngineResult result = 
-				mStatEngine.CompareStrokeDoubleValues(mStrokeAuthExtended.GetInstruction(), paramName, mStrokeAuthExtended.GetStrokeIdx(), authValue, mStrokeStoredExtended.GetFeatureMeansHash());
+				mStatEngine.CompareStrokeDoubleValues(mStrokeAuthExtended.GetInstruction(), paramName, mStrokeStoredExtended.GetStrokeIdx(), mStrokeStoredExtended.GetStrokeKey(), authValue, mStrokeStoredExtended.GetFeatureMeansHash());
 		
 		double finalScore = result.GetScore();		
 		AddDoubleParameter(paramName, finalScore, result.GetZScore(), authValue);
 		return finalScore;
+	}
+	
+	public StrokeExtended GetBaseStroke() {
+		return mStrokeStoredExtended;
 	}
 	
 	protected void AddDoubleParameter(String parameterName, double score, double weight, double originalValue)
@@ -1027,13 +1122,13 @@ public class StrokeComparer {
 		
 		if(hashFeatureMeans.containsKey(key)) {
 			mean = hashFeatureMeans.get(key).GetMean();
-			
-			INormData normData = NormMgr.GetInstance().GetNormDataByParamName(parameterName, mStrokeStoredExtended.GetInstruction(), mStrokeStoredExtended.GetStrokeIdx());
-			internalSd = normData.GetInternalStandardDev();
-			popSd = normData.GetStandardDev();
-			popMean = normData.GetMean();
 			internalSdUserOnly = hashFeatureMeans.get(key).GetInternalSd();
 		}
+		
+		INormData normData = NormMgr.GetInstance().GetNormDataByParamName(parameterName, mStrokeStoredExtended.GetInstruction(), mStrokeStoredExtended.GetStrokeKey());
+		internalSd = normData.GetInternalStandardDev();
+		popSd = normData.GetStandardDev();
+		popMean = normData.GetMean();		
 		
 		ICompareResult compareResult = 
 				(ICompareResult) new CompareResultGeneric(parameterName, score, originalValue, mean, popMean ,popSd, internalSd, internalSdUserOnly);

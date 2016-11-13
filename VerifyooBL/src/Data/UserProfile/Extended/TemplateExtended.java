@@ -49,7 +49,7 @@ public class TemplateExtended extends Template {
 				tempDelay = currGestureStartTime - prevGestureEndTime;
 				tempGestureExtended.GestureDelay = tempDelay;
 				
-				tempGestureExtended.AddGestureValue(tempGestureExtended.Instruction, ConstsParamNames.Gesture.GESTURE_DELAY_TIME, tempGestureExtended.GestureDelay);
+				tempGestureExtended.AddGestureValue(ConstsParamNames.Gesture.GESTURE_DELAY_TIME, tempGestureExtended.GestureDelay);
 			}
 			
 			mGestureMaxTimeContainer.AddGesture(tempGestureExtended);
