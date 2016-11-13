@@ -274,7 +274,7 @@ public class GestureComparer {
 		NormalizedParam interestPointScoreNormalizedParam = new NormalizedParam("InterestPoints", InterestPointScore, 1);
 		
 		mCompareResultsGesture.Score = 				
-				dtwScoreNormalizedParam.NormalizedScore * 0.15 + 
+				dtwScoreNormalizedParam.NormalizedScore * 0.15 +
 				pcaScoreNormalizedParam.NormalizedScore * 0.15 +
 				interestPointScoreNormalizedParam.NormalizedScore * 0.1 +
 				totalScores * 0.6;

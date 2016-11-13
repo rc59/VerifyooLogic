@@ -11,6 +11,9 @@ public class NormalizedParam {
 	public NormalizedParam(String name, double value, double weight) {
 		double threashold = Utils.GetInstance().GetUtilsGeneral().GetThreashold(name);
 		threashold = threashold + 0.1;
+		if(threashold > 1) {
+			threashold = 1;
+		}
 		
 		IsValid = false;
 		if(value >= threashold) {

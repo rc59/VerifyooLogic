@@ -42,6 +42,8 @@ public class ConstsParamNames {
 		public static final String STROKE_MAX_RADIAL_VELOCITY = "StrokeMaxRadialVelocity";
 		public static final String STROKE_MAX_RADIAL_ACCELERATION = "StrokeMaxRadialAcceleration";
 		
+		public static final String STROKE_INTEREST_POINT_PARAM = "StrokeInterestPointParam";
+		
 		public class InterestPoints
 		{
 			public static final String STROKE_MAX_INTEREST_POINT_INDEX = "StrokeMaxInterestPointIndex";
