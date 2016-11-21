@@ -124,7 +124,10 @@ public class UtilsGeneral {
 				break;
 			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA:
 				boundary = 0.30;
-				break;			
+				break;
+			case Consts.ConstsParamNames.Stroke.STROKE_INTEREST_POINT_PARAM:
+				boundary = 0.35;
+				break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE:
 				boundary = 0.14;
 				break;

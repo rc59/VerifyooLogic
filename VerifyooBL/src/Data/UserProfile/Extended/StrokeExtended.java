@@ -56,7 +56,7 @@ public class StrokeExtended extends Stroke {
 	public double PointMaxXMM;
 	public double PointMinYMM;
 	public double PointMaxYMM;
-
+	
 	private HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	private double[] mVelocities;
 	private double[] mAccelerations;
@@ -154,7 +154,10 @@ public class StrokeExtended extends Stroke {
 	public double ZScoreTotal;
 	public double ZScoreCount;
 	public double ZScoreMostUnique;
-		
+
+	protected double mMinXnormalized;
+	protected double mMinYnormalized;
+	
 	protected double mNumEvents;
 	
 	int mNumElementsInRow;	
@@ -225,7 +228,7 @@ public class StrokeExtended extends Stroke {
 		ListEventsExtended = ListEventsCompactToExtended(ListEvents);		
 		MedianFilters();
 		
-		Normalize();
+		Normalize();		
 		ListEventsExtended = CalculateRadiusAndTeta(ListEventsExtended);
 		
 		ListEventsExtended = CalculateAccelerationsForEventsList(ListEventsExtended);		
@@ -235,9 +238,20 @@ public class StrokeExtended extends Stroke {
 		NormalizeSpatial();		
 				
 		CalculateStartEndOfStroke();
-		PrepareData();
+		GetStrokeMinBoundaries();
+		PrepareData();		
 	}	
 	
+	private void GetStrokeMinBoundaries() {
+		mMinXnormalized = Double.MAX_VALUE;
+		mMinYnormalized = Double.MAX_VALUE;
+		
+		for(int idx = 0; idx < ListEventsExtended.size(); idx++) {
+			mMinXnormalized = Utils.GetInstance().GetUtilsMath().GetMinValue(mMinXnormalized, ListEventsExtended.get(idx).Xnormalized);
+			mMinYnormalized = Utils.GetInstance().GetUtilsMath().GetMinValue(mMinYnormalized, ListEventsExtended.get(idx).Ynormalized);
+		}
+	}
+
 	private ArrayList<MotionEventExtended> CalculateRadialVelocityForEventsList(ArrayList<MotionEventExtended> listEvents) {
 		
 		Complex complexCurrent, complexPrev, complexDiff;
@@ -433,7 +447,7 @@ public class StrokeExtended extends Stroke {
 		double[] densityAreas = new double[ListEventsExtended.size()];
 		
 		for(int idx = 0; idx < ListEventsExtended.size(); idx++) {
-			densityAreas[idx] = ListEventsExtended.get(idx).EventDensity - 1;
+			densityAreas[idx] = ListEventsExtended.get(idx).EventDensity;
 		}
 		
 		double[] listSignalStrengths = Utils.GetInstance().GetUtilsSignalProcessing().CalculateSignalStrength(densityAreas);
@@ -473,8 +487,10 @@ public class StrokeExtended extends Stroke {
 				if(idx > 0 && idx < (listEventsStrengths.size() - 1)) {
 					InterestPointDensityStrengthsParam += tempWeight * tempLocation;
 				}
-			}
+			}			
 		}
+		
+		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INTEREST_POINT_PARAM, mStrokeIdx, InterestPointDensityStrengthsParam);
 		
 		MaxInterestPointLocation = (double)MaxInterestPointIndex / (double) ListEventsExtended.size();
 	}
@@ -669,9 +685,12 @@ public class StrokeExtended extends Stroke {
 		StrokeMaxVelocityWithIndex.Value = 0;
 		StrokePropertiesObj.AccumulatedLength[0] = 0;
 				
+		ShapeDataObj.ShapeAreaMinXMinY = 0;
+		
 		double totalAcc = 0;		
 		double x1, y1, x2, y2, x3, y3;
-		double tmpArea = 0;
+		double tmpArea = 0;		
+		
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++)
 		{
 
@@ -695,13 +714,13 @@ public class StrokeExtended extends Stroke {
                 StrokePropertiesObj.AccumulatedLength[idxEvent - 1] = StrokePropertiesObj.LengthMM;
                 
                 x1 = 0; y1 = 0;
-                x2 = ListEventsExtended.get(idxEvent - 1).Xmm; y2 = ListEventsExtended.get(idxEvent - 1).Ymm;
-                x3 = ListEventsExtended.get(idxEvent).Xmm; y3 = ListEventsExtended.get(idxEvent).Ymm;
+                x2 = ListEventsExtended.get(idxEvent - 1).Xnormalized; y2 = ListEventsExtended.get(idxEvent - 1).Ynormalized;
+                x3 = ListEventsExtended.get(idxEvent).Xnormalized; y3 = ListEventsExtended.get(idxEvent).Ynormalized;
                 ShapeDataObj.ShapeArea += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
 
                 x1 = 0; y1 = 0;
-                x2 = ListEventsExtended.get(idxEvent - 1).Xmm - PointMinXMM; y2 = ListEventsExtended.get(idxEvent - 1).Ymm - PointMinYMM;
-                x3 = ListEventsExtended.get(idxEvent).Xmm - PointMinXMM; y3 = ListEventsExtended.get(idxEvent).Ymm - PointMinYMM;
+                x2 = ListEventsExtended.get(idxEvent - 1).Xnormalized - mMinXnormalized; y2 = ListEventsExtended.get(idxEvent - 1).Ynormalized - mMinYnormalized;
+                x3 = ListEventsExtended.get(idxEvent).Xnormalized - mMinXnormalized; y3 = ListEventsExtended.get(idxEvent).Ynormalized - mMinYnormalized;
                 ShapeDataObj.ShapeAreaMinXMinY += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
                 
                 if(CheckIfPressureExists(ListEventsExtended.get(idxEvent))) {
@@ -724,8 +743,8 @@ public class StrokeExtended extends Stroke {
 			totalAcc += mAccelerations[idxEvent];			
 		}
 				
-		ShapeDataObj.ShapeArea = Math.sqrt(ShapeDataObj.ShapeArea);
-		ShapeDataObj.ShapeAreaMinXMinY = Math.sqrt(ShapeDataObj.ShapeAreaMinXMinY);
+//		ShapeDataObj.ShapeArea = Math.sqrt(ShapeDataObj.ShapeArea);
+//		ShapeDataObj.ShapeAreaMinXMinY = Math.sqrt(ShapeDataObj.ShapeAreaMinXMinY);
 		
 		StrokeAverageAcceleration = totalAcc / ListEventsExtended.size();
 	}
@@ -862,7 +881,7 @@ public class StrokeExtended extends Stroke {
                 mPointMinX = GetMinXpixel(mPointMinX, eventCurrent);
                 mPointMaxX = GetMaxXpixel(mPointMaxX, eventCurrent);
                 mPointMinY = GetMinYpixel(mPointMinY, eventCurrent);
-                mPointMaxY = GetMaxYpixel(mPointMaxY, eventCurrent);                
+                mPointMaxY = GetMaxYpixel(mPointMaxY, eventCurrent);
             }
         }
 		

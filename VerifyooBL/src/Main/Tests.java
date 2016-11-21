@@ -30,7 +30,11 @@ public class Tests {
 //			"57d6950e2f0e497411a02367"
 //			"57d695382f0e497411a0244a"
 									
-			score = t.CompareTemplatesById("57d668052f0e4974119f7373", "57d669c32f0e4974119f966e");
+			
+			
+			score = t.CompareTemplatesById("583179899a59ecac0f3ad2ae", "583179949a59ecac0f3ad8a5");
+//			score = t.CompareTemplatesById("582895119a59ecac0f36d2e4", "5828956a9a59ecac0f36ea8b");
+			
 			
 //			t.GetNorms("5819c3c39a59ecac0f34aa70");
 			

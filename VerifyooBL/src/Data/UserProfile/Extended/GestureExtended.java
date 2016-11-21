@@ -41,7 +41,7 @@ public class GestureExtended extends Gesture {
 	public double PointMaxXMM;
 	public double PointMinYMM;
 	public double PointMaxYMM;
-	
+		
 	public double GestureLengthPixel;
 	public double GestureLengthMM;
 	public double GestureLengthMMX;
@@ -114,6 +114,9 @@ public class GestureExtended extends Gesture {
 	public ArrayList<StrokeExtended> ListStrokesExtended;
 	public ArrayList<MotionEventExtended> ListGestureEventsExtended;
 	public ArrayList<MotionEventCompact> ListGestureEvents;
+		
+	protected double mMinXnormalized;
+	protected double mMinYnormalized;
 	
 	protected HashMap<String, IFeatureMeanData> mHashFeatureMeans;
 	
@@ -221,8 +224,8 @@ public class GestureExtended extends Gesture {
 				GestureTotalStrokeAreaMinXMinY += tempStrokeExtended.ShapeDataObj.ShapeAreaMinXMinY;
 				
 				ListGestureEvents.addAll(tempStroke.ListEvents);
-				ListGestureEventsExtended.addAll(tempStrokeExtended.ListEventsExtended);	
-			
+				ListGestureEventsExtended.addAll(tempStrokeExtended.ListEventsExtended);
+				
 				IsOnlyPoints = false; 
 			}
 			
@@ -240,7 +243,19 @@ public class GestureExtended extends Gesture {
 				PointMaxYMM = mUtilsMath.GetMaxValue(PointMaxYMM, tempStrokeExtended.PointMaxYMM);
 			}
 		}		
+		
+		GetStrokeMinBoundaries();
 	}	
+	
+	private void GetStrokeMinBoundaries() {
+		mMinXnormalized = Double.MAX_VALUE;
+		mMinYnormalized = Double.MAX_VALUE;
+		
+		for(int idx = 0; idx < ListGestureEventsExtended.size(); idx++) {
+			mMinXnormalized = Utils.GetInstance().GetUtilsMath().GetMinValue(mMinXnormalized, ListGestureEventsExtended.get(idx).Xnormalized);
+			mMinYnormalized = Utils.GetInstance().GetUtilsMath().GetMinValue(mMinYnormalized, ListGestureEventsExtended.get(idx).Ynormalized);
+		}
+	}
 	
 	private StrokeExtended CalculateStrokeDistancesAndTransitionTime(Stroke tempStroke, Stroke prevStroke, StrokeExtended currStrokeExtended) {
 		MotionEventCompact currStrokeStart = tempStroke.ListEvents.get(0);
@@ -471,13 +486,13 @@ public class GestureExtended extends Gesture {
 			try {
 				if(idxEvent > 0) {
 					x1 = 0; y1 = 0;
-	                x2 = ListGestureEventsExtended.get(idxEvent - 1).Xmm; y2 = ListGestureEventsExtended.get(idxEvent - 1).Ymm;
-	                x3 = ListGestureEventsExtended.get(idxEvent).Xmm; y3 = ListGestureEventsExtended.get(idxEvent).Ymm;
+	                x2 = ListGestureEventsExtended.get(idxEvent - 1).Xnormalized; y2 = ListGestureEventsExtended.get(idxEvent - 1).Ynormalized;
+	                x3 = ListGestureEventsExtended.get(idxEvent).Xnormalized; y3 = ListGestureEventsExtended.get(idxEvent).Ynormalized;
 	                GestureTotalArea += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
 
 	                x1 = 0; y1 = 0;
-	                x2 = ListGestureEventsExtended.get(idxEvent - 1).Xmm - PointMinXMM; y2 = ListGestureEventsExtended.get(idxEvent - 1).Ymm - PointMinYMM;
-	                x3 = ListGestureEventsExtended.get(idxEvent).Xmm - PointMinXMM; y3 = ListGestureEventsExtended.get(idxEvent).Ymm - PointMinYMM;
+	                x2 = ListGestureEventsExtended.get(idxEvent - 1).Xnormalized - mMinXnormalized; y2 = ListGestureEventsExtended.get(idxEvent - 1).Ynormalized - mMinYnormalized;
+	                x3 = ListGestureEventsExtended.get(idxEvent).Xnormalized - mMinXnormalized; y3 = ListGestureEventsExtended.get(idxEvent).Ynormalized - mMinYnormalized;
 	                GestureTotalAreaMinXMinY += mUtilsMath.CalculateTriangleArea(x1, y1, x2, y2, x3, y3);
 				}	
 			}

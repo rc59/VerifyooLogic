@@ -243,7 +243,7 @@ public class NormContainerMgr {
 			return 700;
 		}		
 		
-//		instruction = CheckInstruction(instruction);
+		instruction = CheckInstruction2(instruction);
 		return HashMapNumericNormsMeans.get(param).GetMean(instruction);
 	}
 	
@@ -252,7 +252,7 @@ public class NormContainerMgr {
 			return 120;
 		}
 		
-//		instruction = CheckInstruction(instruction);
+		instruction = CheckInstruction2(instruction);
 		return HashMapNumericNormsMeans.get(param).GetStd(instruction);
 	}
 	
@@ -261,12 +261,32 @@ public class NormContainerMgr {
 			return 60;
 		}
 		
-//		instruction = CheckInstruction(instruction);
+		instruction = CheckInstruction2(instruction);
 		return HashMapNumericNormsSds.get(param).GetMean(instruction);
 	}
 	
 	private String CheckInstruction(String instruction) {
 		instruction = "RLETTER";
-		return "BUCKET";	
+		return "BUCKET";
+	}
+	
+	private String CheckInstruction2(String instruction) {
+//		if(instruction.contains("GLETTER") ||
+//			instruction.contains("HLETTER") ||
+//			instruction.contains("ILETTER") ||
+//			instruction.contains("JLETTER") ||
+//			instruction.contains("QLETTER") ||
+//			instruction.contains("TLETTER") ||
+//			instruction.contains("WLETTER") ||
+//			instruction.contains("YLETTER") ||
+//			instruction.contains("ZLETTER") ||
+//			instruction.contains("NLETTER"))  {
+//			
+//				
+//		}	
+		String[] split = instruction.split("-");
+		instruction = String.format("%s-%s", "RLETTER", split[1]);
+		
+		return instruction;
 	}
 }

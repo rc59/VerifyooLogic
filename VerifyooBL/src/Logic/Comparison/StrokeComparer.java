@@ -271,6 +271,7 @@ public class StrokeComparer {
 				CompareAccelerations();
 //				CompareRadials();				
 				CompareInterestPoints();
+				CompareInterestPointsParams();
 //				CalculateFinalScoresToDtwPcaInterestPoints();
 //				CheckStrokeTypes();
 //				CalculateFinalScore();
@@ -284,8 +285,8 @@ public class StrokeComparer {
 		if(pointStatus == PointStatus.ONE) {
 			mCompareResult.Score = 0;
 		}		
-	}			
-	
+	}				
+
 	private void CheckStrokeTypes() {
 		IsStrokeTypesValid = true;
 		if(mStrokeAuthExtended.GetStrokeKey() != mStrokeStoredExtended.GetStrokeKey()) {
@@ -720,7 +721,7 @@ public class StrokeComparer {
 		
 		PcaScore = Math.abs(transformedData.get(0, 0));	
 		
-		double maxValue = 2;
+		double maxValue = 8;
 		PcaScoreFinal = PcaScore;
 		if(PcaScoreFinal > maxValue) {
 			PcaScoreFinal = maxValue;
@@ -1019,6 +1020,12 @@ public class StrokeComparer {
 		MiddleSurfaceScore = CompareParameter(ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE, middleSurfaceAuth);
 	}
 	
+	private void CompareInterestPointsParams() {
+		double interestPointParamAuth = mStrokeAuthExtended.InterestPointDensityStrengthsParam;
+		
+		CompareParameter(ConstsParamNames.Stroke.STROKE_INTEREST_POINT_PARAM, interestPointParamAuth);
+	}
+	
 	protected void CompareVelocities()
 	{
 		double avgVelocityAuth = mStrokeAuthExtended.StrokeAverageVelocity;
@@ -1093,9 +1100,7 @@ public class StrokeComparer {
 		return mIsStrokesIdentical;
 	}
 
-	protected double CompareParameter(String paramName, double authValue) {
-		int strokeKey = mStoredStrokeKey;
-		
+	protected double CompareParameter(String paramName, double authValue) {		
 		IStatEngineResult result = 
 				mStatEngine.CompareStrokeDoubleValues(mStrokeAuthExtended.GetInstruction(), paramName, mStrokeStoredExtended.GetStrokeIdx(), mStrokeStoredExtended.GetStrokeKey(), authValue, mStrokeStoredExtended.GetFeatureMeansHash());
 		

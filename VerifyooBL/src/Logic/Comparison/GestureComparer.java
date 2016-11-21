@@ -174,8 +174,6 @@ public class GestureComparer {
 		
 		double dtwTotalScore = 0;				
 		double pcaTotalScore = 0;
-
-		InterestPointScore = 0;
 		
 		double extraParamTotalWeights = 0;
 		
@@ -188,8 +186,7 @@ public class GestureComparer {
 		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {
 			avgPressureScore += mListStrokeComparers.get(idx).MiddlePressureScore;
 			avgSurfaceScore += mListStrokeComparers.get(idx).MiddleSurfaceScore;
-			
-			InterestPointScore += mListStrokeComparers.get(idx).InterestPointScoreFinal;
+				
 			if(mListStrokeComparers.get(idx).IsInterestPointFound) {
 				isInterestPointsFound = true;
 			}
@@ -207,9 +204,10 @@ public class GestureComparer {
 				if(tempCompareResult.GetValue() == 0) {
 					NumZeroScores++;
 				}
+				
 				listParamsAuth.add(new NormalizedParam(tempCompareResult.GetName(), tempCompareResult.GetValue(), tempWeight));
-				if(tempCompareResult.GetName().compareTo(ConstsParamNames.Stroke.STROKE_MIDDLE_PRESSURE) == 0) {
-						
+				if(tempCompareResult.GetName().compareTo(ConstsParamNames.Stroke.STROKE_INTEREST_POINT_PARAM) == 0) {
+					
 				}
 			}
 		}
@@ -218,12 +216,10 @@ public class GestureComparer {
 		double totalScores = 0;
 		double weight;
 				
-		double numStrokes = mListStrokeComparers.size();
-		
-		InterestPointScore = InterestPointScore / numStrokes;
+		double numStrokes = mListStrokeComparers.size();		
 		
 		avgPressureScore = avgPressureScore / numStrokes;
-		avgSurfaceScore = avgSurfaceScore / numStrokes;
+		avgSurfaceScore = avgSurfaceScore / numStrokes;		
 		
 		for(int idx = 0; idx < mCompareResultsGesture.ListCompareResults.size(); idx++) {
 			listParamsAuth.add(new NormalizedParam(mCompareResultsGesture.ListCompareResults.get(idx).GetName(), mCompareResultsGesture.ListCompareResults.get(idx).GetValue(), 1));
@@ -268,23 +264,21 @@ public class GestureComparer {
 		
 		DtwScore = dtwTotalScore / extraParamTotalWeights;
 		PcaScore = pcaTotalScore / extraParamTotalWeights;
-		
+				
 		NormalizedParam pcaScoreNormalizedParam = new NormalizedParam("PcaScore", PcaScore, 1);
-		NormalizedParam dtwScoreNormalizedParam = new NormalizedParam("DtwScore", DtwScore, 1);				
-		NormalizedParam interestPointScoreNormalizedParam = new NormalizedParam("InterestPoints", InterestPointScore, 1);
+		NormalizedParam dtwScoreNormalizedParam = new NormalizedParam("DtwScore", DtwScore, 1);		
 		
 		mCompareResultsGesture.Score = 				
-				dtwScoreNormalizedParam.NormalizedScore * 0.15 +
-				pcaScoreNormalizedParam.NormalizedScore * 0.15 +
-				interestPointScoreNormalizedParam.NormalizedScore * 0.1 +
+				dtwScoreNormalizedParam.NormalizedScore * 0.2 +
+				pcaScoreNormalizedParam.NormalizedScore * 0.2 +		
 				totalScores * 0.6;
 		
-		double removeMiddlePressureScore = (1 - avgSurfaceScore * avgSurfaceScore) / 5;
+		double removeMiddlePressureScore = (1 - avgSurfaceScore) / 5;
 		mCompareResultsGesture.Score -= removeMiddlePressureScore;
 		
-		if(InterestPointScore == 0) {
-			mCompareResultsGesture.Score = 0;
-		}
+//		if(InterestPointScore == 0) {
+//			mCompareResultsGesture.Score = 0;
+//		}		
 	}
 
 	protected void CheckFinalScore() {
