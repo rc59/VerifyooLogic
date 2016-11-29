@@ -35,6 +35,18 @@ public class UtilsGeneral {
 		return key;
 	}
 	
+	public ArrayList<IDTWObj> ConvertVectorToDTWObj(double[] vector) {
+		ArrayList<IDTWObj> listDTWCoords = new ArrayList<>();		
+		
+		IDTWObj tempObj;
+		for(int idx = 0; idx < vector.length; idx+=2) {
+			tempObj = new DTWObjCoordinate(vector[idx], vector[idx + 1]);
+			listDTWCoords.add(tempObj);
+		}
+		
+		return listDTWCoords;
+	}
+	
 	public ArrayList<IDTWObj> ConvertStrokeToDTWObj(StrokeExtended stroke) {
 		ArrayList<IDTWObj> listDTWCoords = new ArrayList<>();		
 		
@@ -336,8 +348,7 @@ public class UtilsGeneral {
 	}
 	
 	public ArrayList<NormStroke> NormStrokeListFromString(String input) {
-		ArrayList<NormStroke> listNormStrokes = new ArrayList<>(); 
-		
+		ArrayList<NormStroke> listNormStrokes = new ArrayList<>();
 		
 		NormStroke tempNormStroke;
 		String[] listStrNormStrokes = input.split(";");

@@ -35,6 +35,9 @@ import Logic.Utils.DTW.UtilsDTW;
 
 public class GestureComparer {	
 	
+	public double AvgPressureScore = 0;
+	public double AvgSurfaceScore = 0;	
+	
 	protected boolean mIsGesturesIdentical;
 	protected IStatEngine mStatEngine;
 	
@@ -162,9 +165,6 @@ public class GestureComparer {
 		ArrayList<NormalizedParam> listParamsAuth = new ArrayList<NormalizedParam>();
 		ArrayList<NormalizedParam> listParamsHack = new ArrayList<NormalizedParam>();
 		
-		double avgPressureScore = 0;
-		double avgSurfaceScore = 0;
-		
 		double tempWeight;
 		double totalEvents = 0;
 		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {
@@ -184,8 +184,8 @@ public class GestureComparer {
 		NumZeroScores = 0;
 		
 		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {
-			avgPressureScore += mListStrokeComparers.get(idx).MiddlePressureScore;
-			avgSurfaceScore += mListStrokeComparers.get(idx).MiddleSurfaceScore;
+			AvgPressureScore += mListStrokeComparers.get(idx).MiddlePressureScore;
+			AvgSurfaceScore += mListStrokeComparers.get(idx).MiddleSurfaceScore;
 				
 			if(mListStrokeComparers.get(idx).IsInterestPointFound) {
 				isInterestPointsFound = true;
@@ -218,11 +218,11 @@ public class GestureComparer {
 				
 		double numStrokes = mListStrokeComparers.size();		
 		
-		avgPressureScore = avgPressureScore / numStrokes;
-		avgSurfaceScore = avgSurfaceScore / numStrokes;		
+		AvgPressureScore = AvgPressureScore / numStrokes;
+		AvgSurfaceScore = AvgSurfaceScore / numStrokes;		
 		
 		for(int idx = 0; idx < mCompareResultsGesture.ListCompareResults.size(); idx++) {
-			listParamsAuth.add(new NormalizedParam(mCompareResultsGesture.ListCompareResults.get(idx).GetName(), mCompareResultsGesture.ListCompareResults.get(idx).GetValue(), 1));
+			//listParamsAuth.add(new NormalizedParam(mCompareResultsGesture.ListCompareResults.get(idx).GetName(), mCompareResultsGesture.ListCompareResults.get(idx).GetValue(), 1));
 			
 			if(mCompareResultsGesture.ListCompareResults.get(idx).GetValue() == 0) {
 				NumZeroScores++;
@@ -246,6 +246,7 @@ public class GestureComparer {
 		UtilsAccumulator utilsAccumulator = new UtilsAccumulator(); 
 		int idxStart = mListStrokeComparers.size();
 		
+		idxStart = 0;
 		for(int idx = 0; idx < listParamsAuth.size(); idx++) {
 			if(idx >= idxStart) {
 				//weight = idx + baseWeight;
@@ -273,12 +274,14 @@ public class GestureComparer {
 				pcaScoreNormalizedParam.NormalizedScore * 0.2 +		
 				totalScores * 0.6;
 		
-		double removeMiddlePressureScore = (1 - avgSurfaceScore) / 5;
+		double removeMiddlePressureScore = (1 - AvgSurfaceScore) / 5;
 		mCompareResultsGesture.Score -= removeMiddlePressureScore;
 		
 //		if(InterestPointScore == 0) {
 //			mCompareResultsGesture.Score = 0;
 //		}		
+		
+//		mCompareResultsGesture.Score = totalScores;
 	}
 
 	protected void CheckFinalScore() {
@@ -365,17 +368,11 @@ public class GestureComparer {
 	protected void CompareGestureFeatures()
 	{					
 		mMinCosineDistanceValid = true;
-		if(IsNeedToRun("CompareGestureMinCosineDistance")){
-			CompareGestureMinCosineDistance();
-		}
 		
-		if(IsNeedToRun("CompareGestureTotalTimeInterval")){
-			CompareGestureTotalTimeInterval();
-		}	
-		if(IsNeedToRun("CompareGestureAreas")){
+		if(mListStrokeComparers.size() > 1) {
+			CompareGestureMinCosineDistance();
+			CompareGestureTotalTimeInterval();			
 			CompareGestureAreas();
-		}
-		if(IsNeedToRun("CompareGestureAreasMinXMinY")){
 			CompareGestureAreasMinXMinY();
 		}
 	}

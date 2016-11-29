@@ -17,6 +17,8 @@ public class UtilsShapeComparer {
 	
 	public void Compare(NormStroke stroke1,  NormStroke stroke2) {
 
+		stroke2.ListObjDTW = Utils.GetInstance().GetUtilsGeneral().ConvertVectorToDTWObj(stroke2.SpatialSamplingVector);
+		
 		ArrayList<IDTWObj> listDTWCoords1 = stroke1.ListObjDTW;
 		ArrayList<IDTWObj> listDTWCoords2 = stroke2.ListObjDTW;
 		

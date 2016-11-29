@@ -13,14 +13,16 @@ public class NormStroke {
 	public double[] SpatialSamplingVector;
 	public double[] SpatialSamplingVectorX;
 	public double[] SpatialSamplingVectorY;
-	public int StrokeIdx;	
+	public int StrokeIdx;
+	
+	public String StrokeKeyCategory;
 	
 	public NormStroke() {
 		
 	}
 	
 	public NormStroke(StrokeExtended stroke, int strokeIdx) {
-		ListObjDTW = Utils.GetInstance().GetUtilsGeneral().ConvertStrokeToDTWObj(stroke);
+		ListObjDTW = Utils.GetInstance().GetUtilsGeneral().ConvertVectorToDTWObj(stroke.SpatialSamplingVector);
 		SpatialSamplingVector = stroke.SpatialSamplingVector;
 		StrokeIdx = strokeIdx;
 		

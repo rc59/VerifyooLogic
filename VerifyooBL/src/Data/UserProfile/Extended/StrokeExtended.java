@@ -34,6 +34,12 @@ import Logic.Utils.UtilsPeakCalc;
 import Logic.Utils.UtilsSignalProcessing;
 
 public class StrokeExtended extends Stroke {
+	/************** Consts **************/
+	
+	public static final int DENSITY_STATE_POSITIVE = 1;
+	public static final int DENSITY_STATE_NEUTRAL = 0;
+	public static final int DENSITY_STATE_NEGATIVE = -1;
+	
 	/************** Private Members **************/
 	private String mInstruction;
 	private int mStrokeIdx;
@@ -63,6 +69,17 @@ public class StrokeExtended extends Stroke {
 	/****************************************/
 	
 	/************** Stroke Features **************/
+	public ArrayList<IndexBoundary> ListInterestPoints = new ArrayList<>();
+	public int InterestPointNewStartIdx;
+	public int InterestPointNewEndIdx;
+	public double InterestPointNewAvgIdx;
+	public double InterestPointNewLocation;
+	
+	public double InterestPointNewAvgVelocity;
+	public double InterestPointNewIntensity;
+	public double InterestPointNewDTWVel;
+	public double InterestPointNewDTWCoords;
+	
 	public boolean IsPoint;
 	public int StrokeStartEvent;
 	public int StrokeEndEvent;
@@ -423,9 +440,111 @@ public class StrokeExtended extends Stroke {
 		CalculateStrokeVelocityPeaks();
 		CalculateStrokeAccelerationPeaks();
 		CalculateStrokeAccelerometer();
-		CalculateEventDensity();
-		CalculateDensityArea();
+		CalculateEventDensityNew();
+		CalculateEventDensitySpikes();
+//		CalculateEventDensity();
+//		CalculateDensityArea();
 	}	
+
+	private void CalculateEventDensitySpikes() {		
+		double stateCurr = DENSITY_STATE_NEUTRAL;
+		double stateNext = DENSITY_STATE_NEUTRAL;
+		
+		boolean isMinimumPointFound = false;
+		double consecutivePositives = 0;
+		double consecutiveNeutrals = 0;
+		
+		double minConsecutivePositives = 2;		
+		
+		int idxMinBoundary = 0;
+		int idxMaxBoundary = 0;
+		
+		IndexBoundary tempIndexBoundary;
+		
+		for(int idxEvent = 3; idxEvent < ListEventsExtended.size() - 1; idxEvent++) {
+
+			if(ListEventsExtended.get(idxEvent).EventDensity < ListEventsExtended.get(idxEvent + 1).EventDensity) {
+				stateNext = DENSITY_STATE_POSITIVE;				
+			}
+			if(ListEventsExtended.get(idxEvent).EventDensity == ListEventsExtended.get(idxEvent + 1).EventDensity) {
+				stateNext = DENSITY_STATE_NEUTRAL;
+				consecutiveNeutrals++;
+			}
+			
+			if(ListEventsExtended.get(idxEvent).EventDensity > ListEventsExtended.get(idxEvent + 1).EventDensity) {
+				stateNext = DENSITY_STATE_NEGATIVE;			
+			}
+			
+			if(stateCurr == DENSITY_STATE_NEGATIVE && stateNext == DENSITY_STATE_POSITIVE && !isMinimumPointFound) {
+				idxMinBoundary = idxEvent - (int)consecutiveNeutrals;
+								
+				ListEventsExtended.get(idxMinBoundary).EventDensitySignalStrength = -1;
+				isMinimumPointFound = true;
+				consecutiveNeutrals = 0;
+			}
+			
+			if(stateNext != DENSITY_STATE_NEUTRAL) {
+				consecutiveNeutrals = 0;
+			}
+			
+			if(isMinimumPointFound && (stateCurr == DENSITY_STATE_POSITIVE && stateNext == DENSITY_STATE_POSITIVE)) {
+				consecutivePositives++;
+			}
+			else {
+				consecutivePositives = 0;
+			}
+			
+			if(consecutivePositives >= minConsecutivePositives && isMinimumPointFound) {
+				idxMaxBoundary = idxEvent - (int)consecutivePositives;
+								
+				if(idxMaxBoundary == idxMinBoundary) {
+					idxMaxBoundary = idxMinBoundary + 1;
+				}
+				
+				tempIndexBoundary = new IndexBoundary(idxMinBoundary, idxMaxBoundary);
+				ListInterestPoints.add(tempIndexBoundary);
+						
+				ListEventsExtended.get(idxMaxBoundary).EventDensitySignalStrength = 1;
+				consecutivePositives = 0;
+				isMinimumPointFound = false;
+			}
+			
+			if(stateNext != DENSITY_STATE_NEUTRAL) {
+				stateCurr = stateNext;
+			}
+		}
+		
+		if(ListInterestPoints.size() > 0) {
+			InterestPointNewStartIdx = ListInterestPoints.get(0).LowerBoundary;
+			InterestPointNewEndIdx = ListInterestPoints.get(0).UpperBoundary;
+			InterestPointNewAvgIdx = (InterestPointNewStartIdx + InterestPointNewEndIdx) / 2;
+			InterestPointNewLocation = InterestPointNewAvgIdx / mNumEvents;
+		}
+	}
+
+	private void CalculateEventDensityNew() {
+		double[] eventDensities = new double[ListEventsExtended.size()];
+		
+		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++) {
+			if(idxEvent == 0) {
+				eventDensities[idxEvent] = 2 * Utils.GetInstance().GetUtilsMath().CalcDistanceInMMs(ListEventsExtended.get(idxEvent), ListEventsExtended.get(idxEvent + 1));
+			}
+			else {
+				if((idxEvent + 1) == ListEventsExtended.size()) {
+					eventDensities[idxEvent] = 2 * Utils.GetInstance().GetUtilsMath().CalcDistanceInMMs(ListEventsExtended.get(idxEvent), ListEventsExtended.get(idxEvent - 1));					
+				}
+				else {
+					eventDensities[idxEvent] = GetDensityNew(ListEventsExtended.get(idxEvent - 1), ListEventsExtended.get(idxEvent), ListEventsExtended.get(idxEvent + 1));		
+				}
+			}
+		}
+		
+		Utils.GetInstance().GetUtilsVectors().MedianFilter(eventDensities);
+		
+		for(int idxDensity = 0; idxDensity < eventDensities.length; idxDensity++) {
+			ListEventsExtended.get(idxDensity).EventDensity = eventDensities[idxDensity]; 
+		}
+	}
 
 	private void CalculateStrokeKey() {
 		try {
@@ -521,7 +640,7 @@ public class StrokeExtended extends Stroke {
 	
 	protected void CalculateEventDensity() {
 		boolean isReachedDistance;
-		double maxDistance = 0.9;
+		double maxDistance = 1.5 * StrokePropertiesObj.LengthMM / mNumEvents;
 		double currentDistance;
 		double eventDensity;
 		
@@ -554,7 +673,7 @@ public class StrokeExtended extends Stroke {
 						
 			valueFreqContainer.AddValue(eventDensity);
 			ListEventsExtended.get(idxEvent).EventDensity = eventDensity;
-		}		
+		}
 		
 		InterestPointsMostFreqDensity = valueFreqContainer.GetMostFreq();
 		if(InterestPointsMostFreqDensity > 3) {
@@ -564,6 +683,10 @@ public class StrokeExtended extends Stroke {
 		for(int idxEvent = 0; idxEvent < ListEventsExtended.size(); idxEvent++) {
 			ListEventsExtended.get(idxEvent).EventDensityRaw = ListEventsExtended.get(idxEvent).EventDensity;
 			ListEventsExtended.get(idxEvent).EventDensity = ListEventsExtended.get(idxEvent).EventDensity - (InterestPointsMostFreqDensity - 1); //Utils.GetInstance().GetUtilsMath().GetMaxValue((ListEventsExtended.get(idxEvent).EventDensity - InterestPointsMostFreqDensity - 1), 0);
+			
+			if(ListEventsExtended.get(idxEvent).EventDensity < 0) {
+				ListEventsExtended.get(idxEvent).EventDensity = 0;
+			}
 		}
 			
 		InterestPointsStartIndex = GetDensityStartIndex();
@@ -593,6 +716,16 @@ public class StrokeExtended extends Stroke {
 //		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.InterestPoints.STROKE_MAX_INTEREST_POINT_SURFACE, mStrokeIdx, MaxInterestPointSurface);
 //		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.InterestPoints.STROKE_MAX_INTEREST_POINT_VELOCITY, mStrokeIdx, MaxInterestPointVelocity);
 //		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.InterestPoints.STROKE_MAX_INTEREST_POINT_ACCELERATION, mStrokeIdx, MaxInterestPointAcceleration);
+	}
+
+	private double GetDensityNew(MotionEventExtended eventPrev, MotionEventExtended eventCurr, MotionEventExtended eventNext) {
+		double density = 0;
+		
+		double distance1 = Utils.GetInstance().GetUtilsMath().CalcDistanceInMMs(eventPrev, eventCurr);
+		double distance2 = Utils.GetInstance().GetUtilsMath().CalcDistanceInMMs(eventCurr, eventNext);
+		
+		density = distance1 + distance2;
+		return density;
 	}
 
 	private void ExtractInterestPointFeatures(int idxMin, int idxMax) {

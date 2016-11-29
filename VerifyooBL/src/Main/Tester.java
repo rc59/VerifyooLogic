@@ -387,10 +387,10 @@ public class Tester {
 		Template template1 = GetFromDBById(id1, true);
 		TemplateExtended templateBase = new TemplateExtended(template1);
 		
-		ArrayList<NormStroke> listNormStrokes = new ArrayList<>();
+		ArrayList<NormStroke> listNormStrokes = new ArrayList<>();		
 		
 		int count = 0;
-		for(int idxGesture = 0; idxGesture < templateBase.ListGestureExtended.size(); idxGesture++) {
+		for(int idxGesture = 0; idxGesture < templateBase.ListGestureExtended.size() / 2; idxGesture++) {
 			for(int idxStroke = 0; idxStroke < templateBase.ListGestureExtended.get(idxGesture).ListStrokesExtended.size(); idxStroke++) {
 				count++;
 				listNormStrokes.add(new NormStroke(templateBase.ListGestureExtended.get(idxGesture).ListStrokesExtended.get(idxStroke), count));

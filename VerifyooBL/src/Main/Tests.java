@@ -32,11 +32,11 @@ public class Tests {
 									
 			
 			
-			score = t.CompareTemplatesById("583179899a59ecac0f3ad2ae", "583179949a59ecac0f3ad8a5");
+			score = t.CompareTemplatesById("57d691c62f0e497411a00751", "57d691d62f0e497411a00e5a");
 //			score = t.CompareTemplatesById("582895119a59ecac0f36d2e4", "5828956a9a59ecac0f36ea8b");
 			
 			
-//			t.GetNorms("5819c3c39a59ecac0f34aa70");
+//			t.GetNorms("5832fb309a59ecac0f3b2e5a");
 			
 //			score = t.CompareTemplates("Roeeyshaked@gmail.com", "Roeeyshaked@gmail.com", 35);
 //			score = t.CompareTemplates("Roeeyshaked@gmail.com", "abuchnick@yahoo.com", 35);

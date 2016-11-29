@@ -76,7 +76,7 @@ public class StrokeComparer {
 	public double DtwScoreToRemove;		
 	
 	public double RadialVelocityDiff;
-	public double RadialAccelerationDiff;
+	public double RadialAccelerationDiff;	
 	
 	public double DtwCoordinates;
 	public double DtwNormalizedCoordinates;
@@ -147,6 +147,11 @@ public class StrokeComparer {
 	public double MaxInterestPointVelocity;
 	public double MaxInterestPointAcceleration;
 	public double MaxInterestPointConvolution;
+	
+	public double InterestPointNewIdxStartDiff;
+	public double InterestPointNewIdxEndDiff;
+	public double InterestPointNewIdxAvgDiff;
+	public double InterestPointNewIdxLocationDiff;
 	
 	public double InterestPointDensityStrengthsDiff;
 	public double InterestPointDensityStrengthsWithEdgesDiff;
@@ -254,7 +259,10 @@ public class StrokeComparer {
 			CheckIfStrokesAreIdentical();
 			
 			if(!mIsStrokesIdentical) {
-				CheckStoredStrokeKey();
+//				CheckStoredStrokeKey();
+//				CompareNumEvents();
+				
+				
 //				CompareStrokeDistances();
 				DtwVelocities();
 				CreateSpatialVectorsForDtwAnalysis();
@@ -269,11 +277,12 @@ public class StrokeComparer {
 //				CompareAccelerometer();
 				CompareStrokeTransitionTimes();
 				CompareAccelerations();
-//				CompareRadials();				
-				CompareInterestPoints();
-				CompareInterestPointsParams();
+//				CompareRadials();			
+				CompareInterestPointsNew();
+//				CompareInterestPoints();
+//				CompareInterestPointsParams();
 //				CalculateFinalScoresToDtwPcaInterestPoints();
-//				CheckStrokeTypes();
+				CheckStrokeTypes();
 //				CalculateFinalScore();
 //				CheckFinalScore();
 			}
@@ -286,6 +295,13 @@ public class StrokeComparer {
 			mCompareResult.Score = 0;
 		}		
 	}				
+
+	private void CompareInterestPointsNew() {
+		InterestPointNewIdxStartDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.InterestPointNewStartIdx, mStrokeAuthExtended.InterestPointNewStartIdx);
+		InterestPointNewIdxEndDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.InterestPointNewEndIdx, mStrokeAuthExtended.InterestPointNewEndIdx);
+		InterestPointNewIdxAvgDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.InterestPointNewAvgIdx, mStrokeAuthExtended.InterestPointNewAvgIdx);
+		InterestPointNewIdxLocationDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.InterestPointNewLocation, mStrokeAuthExtended.InterestPointNewLocation);
+	}
 
 	private void CheckStrokeTypes() {
 		IsStrokeTypesValid = true;

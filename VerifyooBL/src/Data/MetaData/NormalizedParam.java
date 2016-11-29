@@ -14,6 +14,7 @@ public class NormalizedParam {
 		if(threashold > 1) {
 			threashold = 1;
 		}
+		threashold = 1;
 		
 		IsValid = false;
 		if(value >= threashold) {

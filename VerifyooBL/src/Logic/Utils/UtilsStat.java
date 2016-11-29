@@ -53,19 +53,20 @@ public class UtilsStat {
 			boundaryFactorMultiplier = 0;
 		}
 		boundaryFactorMultiplier = boundaryFactorMultiplier * 0.1;
-		boundaryFactor += boundaryFactorMultiplier;
+//		boundaryFactor += boundaryFactorMultiplier;
 		
 		double boundary = internalMean * boundaryFactor;
-		return (boundaryAdj * zScore);
-		//		return boundary;
+//		return (boundaryAdj * zScore);
+		return boundary;
 	}
 	
-	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd, double boundaryAdj) {
+	public double CalculateScore1(double authValue, double populationMean, double populationSd, double internalMean, double internalSd, double boundaryAdj) {
 		double boundary = CalculateBoundaryFactor(populationMean, populationSd, internalMean, boundaryAdj);	
 		
 		double uniquenessFactor = 1;
 		
-		double b = internalMean * boundary;
+//		double b = internalMean * boundary;
+		double b = boundary;
 		
 		double firstUpperPopulationInternalSD = (internalMean + b);
 		double firstLowerPopulationInternalSD = (internalMean - b);
@@ -114,6 +115,47 @@ public class UtilsStat {
 					score = 0;
 				}
 			}			
+		}
+		
+		return score;
+	}
+	
+	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd, double boundaryAdj) {
+		double boundary = CalculateBoundaryFactor(populationMean, populationSd, internalMean, boundaryAdj);	
+		
+		boundary = internalSd / populationMean;
+		if(boundary < 0.1) {
+			boundary = 0.1;
+		}
+		
+		double internalBoundaryLower = internalMean - 2 * internalMean * boundary;
+		double internalBoundaryUpper = internalMean + 2 * internalMean * boundary;
+		
+		double secondLowerPopulationInternalSD = internalMean - 5 * internalMean * boundary;
+		double secondUpperPopulationInternalSD = internalMean + 5 * internalMean * boundary;
+		
+		double score = 0;
+		
+		if(authValue > internalBoundaryLower && authValue < internalBoundaryUpper) {
+			score = 1;
+		}
+		else {
+			if(authValue > secondLowerPopulationInternalSD && authValue < secondUpperPopulationInternalSD) {
+				if(authValue > internalBoundaryLower) {
+					double u = Math.abs(secondUpperPopulationInternalSD - authValue);
+					double d = Math.abs(secondUpperPopulationInternalSD - internalBoundaryUpper);
+					
+					score = u/d;
+				}
+				else {
+					double u = Math.abs(secondLowerPopulationInternalSD - authValue);
+					double d = Math.abs(secondLowerPopulationInternalSD - internalBoundaryLower);
+					
+					score = u/d;
+				}
+			}
+			
+//			score = score * score;
 		}
 		
 		return score;
