@@ -16,6 +16,7 @@ import Data.MetaData.ParameterAvgPoint;
 import Data.Comparison.Interfaces.ICompareResult;
 import Data.MetaData.IndexBoundary;
 import Data.MetaData.IndexValue;
+import Data.MetaData.InterestPoint;
 import Data.UserProfile.Raw.MotionEventCompact;
 import Data.UserProfile.Raw.Stroke;
 import Logic.Comparison.Stats.FeatureMatrix;
@@ -69,11 +70,7 @@ public class StrokeExtended extends Stroke {
 	/****************************************/
 	
 	/************** Stroke Features **************/
-	public ArrayList<IndexBoundary> ListInterestPoints = new ArrayList<>();
-	public int InterestPointNewStartIdx;
-	public int InterestPointNewEndIdx;
-	public double InterestPointNewAvgIdx;
-	public double InterestPointNewLocation;
+	public ArrayList<InterestPoint> ListInterestPoints = new ArrayList<>();	
 	
 	public double InterestPointNewAvgVelocity;
 	public double InterestPointNewIntensity;
@@ -459,9 +456,25 @@ public class StrokeExtended extends Stroke {
 		int idxMinBoundary = 0;
 		int idxMaxBoundary = 0;
 		
-		IndexBoundary tempIndexBoundary;
+		InterestPoint tempInterestPoint;
 		
-		for(int idxEvent = 3; idxEvent < ListEventsExtended.size() - 1; idxEvent++) {
+		int startIdx = 0;
+		for(int idxEvent = 0; idxEvent < ListEventsExtended.size() - 1; idxEvent++) {
+			if(ListEventsExtended.get(idxEvent).EventDensity < ListEventsExtended.get(idxEvent + 1).EventDensity) {
+				consecutivePositives++;
+			}
+			else {
+				consecutivePositives = 0;				
+			}
+			
+			if(consecutivePositives > minConsecutivePositives) {
+				startIdx = idxEvent;
+				break;				
+			}
+		}
+		
+		consecutivePositives = 0;
+		for(int idxEvent = startIdx; idxEvent < ListEventsExtended.size() - 1; idxEvent++) {
 
 			if(ListEventsExtended.get(idxEvent).EventDensity < ListEventsExtended.get(idxEvent + 1).EventDensity) {
 				stateNext = DENSITY_STATE_POSITIVE;				
@@ -501,8 +514,8 @@ public class StrokeExtended extends Stroke {
 					idxMaxBoundary = idxMinBoundary + 1;
 				}
 				
-				tempIndexBoundary = new IndexBoundary(idxMinBoundary, idxMaxBoundary);
-				ListInterestPoints.add(tempIndexBoundary);
+				tempInterestPoint = new InterestPoint(idxMinBoundary, idxMaxBoundary, mNumEvents);
+				ListInterestPoints.add(tempInterestPoint);
 						
 				ListEventsExtended.get(idxMaxBoundary).EventDensitySignalStrength = 1;
 				consecutivePositives = 0;
@@ -512,13 +525,6 @@ public class StrokeExtended extends Stroke {
 			if(stateNext != DENSITY_STATE_NEUTRAL) {
 				stateCurr = stateNext;
 			}
-		}
-		
-		if(ListInterestPoints.size() > 0) {
-			InterestPointNewStartIdx = ListInterestPoints.get(0).LowerBoundary;
-			InterestPointNewEndIdx = ListInterestPoints.get(0).UpperBoundary;
-			InterestPointNewAvgIdx = (InterestPointNewStartIdx + InterestPointNewEndIdx) / 2;
-			InterestPointNewLocation = InterestPointNewAvgIdx / mNumEvents;
 		}
 	}
 

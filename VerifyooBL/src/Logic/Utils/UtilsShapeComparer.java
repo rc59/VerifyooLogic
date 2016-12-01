@@ -17,12 +17,23 @@ public class UtilsShapeComparer {
 	
 	public void Compare(NormStroke stroke1,  NormStroke stroke2) {
 
-		stroke2.ListObjDTW = Utils.GetInstance().GetUtilsGeneral().ConvertVectorToDTWObj(stroke2.SpatialSamplingVector);
+		stroke2.ListObjDTW = Utils.GetInstance().GetUtilsGeneral().ConvertVectorToDTWCoords(stroke2.SpatialSamplingVector);
 		
-		ArrayList<IDTWObj> listDTWCoords1 = stroke1.ListObjDTW;
-		ArrayList<IDTWObj> listDTWCoords2 = stroke2.ListObjDTW;
+		ArrayList<DTWObjCoordinate> listDTWCoords1 = stroke1.ListObjDTW;
+		ArrayList<DTWObjCoordinate> listDTWCoords2 = stroke2.ListObjDTW;
+				
+		ArrayList<IDTWObj> listDTW1 = new ArrayList<>();
+		ArrayList<IDTWObj> listDTW2 = new ArrayList<>();
+
+		for(int idx = 0; idx < listDTWCoords1.size(); idx++) {
+			listDTW1.add(listDTWCoords1.get(idx));
+		}
 		
-		UtilsDTW dtwCoords = new UtilsDTW(listDTWCoords1, listDTWCoords2);
+		for(int idx = 0; idx < listDTWCoords2.size(); idx++) {
+			listDTW2.add(listDTWCoords2.get(idx));
+		}
+		
+		UtilsDTW dtwCoords = new UtilsDTW(listDTW1, listDTW2);
 		DTWDistance = dtwCoords.getDistance();
 		
 		double[] vectorStored = stroke1.SpatialSamplingVector;

@@ -3,6 +3,10 @@ package Main;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonNull;
+
 import Data.Gestures.GestureStore;
 import Logic.Comparison.Stats.Norms.NormContainerMgr;
 import Logic.Comparison.Stats.Norms.NormMgr;
@@ -32,7 +36,7 @@ public class Tests {
 									
 			
 			
-			score = t.CompareTemplatesById("57d691c62f0e497411a00751", "57d691d62f0e497411a00e5a");
+			score = t.CompareTemplatesById("57dbcb762f0e497411a30b24", "57d668132f0e4974119f7927");
 //			score = t.CompareTemplatesById("582895119a59ecac0f36d2e4", "5828956a9a59ecac0f36ea8b");
 			
 			

@@ -152,6 +152,15 @@ public class StrokeComparer {
 	public double InterestPointNewIdxEndDiff;
 	public double InterestPointNewIdxAvgDiff;
 	public double InterestPointNewIdxLocationDiff;
+	public double InterestPointCountPercentageDiff;
+	public double InterestPointCountDiff;
+	
+	public boolean IsThereInterestPoints;
+	
+	public double InterestPointNewIdxStartAllDiff;
+	public double InterestPointNewIdxEndAllDiff;
+	public double InterestPointNewIdxAvgAllDiff;
+	public double InterestPointNewIdxLocationAllDiff;
 	
 	public double InterestPointDensityStrengthsDiff;
 	public double InterestPointDensityStrengthsWithEdgesDiff;
@@ -259,16 +268,18 @@ public class StrokeComparer {
 			CheckIfStrokesAreIdentical();
 			
 			if(!mIsStrokesIdentical) {
-//				CheckStoredStrokeKey();
+				CheckStoredStrokeKey();
+				
+				
 //				CompareNumEvents();
 				
 				
-//				CompareStrokeDistances();
+				CompareStrokeDistances();
 				DtwVelocities();
+				CompareStrokeAreas();
 				CreateSpatialVectorsForDtwAnalysis();
 				PcaAnalysis();
- 				CompareMinCosineDistance();
-				CompareStrokeAreas();
+ 				CompareMinCosineDistance();				
 				CompareLengths();
 				CompareTimeInterval();
 				CompareNumEvents();
@@ -297,10 +308,38 @@ public class StrokeComparer {
 	}				
 
 	private void CompareInterestPointsNew() {
-		InterestPointNewIdxStartDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.InterestPointNewStartIdx, mStrokeAuthExtended.InterestPointNewStartIdx);
-		InterestPointNewIdxEndDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.InterestPointNewEndIdx, mStrokeAuthExtended.InterestPointNewEndIdx);
-		InterestPointNewIdxAvgDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.InterestPointNewAvgIdx, mStrokeAuthExtended.InterestPointNewAvgIdx);
-		InterestPointNewIdxLocationDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.InterestPointNewLocation, mStrokeAuthExtended.InterestPointNewLocation);
+		IsThereInterestPoints = true;
+		InterestPointCountPercentageDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.size(), mStrokeAuthExtended.ListInterestPoints.size());
+		InterestPointCountDiff = Math.abs(mStrokeStoredExtended.ListInterestPoints.size() - mStrokeAuthExtended.ListInterestPoints.size());
+		if(mStrokeStoredExtended.ListInterestPoints.size() == 0 || mStrokeAuthExtended.ListInterestPoints.size() == 0) {
+			IsThereInterestPoints = false;
+		}
+		else {
+			InterestPointNewIdxStartDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(0).IdxStart, mStrokeAuthExtended.ListInterestPoints.get(0).IdxStart);
+			InterestPointNewIdxEndDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(0).IdxEnd, mStrokeAuthExtended.ListInterestPoints.get(0).IdxEnd);
+			InterestPointNewIdxAvgDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(0).IdxAverage, mStrokeAuthExtended.ListInterestPoints.get(0).IdxAverage);
+			InterestPointNewIdxLocationDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(0).IdxLocation, mStrokeAuthExtended.ListInterestPoints.get(0).IdxLocation);
+					
+			if(InterestPointCountDiff == 0) {
+				InterestPointNewIdxStartAllDiff = 0;
+				InterestPointNewIdxEndAllDiff = 0;
+				InterestPointNewIdxAvgAllDiff = 0;
+				InterestPointNewIdxLocationAllDiff = 0;
+				
+				for(int idx = 0; idx < mStrokeStoredExtended.ListInterestPoints.size(); idx++) {
+					InterestPointNewIdxStartAllDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxStart, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxStart);
+					InterestPointNewIdxEndAllDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxEnd, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxEnd);
+					InterestPointNewIdxAvgAllDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxAverage, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxAverage);
+					InterestPointNewIdxLocationAllDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxLocation, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxLocation);
+				}
+				
+				double numInterestPoints = mStrokeStoredExtended.ListInterestPoints.size();
+				InterestPointNewIdxStartAllDiff = InterestPointNewIdxStartAllDiff / numInterestPoints;
+				InterestPointNewIdxEndAllDiff = InterestPointNewIdxEndAllDiff / numInterestPoints;
+				InterestPointNewIdxAvgAllDiff = InterestPointNewIdxAvgAllDiff / numInterestPoints;
+				InterestPointNewIdxLocationAllDiff = InterestPointNewIdxLocationAllDiff / numInterestPoints;
+			}	
+		}
 	}
 
 	private void CheckStrokeTypes() {
@@ -314,7 +353,7 @@ public class StrokeComparer {
 		mStoredStrokeKey = NormMgr.GetInstance().GetStrokeKey(mStrokeStoredExtended);
 	}
 	
-	public int GetStoredStrokeKey() {
+	public int GetStoredStrokeKey() {		
 		return mStoredStrokeKey;
 	}
 

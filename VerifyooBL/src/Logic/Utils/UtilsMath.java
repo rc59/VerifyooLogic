@@ -1,5 +1,8 @@
 package Logic.Utils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import Consts.ConstsMeasures;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Raw.MotionEventCompact;
@@ -140,6 +143,15 @@ public class UtilsMath {
         return result;
     }
 		
+	public double Round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    BigDecimal bd = new BigDecimal(value);
+	    bd = bd.setScale(places, RoundingMode.HALF_UP);
+	    return bd.doubleValue();
+	}
+	
+	
 	public double GetPercentageDiff(double value1, double value2) {
 
         if(value1 == 0 || value2 == 0)

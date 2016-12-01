@@ -9,7 +9,7 @@ import Logic.Utils.DTW.DTWObjCoordinate;
 import Logic.Utils.DTW.IDTWObj;
 
 public class NormStroke {	
-	public ArrayList<IDTWObj> ListObjDTW;
+	public ArrayList<DTWObjCoordinate> ListObjDTW;
 	public double[] SpatialSamplingVector;
 	public double[] SpatialSamplingVectorX;
 	public double[] SpatialSamplingVectorY;
@@ -22,7 +22,7 @@ public class NormStroke {
 	}
 	
 	public NormStroke(StrokeExtended stroke, int strokeIdx) {
-		ListObjDTW = Utils.GetInstance().GetUtilsGeneral().ConvertVectorToDTWObj(stroke.SpatialSamplingVector);
+		ListObjDTW = Utils.GetInstance().GetUtilsGeneral().ConvertVectorToDTWCoords(stroke.SpatialSamplingVector);
 		SpatialSamplingVector = stroke.SpatialSamplingVector;
 		StrokeIdx = strokeIdx;
 		
@@ -77,12 +77,12 @@ public class NormStroke {
 		double y;
 		
 		ListObjDTW = new ArrayList<>();
-		IDTWObj tempCoord;
+		DTWObjCoordinate tempCoord;
 		
 		for(int idx = 0; idx < listStrDtwObj.length; idx += 2) {
 			
-			x = Double.parseDouble(listStrDtwObj[idx]);
-			y = Double.parseDouble(listStrDtwObj[idx + 1]);
+			x = Utils.GetInstance().GetUtilsMath().Round(Double.parseDouble(listStrDtwObj[idx]), 5);
+			y = Utils.GetInstance().GetUtilsMath().Round(Double.parseDouble(listStrDtwObj[idx + 1]), 5);
 			tempCoord = new DTWObjCoordinate(x, y);
 			ListObjDTW.add(tempCoord);
 		}
@@ -93,8 +93,8 @@ public class NormStroke {
 		SpatialSamplingVectorY = new double[vectorSize / 2];
 		
 		for(int idx = 0; idx < listStrVector.length; idx += 2) {			
-			x = Double.parseDouble(listStrVector[idx]);
-			y = Double.parseDouble(listStrVector[idx + 1]);
+			x = Utils.GetInstance().GetUtilsMath().Round(Double.parseDouble(listStrVector[idx]), 5);
+			y = Utils.GetInstance().GetUtilsMath().Round(Double.parseDouble(listStrVector[idx + 1]), 5);
 			
 			SpatialSamplingVector[idx] = x;
 			SpatialSamplingVector[idx + 1] = y;

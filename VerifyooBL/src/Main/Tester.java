@@ -9,6 +9,8 @@ import java.util.HashMap;
 
 import org.bson.types.ObjectId;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
@@ -411,7 +413,7 @@ public class Tester {
 	{			
 		Template template1 = GetFromDBById(id1, true);		
 		Template template2 = GetFromDBById(id2, true);
-		
+				
 		TemplateComparer comparer = new TemplateComparer();			
 		
 		long start = System.currentTimeMillis();

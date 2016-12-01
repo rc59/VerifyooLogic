@@ -47,6 +47,18 @@ public class UtilsGeneral {
 		return listDTWCoords;
 	}
 	
+	public ArrayList<DTWObjCoordinate> ConvertVectorToDTWCoords(double[] vector) {
+		ArrayList<DTWObjCoordinate> listDTWCoords = new ArrayList<>();		
+		
+		DTWObjCoordinate tempObj;
+		for(int idx = 0; idx < vector.length; idx+=2) {
+			tempObj = new DTWObjCoordinate(vector[idx], vector[idx + 1]);
+			listDTWCoords.add(tempObj);
+		}
+		
+		return listDTWCoords;
+	}
+	
 	public ArrayList<IDTWObj> ConvertStrokeToDTWObj(StrokeExtended stroke) {
 		ArrayList<IDTWObj> listDTWCoords = new ArrayList<>();		
 		

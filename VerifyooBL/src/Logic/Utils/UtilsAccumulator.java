@@ -20,6 +20,9 @@ public class UtilsAccumulator {
         double delta = x - Mu;
         Mu  += delta / N;
         Sum += (double) (N - 1) / N * delta * delta;
+        
+        Mu = Utils.GetInstance().GetUtilsMath().Round(Mu, 8);
+        Sum = Utils.GetInstance().GetUtilsMath().Round(Sum, 8);
     }
 
     /**
