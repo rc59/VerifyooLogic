@@ -21,6 +21,7 @@ import com.mongodb.MongoClient;
 
 import Data.Comparison.Interfaces.ICompareResult;
 import Data.MetaData.NormStroke;
+import Data.MetaData.StoredMetaDataMgr;
 import Data.UserProfile.Extended.GestureExtended;
 import Data.UserProfile.Extended.TemplateExtended;
 import Data.UserProfile.Raw.Gesture;
@@ -425,6 +426,7 @@ public class Tester {
 		comparer.CompareTemplates(templateBase, templateAuth);
 		
 		NormMgr normMgr = (NormMgr)NormMgr.GetInstance();
+		normMgr.Threashold = 0.9;		
 		NormContainerMgr normContainerMgr = normMgr.NormContainerMgr;
 		
 		for(int idxGesture = 0; idxGesture < templateBase.ListGestureExtended.size(); idxGesture++) {

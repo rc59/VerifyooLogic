@@ -6,19 +6,20 @@ import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Norms.NormMgr;
 import Logic.Comparison.Stats.Norms.Interfaces.INormData;
 import Logic.Comparison.Stats.Norms.Interfaces.INormMgr;
+import Logic.Utils.UtilsAccumulator;
 
 public abstract class FeatureMeanDataAbstract implements IFeatureMeanData {
 	protected String mName;
 	protected String mInstruction;
 	protected double mSumValues;
 	protected double mCount;
-	protected ArrayList<Double> mListValues;
-	protected INormMgr mNormMgr;
+	
+	protected UtilsAccumulator mUtilsAccumulator;
 
 	public FeatureMeanDataAbstract(String name, String instruction)
 	{
-		mNormMgr = NormMgr.GetInstance(); 		
-		mListValues = new ArrayList<>();
+		mUtilsAccumulator = new UtilsAccumulator();
+		
 		mName = name;
 		mInstruction = instruction;
 		mSumValues = 0;
@@ -29,13 +30,14 @@ public abstract class FeatureMeanDataAbstract implements IFeatureMeanData {
 	{
 		mCount++;
 		mSumValues += currentValue;
-		mListValues.add(currentValue);
+		
+		mUtilsAccumulator.AddDataValue(currentValue);
 	}
 	
 	public double GetPopulationZScore() {
 		double popZScore;
 				
-		INormData normObj = mNormMgr.GetNormDataByParamName(mName, mInstruction);
+		INormData normObj = NormMgr.GetInstance().GetNormDataByParamName(mName, mInstruction);
 		
 		double populationMean = normObj.GetMean();
 		double populationSd = normObj.GetStandardDev();
@@ -51,5 +53,9 @@ public abstract class FeatureMeanDataAbstract implements IFeatureMeanData {
 	
 	public String GetInstruction() {
 		return mInstruction;
+	}
+	
+	public UtilsAccumulator GetUtilsAccumulator() {
+		return mUtilsAccumulator;
 	}
 }

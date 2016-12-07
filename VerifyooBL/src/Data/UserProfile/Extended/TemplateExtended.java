@@ -25,8 +25,15 @@ public class TemplateExtended extends Template {
 	private void InitTemplateExtended(Template template) {
 		
 		mGestureMaxTimeContainer = new GestureMaxTimeContainer(); 
+		mHashFeatureMeansInit = template.GetHashMap();
 		Id = template.Id;
-		mHashFeatureMeans = new HashMap<>();
+		if(mHashFeatureMeansInit != null && mHashFeatureMeansInit.keySet().size() > 0) {
+			mHashFeatureMeans = mHashFeatureMeansInit;
+		}
+		else {
+			mHashFeatureMeans = new HashMap<>();
+		}
+		
 		ListGestureExtended = new ArrayList<GestureExtended>();
 		ListGestures = template.ListGestures;
 				
@@ -86,5 +93,9 @@ public class TemplateExtended extends Template {
 	
 	public double GetGestureMaxTimeInterval(String instruction) {
 		return mGestureMaxTimeContainer.GetMaxTimeForGesture(instruction);
+	}
+	
+	public HashMap<String, IFeatureMeanData> GetHashMapNorms() {
+		return mHashFeatureMeans;
 	}
 }

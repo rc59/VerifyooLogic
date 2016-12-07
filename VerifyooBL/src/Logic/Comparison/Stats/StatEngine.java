@@ -37,7 +37,7 @@ public class StatEngine implements IStatEngine {
 	protected StatEngine()
 	{
 		
-	}	
+	}
 	
 	public static IStatEngine GetInstance() {
       if(mInstance == null) {
@@ -91,7 +91,8 @@ public class StatEngine implements IStatEngine {
 		double popSd = normObj.GetStandardDev();
 		
 		double internalMean = hashFeatureMeans.get(key).GetMean();
-		double internalSd = normObj.GetInternalStandardDev();
+		double userInternalStd = hashFeatureMeans.get(key).GetInternalSd();
+		double avgPopinternalStd = normObj.GetInternalStandardDev();
 		
 //		if(paramName.compareTo(ConstsParamNames.Stroke.STROKE_NUM_EVENTS) == 0) {
 //			internalMean = 19.04761905;
@@ -123,11 +124,13 @@ public class StatEngine implements IStatEngine {
 //			internalSd = internalSd * factor;
 //		}
 		
-		double boundaryAdj = Utils.GetInstance().GetUtilsGeneral().GetBoundaryAdj(paramName);
+		double boundaryAdj = NormMgr.GetInstance().GetStoredMetaDataMgr().GetParamBoundary(key, popMean, avgPopinternalStd); //Utils.GetInstance().GetUtilsGeneral().GetBoundaryAdj(paramName);
 		
-		double score = Utils.GetInstance().GetUtilsStat().CalculateScore(authValue, popMean, popSd, internalMean, internalSd, boundaryAdj);
+		double score = Utils.GetInstance().GetUtilsStat().CalculateScore(authValue, popMean, popSd, internalMean, avgPopinternalStd, boundaryAdj);
 		
-		weight = Utils.GetInstance().GetUtilsStat().CalcWeight(internalMean, internalSd, popMean, popSd, boundaryAdj);
+		NormMgr.GetInstance().GetStoredMetaDataMgr().UpdateParamBoundary(key, popMean, avgPopinternalStd, userInternalStd);
+		
+		weight = Utils.GetInstance().GetUtilsStat().CalcWeight(internalMean, avgPopinternalStd, popMean, popSd, boundaryAdj);
 		IStatEngineResult statResult = new StatEngineResult(score, zScore, weight);
 		return statResult;
 	}

@@ -787,7 +787,7 @@ public class GestureExtended extends Gesture {
 			}
 			else {
 				tempFeatureMeanData = new FeatureMeanData(paramName, mGestureKey);	
-			}
+			}			
 					
 			mHashFeatureMeans.put(key, tempFeatureMeanData);
 		}

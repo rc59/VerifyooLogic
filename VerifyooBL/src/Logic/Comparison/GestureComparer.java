@@ -146,8 +146,8 @@ public class GestureComparer {
 			if(pointStatus == PointStatus.NONE) {
 				CompareGestureStrokes();
 				CompareGestureFeatures();
-				//CalculateFinalScore();
-				CalculateFinalScoreTemp();
+				CalculateFinalScoreOld();
+				CalculateFinalScore();
 				CheckStrokesCosineAndStrokeDistance();
 				CheckFinalScore();
 			}
@@ -157,13 +157,12 @@ public class GestureComparer {
 		}	
 	}
 	
-	private void CalculateFinalScoreTemp() {
+	private void CalculateFinalScore() {
 
 		ICompareResult tempCompareResult;
 		StrokeComparer tempStrokeComparer;
 		
 		ArrayList<NormalizedParam> listParamsAuth = new ArrayList<NormalizedParam>();
-		ArrayList<NormalizedParam> listParamsHack = new ArrayList<NormalizedParam>();
 		
 		double tempWeight;
 		double totalEvents = 0;
@@ -183,6 +182,9 @@ public class GestureComparer {
 		
 		NumZeroScores = 0;
 		
+		double interestPointTotalScore = 0;		
+		double interestPointScoreParams = 0;
+		
 		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {
 			AvgPressureScore += mListStrokeComparers.get(idx).MiddlePressureScore;
 			AvgSurfaceScore += mListStrokeComparers.get(idx).MiddleSurfaceScore;
@@ -190,6 +192,11 @@ public class GestureComparer {
 			if(mListStrokeComparers.get(idx).IsInterestPointFound) {
 				isInterestPointsFound = true;
 			}
+			
+//			interestPointTotalScore += mListStrokeComparers.get(idx).InterestPointCountPercentageDiff;
+//			interestPointScoreParams ++;
+			interestPointTotalScore += mListStrokeComparers.get(idx).InterestPointNewIdxLocationDiff;
+			interestPointScoreParams ++;
 			
 			tempStrokeComparer = mListStrokeComparers.get(idx);
 			tempWeight = tempStrokeComparer.GetBaseStroke().ListEventsExtended.size() / totalEvents;
@@ -216,6 +223,8 @@ public class GestureComparer {
 		double totalScores = 0;
 		double weight;
 				
+		InterestPointScore = interestPointTotalScore / interestPointScoreParams;
+		
 		double numStrokes = mListStrokeComparers.size();		
 		
 		AvgPressureScore = AvgPressureScore / numStrokes;
@@ -271,8 +280,9 @@ public class GestureComparer {
 		
 		mCompareResultsGesture.Score = 				
 				dtwScoreNormalizedParam.NormalizedScore * 0.2 +
-				pcaScoreNormalizedParam.NormalizedScore * 0.2 +		
-				totalScores * 0.6;
+				pcaScoreNormalizedParam.NormalizedScore * 0.2 +
+				InterestPointScore * 0.05 +
+				totalScores * 0.55;
 		
 		double removeMiddlePressureScore = (1 - AvgSurfaceScore) / 5;
 		mCompareResultsGesture.Score -= removeMiddlePressureScore;
@@ -587,7 +597,7 @@ public class GestureComparer {
 		return mMinCosineDistanceScore;
 	}
 	
-	protected void CalculateFinalScore()
+	protected void CalculateFinalScoreOld()
 	{
 		mIsGesturesIdentical = true;
 		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {			
@@ -634,12 +644,12 @@ public class GestureComparer {
 				DtwScore += mListStrokeComparers.get(idx).DtwSpatialTotalScore;
 				PcaScore += Math.abs(mListStrokeComparers.get(idx).PcaScore);
 								
-				if(mListStrokeComparers.get(idx).MaxInterestPointDTWVelocity > 0.17 || mListStrokeComparers.get(idx).MaxInterestPointDTWCoords > 0.4) {
-					scorePenalty += 2;
-				}
+//				if(mListStrokeComparers.get(idx).MaxInterestPointDTWVelocity > 0.17 || mListStrokeComparers.get(idx).MaxInterestPointDTWCoords > 0.4) {
+//					scorePenalty += 2;
+//				}
 				
-				InterestPointDensity += mListStrokeComparers.get(idx).MaxInterestPointDensity;
-				InterestPointLocation += mListStrokeComparers.get(idx).MaxInterestPointLocation;
+//				InterestPointDensity += mListStrokeComparers.get(idx).MaxInterestPointDensity;
+//				InterestPointLocation += mListStrokeComparers.get(idx).MaxInterestPointLocation;
 				
 				InterestPointScore += mListStrokeComparers.get(idx).InterestPointScore;
 				
@@ -787,7 +797,7 @@ public class GestureComparer {
 			
 //			mCompareResultsGesture.Score = Utils.GetInstance().GetUtilsMath().GetMinValue(BooleanParamsScore, NormalizedParamsScore);
 			mCompareResultsGesture.Score = NormalizedParamsScore;
-			mCompareResultsGesture.Score -= scorePenalty;
+//			mCompareResultsGesture.Score -= scorePenalty;
 			
 			double removeMiddlePressureScore = (1 - avgSurfaceScore * avgSurfaceScore) / 5;
 			mCompareResultsGesture.Score -= removeMiddlePressureScore;

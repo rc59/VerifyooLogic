@@ -121,18 +121,21 @@ public class UtilsStat {
 	}
 	
 	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd, double boundaryAdj) {
-		double boundary = CalculateBoundaryFactor(populationMean, populationSd, internalMean, boundaryAdj);	
+		double boundary = boundaryAdj; //CalculateBoundaryFactor(populationMean, populationSd, internalMean, boundaryAdj);	
 		
-		boundary = internalSd / populationMean;
-		if(boundary < 0.1) {
-			boundary = 0.1;
-		}
+//		boundary = internalSd / populationMean;
+//		if(boundary < 0.1) {
+//			boundary = 0.1;
+//		}
 		
-		double internalBoundaryLower = internalMean - 2 * internalMean * boundary;
-		double internalBoundaryUpper = internalMean + 2 * internalMean * boundary;
+		double firstBoundaryFactor = 2;
+		double secondBoundaryFactor = 5;
 		
-		double secondLowerPopulationInternalSD = internalMean - 5 * internalMean * boundary;
-		double secondUpperPopulationInternalSD = internalMean + 5 * internalMean * boundary;
+		double internalBoundaryLower = internalMean - firstBoundaryFactor * internalMean * boundary;
+		double internalBoundaryUpper = internalMean + firstBoundaryFactor * internalMean * boundary;
+		
+		double secondLowerPopulationInternalSD = internalMean - secondBoundaryFactor * internalMean * boundary;
+		double secondUpperPopulationInternalSD = internalMean + secondBoundaryFactor * internalMean * boundary;
 		
 		double score = 0;
 		

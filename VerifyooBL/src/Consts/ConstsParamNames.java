@@ -26,6 +26,15 @@ public class ConstsParamNames {
 		public static final String STROKE_TOTAL_AREA = "StrokeTotalArea";
 		public static final String STROKE_TOTAL_AREA_MINX_MINY = "StrokeTotalAreaMinXMinY";
 		
+		public static final String STROKE_INT_POINT_LOCATION = "StrokeIntPointLocation";
+		public static final String STROKE_INT_POINT_VELOCITY = "StrokeIntPointVelocity";
+		public static final String STROKE_INT_POINT_AVG_VELOCITY = "StrokeIntPointAvgVelocity";		
+		public static final String STROKE_INT_POINT_PRESSURE = "StrokeIntPointPressure";
+		public static final String STROKE_INT_POINT_SURFACE = "StrokeIntPointSurface";
+		public static final String STROKE_INT_POINT_DENSITY = "StrokeIntPointDensity";
+		public static final String STROKE_INT_POINT_INTENSITY = "StrokeIntPointIntensity";
+		
+		
 		public static final String STROKE_AVERAGE_VELOCITY = "StrokeAvgVelocity";
 		public static final String STROKE_MAX_VELOCITY = "StrokeMaxVelocity";
 		public static final String STROKE_MID_VELOCITY = "StrokMidVelocity";		

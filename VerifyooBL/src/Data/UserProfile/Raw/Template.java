@@ -6,13 +6,18 @@ import java.util.HashMap;
 import Data.UserProfile.Extended.StrokeExtended;
 import Logic.Comparison.Stats.FeatureMeanData;
 import Logic.Comparison.Stats.StatEngine;
+import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Comparison.Stats.Interfaces.IStatEngine;
+import Logic.Utils.UtilsAccumulator;
 
 public class Template {
 	public String Id;
 	public ArrayList<Gesture> ListGestures;
 	public String Name;
 	public String ModelName;
+	
+	
+	protected HashMap<String, IFeatureMeanData> mHashFeatureMeansInit;
 
 	public Template Clone() {
 		Template clonedTemplate = new  Template();
@@ -31,5 +36,13 @@ public class Template {
 	
 	public Template() {
 		ListGestures = new ArrayList<>();
+	}
+	
+	public void InitHashMap(HashMap<String, IFeatureMeanData> hashFeatureMeans) {
+		mHashFeatureMeansInit = hashFeatureMeans;
+	}
+	
+	public HashMap<String, IFeatureMeanData> GetHashMap() {
+		return mHashFeatureMeansInit;
 	}
 }
