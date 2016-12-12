@@ -36,8 +36,7 @@ public class Tests {
 									
 			
 			
-			score = t.CompareTemplatesById("57dbcb762f0e497411a30b24", "57d668132f0e4974119f7927");
-			score = t.CompareTemplatesById("57dbcb762f0e497411a30b24", "57d668132f0e4974119f7927");
+			score = t.CompareTemplatesById("57d668132f0e4974119f7927", "57d668f62f0e4974119f88fd");
 			
 			
 //			t.GetNorms("5832fb309a59ecac0f3b2e5a");

@@ -18,6 +18,7 @@ import Data.Comparison.CompareResultParamVectors;
 import Data.Comparison.CompareResultSummary;
 import Data.Comparison.Interfaces.ICompareResult;
 import Data.MetaData.IndexBoundary;
+import Data.MetaData.InterestPoint;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Extended.StrokeExtended;
 import Data.UserProfile.Raw.Stroke;
@@ -131,8 +132,6 @@ public class StrokeComparer {
 	
 	public double StrokeDistanceTotalScore;
 	
-	public boolean IsInterestPointFound;	
-	
 	public double InterestPointNewIdxStartDiff;
 	public double InterestPointNewIdxEndDiff;
 	public double InterestPointNewIdxAvgDiff;
@@ -145,13 +144,10 @@ public class StrokeComparer {
 	
 	public boolean IsThereInterestPoints;
 	
-	public double InterestPointNewIdxStartAllDiff;
-	public double InterestPointNewIdxEndAllDiff;
-	public double InterestPointNewIdxAvgAllDiff;
-	public double InterestPointNewIdxLocationAllDiff;
-	
-	public double InterestPointDensityStrengthsDiff;
-	public double InterestPointDensityStrengthsWithEdgesDiff;
+//	public double InterestPointNewIdxStartAllDiff;
+//	public double InterestPointNewIdxEndAllDiff;
+//	public double InterestPointNewIdxAvgAllDiff;
+//	public double InterestPointNewIdxLocationAllDiff;
 	
 	public double VelocitiesConvolution;
 	
@@ -294,53 +290,46 @@ public class StrokeComparer {
 	}				
 
 	private void CompareInterestPoints() {
-		IsThereInterestPoints = true;
+		IsThereInterestPoints = false;
 		InterestPointCountPercentageDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.size(), mStrokeAuthExtended.ListInterestPoints.size());
 		InterestPointCountDiff = Math.abs(mStrokeStoredExtended.ListInterestPoints.size() - mStrokeAuthExtended.ListInterestPoints.size());
-		if(mStrokeStoredExtended.ListInterestPoints.size() == 0 || mStrokeAuthExtended.ListInterestPoints.size() == 0) {
-			IsThereInterestPoints = false;
-		}
-		else {
-			InterestPointNewIdxStartDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(0).IdxStart, mStrokeAuthExtended.ListInterestPoints.get(0).IdxStart);
-			InterestPointNewIdxEndDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(0).IdxEnd, mStrokeAuthExtended.ListInterestPoints.get(0).IdxEnd);
-			InterestPointNewIdxAvgDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(0).IdxAverage, mStrokeAuthExtended.ListInterestPoints.get(0).IdxAverage);
-			InterestPointNewIdxLocationDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(0).IdxLocation, mStrokeAuthExtended.ListInterestPoints.get(0).IdxLocation);
-					
-			if(InterestPointCountDiff == 0) {
-				InterestPointNewIdxStartAllDiff = 0;
-				InterestPointNewIdxEndAllDiff = 0;
-				InterestPointNewIdxAvgAllDiff = 0;
-				InterestPointNewIdxLocationAllDiff = 0;
+		
+		if(InterestPointCountDiff == 0) {
+			IsThereInterestPoints = true;
+			
+			if(mStrokeStoredExtended.ListInterestPoints.size() == 0 && mStrokeAuthExtended.ListInterestPoints.size() == 0) {
+				InterestPointNewIdxStartDiff = 1;
+				InterestPointNewIdxEndDiff = 1;
+				InterestPointNewIdxAvgDiff = 1;
+				InterestPointNewIdxLocationDiff = 1;
+			}
+			else {
+				InterestPointNewIdxStartDiff = 0;
+				InterestPointNewIdxEndDiff = 0;
+				InterestPointNewIdxAvgDiff = 0;
+				InterestPointNewIdxLocationDiff = 0;
 				
 				for(int idx = 0; idx < mStrokeStoredExtended.ListInterestPoints.size(); idx++) {
-					InterestPointNewIdxStartAllDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxStart, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxStart);
-					InterestPointNewIdxEndAllDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxEnd, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxEnd);
-					InterestPointNewIdxAvgAllDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxAverage, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxAverage);
-					InterestPointNewIdxLocationAllDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxLocation, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxLocation);
-				}				
+					InterestPointNewIdxStartDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxStart, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxStart);
+					InterestPointNewIdxEndDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxEnd, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxEnd);
+					InterestPointNewIdxAvgDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxAverage, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxAverage);
+					InterestPointNewIdxLocationDiff += Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.get(idx).IdxLocation, mStrokeAuthExtended.ListInterestPoints.get(idx).IdxLocation);
+				}
 				
 				double numInterestPoints = mStrokeStoredExtended.ListInterestPoints.size();
-				InterestPointNewIdxStartAllDiff = InterestPointNewIdxStartAllDiff / numInterestPoints;
-				InterestPointNewIdxEndAllDiff = InterestPointNewIdxEndAllDiff / numInterestPoints;
-				InterestPointNewIdxAvgAllDiff = InterestPointNewIdxAvgAllDiff / numInterestPoints;
-				InterestPointNewIdxLocationAllDiff = InterestPointNewIdxLocationAllDiff / numInterestPoints;
+				InterestPointNewIdxStartDiff = InterestPointNewIdxStartDiff / numInterestPoints;
+				InterestPointNewIdxEndDiff = InterestPointNewIdxEndDiff / numInterestPoints;
+				InterestPointNewIdxAvgDiff = InterestPointNewIdxAvgDiff / numInterestPoints;
+				InterestPointNewIdxLocationDiff = InterestPointNewIdxLocationDiff / numInterestPoints;
 			}
 		}
-		
-		double intPointVelocityAuth = mStrokeAuthExtended.InterestPointVelocity;
-		double intPointAvgVelocityAuth = mStrokeAuthExtended.InterestPointAvgVelocity;				
+						
 		double intPointPressureAuth = mStrokeAuthExtended.InterestPointPressure;
 		double intPointSurfaceAuth = mStrokeAuthExtended.InterestPointSurface;
-		double intPointDensityAuth = mStrokeAuthExtended.InterestPointDensity;				
-		double intPointIntensityAuth = mStrokeAuthExtended.InterestPointIntensity;
-		
-//		CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_VELOCITY, intPointVelocityAuth);		
-//		CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_AVG_VELOCITY, intPointAvgVelocityAuth);
+
 		MiddlePressureScore = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_PRESSURE, intPointPressureAuth);
 		MiddleSurfaceScore = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_SURFACE, intPointSurfaceAuth);
-//		CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_DENSITY, intPointDensityAuth);
-//		CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_INTENSITY, intPointIntensityAuth);
-	}
+	}	
 
 	private void CheckStrokeTypes() {
 		IsStrokeTypesValid = true;

@@ -189,10 +189,7 @@ public class GestureComparer {
 			AvgPressureScore += mListStrokeComparers.get(idx).MiddlePressureScore;
 			AvgSurfaceScore += mListStrokeComparers.get(idx).MiddleSurfaceScore;
 				
-			if(mListStrokeComparers.get(idx).IsInterestPointFound) {
-				isInterestPointsFound = true;
-			}
-			
+						
 //			interestPointTotalScore += mListStrokeComparers.get(idx).InterestPointCountPercentageDiff;
 //			interestPointScoreParams ++;
 			interestPointTotalScore += mListStrokeComparers.get(idx).InterestPointNewIdxLocationDiff;

@@ -420,6 +420,8 @@ public class Tester {
 		long start = System.currentTimeMillis();
 		TemplateExtended templateBase = new TemplateExtended(template1);
 		TemplateExtended templateAuth = new TemplateExtended(template2);
+
+		
 		long end = System.currentTimeMillis();		
 		long diff = end - start;
 		

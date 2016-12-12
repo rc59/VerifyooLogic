@@ -175,16 +175,28 @@ public class NormContainerMgr {
 	
 	public double GetNumericNormPopMean(String instruction, String param, int idxStroke) {	
 		instruction = CheckInstruction(instruction);
-		return HashMapNumericNormsMeans.get(param).GetMean(instruction, idxStroke);
+		if(param.compareTo(ConstsParamNames.Stroke.STROKE_TRANSITION_TIME) == 0) {
+			idxStroke = 0;
+		}
+		
+		return HashMapNumericNormsMeans.get(param).GetMean(instruction, idxStroke);	
 	}
 	
 	public double GetNumericNormPopSd(String instruction, String param, int idxStroke) {		
 		instruction = CheckInstruction(instruction);
+		if(param.compareTo(ConstsParamNames.Stroke.STROKE_TRANSITION_TIME) == 0) {
+			idxStroke = 0;
+		}
+		
 		return HashMapNumericNormsMeans.get(param).GetStd(instruction, idxStroke);
 	}
 	
 	public double GetNumericNormInternalSd(String instruction, String param, int idxStroke) {
 		instruction = CheckInstruction(instruction);
+		if(param.compareTo(ConstsParamNames.Stroke.STROKE_TRANSITION_TIME) == 0) {
+			idxStroke = 0;
+		}
+
 		return HashMapNumericNormsSds.get(param).GetMean(instruction, idxStroke);
 	}
 

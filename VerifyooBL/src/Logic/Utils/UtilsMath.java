@@ -88,6 +88,15 @@ public class UtilsMath {
 		}
 	}
 	
+	public int GetMinValue(int value1, int value2) {
+		if(value1 < value2) {
+			return value1;
+		}
+		else {
+			return value2;
+		}
+	}
+	
 	public boolean IsBetween(double value, double lower, double upper) {
 		if(value > lower && value < upper) {
 			return true;

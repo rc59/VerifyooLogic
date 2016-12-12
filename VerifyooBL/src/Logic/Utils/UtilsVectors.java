@@ -2,6 +2,7 @@ package Logic.Utils;
 
 import java.util.ArrayList;
 
+import Data.MetaData.InterestPoint;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Raw.MotionEventCompact;
 
@@ -226,5 +227,102 @@ public class UtilsVectors {
 		double t = a[i];
 		a[i] = a[j];
 		a[j] = t;
+	}
+
+	public void AverageFilter(double[] eventDensities) {
+		double average = 0;
+		double lengthDouble = (double)eventDensities.length;
+		
+		for(int idx = 0; idx < eventDensities.length; idx++) {
+			average += eventDensities[idx];
+		}
+		
+		average = average / lengthDouble;
+		
+		
+		for(int idx = 0; idx < eventDensities.length; idx++) {
+			eventDensities[idx] = eventDensities[idx] - average;
+		}
+	}
+	
+	public ArrayList<InterestPoint> FindInterestPoints(ArrayList<MotionEventExtended> listEventsExtended, int idxStart, int idxEnd, double threashold, boolean isMajorIntPoint) {	
+		double numEvents = (double) listEventsExtended.size();
+		double averageDensity = 0;
+		
+		for(int idx = 0; idx < listEventsExtended.size(); idx++) {
+			averageDensity += listEventsExtended.get(idx).EventDensityRaw;
+		}
+		averageDensity = averageDensity / numEvents;		
+				
+		ArrayList<InterestPoint> listInterestPoints = new ArrayList<>();
+		InterestPoint tempInterestPoint;
+		
+		int idxIntStart = 0;
+		int idxIntEnd = 0;
+		int idxIntAvg = 0;
+		
+		boolean isIntPointFound = false;
+		boolean isIntPointStartIdxFound = false;
+		
+		MotionEventExtended eventCurr, eventNext;
+		double diffDensity;			
+		
+		for(int idx = 0; idx < listEventsExtended.size(); idx++) {
+			if(idx >= idxStart && idx < idxEnd) {
+				eventCurr = listEventsExtended.get(idx);
+				eventNext = listEventsExtended.get(idx + 1);
+				diffDensity =  eventNext.EventDensityRaw - eventCurr.EventDensityRaw;
+				
+				if(diffDensity > 0) {
+					idxIntStart = idx;
+					isIntPointFound = true;
+				}
+				while(isIntPointFound) {
+					idx++;
+					if(idx >= idxEnd) {
+						break;
+					}
+					eventCurr = listEventsExtended.get(idx);
+					eventNext = listEventsExtended.get(idx + 1);
+					diffDensity =  eventNext.EventDensityRaw - eventCurr.EventDensityRaw;							
+					
+					if(diffDensity < 0 && eventCurr.EventDensityRaw > threashold * averageDensity) {
+						idxIntEnd = idx;
+						isIntPointStartIdxFound = false;
+						idxIntStart = idx;
+						while(!isIntPointStartIdxFound) {							
+							if(listEventsExtended.get(idxIntStart).EventDensityRaw - listEventsExtended.get(idxIntStart - 1).EventDensityRaw > 0) {
+								isIntPointStartIdxFound = true;								
+								break;
+							}
+							idxIntStart--;
+							if(idxIntStart <= 0) {
+								break;
+							}
+						}
+						idxIntAvg = (idxIntStart + idxIntEnd) / 2;
+						listEventsExtended.get(idxIntAvg).EventDensitySignalStrength2 = 1;
+						if(isMajorIntPoint) {
+							listEventsExtended.get(idxIntAvg).EventDensitySignalStrength2++;
+						}
+						
+						tempInterestPoint = new InterestPoint(idxIntStart, idxIntEnd, numEvents);
+						listInterestPoints.add(tempInterestPoint);
+						
+						idxIntStart = 0;
+						idxIntEnd = 0;	
+						isIntPointFound = false;
+						break;
+					}
+				}
+			}
+			else {
+				if(isMajorIntPoint) {
+					listEventsExtended.get(idx).EventDensitySignalStrength2 = -1;	
+				}
+			}
+		}
+		
+		return listInterestPoints;
 	}
 }
