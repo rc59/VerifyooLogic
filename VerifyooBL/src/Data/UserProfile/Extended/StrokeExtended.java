@@ -1,5 +1,6 @@
 package Data.UserProfile.Extended;
 
+import java.awt.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -72,12 +73,12 @@ public class StrokeExtended extends Stroke {
 	/****************************************/
 	
 	/************** Stroke Features **************/
-	public ArrayList<InterestPoint> ListInterestPoints = new ArrayList<>();	
+	public ArrayList<InterestPoint> ListInterestPoints = new ArrayList<>();
+	public ArrayList<InterestPoint> ListInterestPointsMinor = new ArrayList<>();
+	public double NumInterestPointsMajor;
+	public double NumInterestPointsMinor;
 	
-	public double InterestPointNewAvgVelocity;
-	public double InterestPointNewIntensity;
-	public double InterestPointNewDTWVel;
-	public double InterestPointNewDTWCoords;
+	public double StrokeAverageDensity = 0;
 	
 	public boolean IsPoint;
 	public int StrokeStartEvent;
@@ -581,9 +582,7 @@ public class StrokeExtended extends Stroke {
 				if(idx > idxStart) {
 					totalDistance += Utils.GetInstance().GetUtilsMath().CalcDistanceInMMs(ListEventsExtended.get(idx - 1), ListEventsExtended.get(idx));
 				}
-			}
-			
-			InterestPointAvgVelocity = totalDistance / totalTime;
+			}			
 			
 			InterestPointVelocity = ListEventsExtended.get(idxAvg).Velocity;		
 			InterestPointPressure = ListEventsExtended.get(idxAvg).Pressure;
@@ -591,28 +590,18 @@ public class StrokeExtended extends Stroke {
 		}
 		else {
 			int idxMid = ListEventsExtended.size() / 2;
-			InterestPointVelocity = ListEventsExtended.get(idxMid).Velocity;
-			InterestPointAvgVelocity = StrokePropertiesObj.LengthMM / StrokeTimeInterval;
+			InterestPointVelocity = ListEventsExtended.get(idxMid).Velocity;			
 			InterestPointPressure = ListEventsExtended.get(idxMid).Pressure;
 			InterestPointSurface = ListEventsExtended.get(idxMid).TouchSurface;
-			InterestPointDensity = ListEventsExtended.get(idxMid).EventDensity;
-			
-			for(int idx = 0; idx < ListEventsExtended.size(); idx++) {
-				InterestPointIntensity += ListEventsExtended.get(idx).EventDensity;
-			}
+			InterestPointDensity = ListEventsExtended.get(idxMid).EventDensity;			
 		}
 		
-		
-		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, mStrokeIdx, InterestPointLocation);
-		
 		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_VELOCITY, mStrokeIdx, InterestPointVelocity);
-		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_AVG_VELOCITY, mStrokeIdx, InterestPointAvgVelocity);
 		
 		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_PRESSURE, mStrokeIdx, InterestPointPressure);
 		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_SURFACE, mStrokeIdx, InterestPointSurface);
 		
 		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_DENSITY, mStrokeIdx, InterestPointDensity);
-		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_INTENSITY, mStrokeIdx, InterestPointIntensity);		
 	}
 
 	protected void CalculateEventDensity() {
@@ -654,54 +643,65 @@ public class StrokeExtended extends Stroke {
 		}
 		
 		int idxStart = 0;
-		int idxEnd = ListEventsExtended.size();
-		
-		MotionEventExtended eventPrev, eventCurr, eventNext;
-		double diffDensity;
+		int idxEnd = ListEventsExtended.size() - 1;	
+				
+		ValueFreqContainer valueFreqContainer = new ValueFreqContainer();
 		
 		for(int idx = 0; idx < ListEventsExtended.size() - 1; idx++) {
-			eventCurr = ListEventsExtended.get(idx);
-			eventNext = ListEventsExtended.get(idx + 1);
-			
-			diffDensity = eventCurr.EventDensityRaw - eventNext.EventDensityRaw;
-			while(diffDensity <= 0) {
-				idx++;
-				
-				if(idx > ListEventsExtended.size()) {
-					idxStart = 0;
-					break;
-				}
-				
-				eventCurr = ListEventsExtended.get(idx);
-				eventNext = ListEventsExtended.get(idx + 1);
-				diffDensity = eventCurr.EventDensityRaw - eventNext.EventDensityRaw;
-				
-				if(diffDensity >= 0) {
+			valueFreqContainer.AddValue(ListEventsExtended.get(idx).EventDensityRaw);
+		}
+		
+		double commonDensity = valueFreqContainer.GetMostFreq();
+		double commonDensitySecond = valueFreqContainer.GetAllFreqs().get(1).GetValue();		
+		
+		if(Math.abs(commonDensity - commonDensitySecond) >= 1) {
+			commonDensitySecond = commonDensity;
+		}
+		
+		for(int idx = 0; idx < ListEventsExtended.size() - 1; idx++) {
+			if(ListEventsExtended.get(idx).EventDensityRaw == commonDensity || ListEventsExtended.get(idx).EventDensityRaw == commonDensitySecond) {
+				if(ListEventsExtended.get(idx + 1).EventDensityRaw == commonDensity || ListEventsExtended.get(idx + 1).EventDensityRaw == commonDensitySecond) {
 					idxStart = idx;
-					break;
+					break;	
+				}				
+			}			
+		}
+		
+		for(int idx = ListEventsExtended.size() - 1; idx > 0; idx--) {
+			if(ListEventsExtended.get(idx).EventDensityRaw == commonDensity) {
+				if(ListEventsExtended.get(idx - 1).EventDensityRaw == commonDensity) {
+					idxEnd = idx;
+					break;	
 				}
 			}
-			
-			if(idxStart > 0) {
-				break;
-			}
+		}		
+		
+		for(int idx = idxStart; idx <= idxEnd; idx++) {
+			StrokeAverageDensity += ListEventsExtended.get(idx).EventDensityRaw;
 		}
 		
-		idxEnd = ListEventsExtended.size() - 1;
-		for(int idx = ListEventsExtended.size() - 1; idx > 0; idx--) {
-			eventCurr = ListEventsExtended.get(idx);
-			eventPrev = ListEventsExtended.get(idx - 1);
-			
-			diffDensity = eventCurr.EventDensityRaw - eventPrev.EventDensityRaw;
-			if(diffDensity > 0) {
-				idxEnd = idx;
-				break;
-			}
-		}
+		double numDensityPoints = idxEnd - idxStart;
+		StrokeAverageDensity = StrokeAverageDensity / numDensityPoints;
+		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_AVG_DENSITY, mStrokeIdx, StrokeAverageDensity);
 		
-		ListInterestPoints = Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxStart, idxEnd, 1.4, true);
+		ListInterestPoints = Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxStart, idxEnd, 1.2, true);
 				
 		if(ListInterestPoints.size() > 0) {
+			InterestPointLocation = ListInterestPoints.get(0).IdxLocation;
+			AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, mStrokeIdx, InterestPointLocation);
+			
+			InterestPointIntensity = 0;
+			InterestPointAvgVelocity = 0;
+			
+			for(int idx = (int)ListInterestPoints.get(0).IdxStart; idx <= ListInterestPoints.get(0).IdxEnd; idx++) {
+				InterestPointIntensity += ListEventsExtended.get(idx).EventDensityRaw;
+				InterestPointAvgVelocity += ListEventsExtended.get(idx).Velocity;
+			}
+			InterestPointAvgVelocity = InterestPointAvgVelocity / (ListInterestPoints.get(0).IdxEnd - ListInterestPoints.get(0).IdxStart);
+						
+			AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_AVG_VELOCITY, mStrokeIdx, InterestPointAvgVelocity);		
+			AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_INTENSITY, mStrokeIdx, InterestPointIntensity);
+			
 			int start = (int) ListInterestPoints.get(0).IdxStart;
 			while(true) {
 				if(ListEventsExtended.get(start).EventDensityRaw - ListEventsExtended.get(start - 1).EventDensityRaw <= 0) {
@@ -712,8 +712,10 @@ public class StrokeExtended extends Stroke {
 					break;
 				}
 			}
-			ArrayList<InterestPoint> listInterestPoints = Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxStart, start, 1.2, false);	
-		}		
+			ListInterestPointsMinor = Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxStart, start, 1, false);
+			NumInterestPointsMajor = ListInterestPoints.size();
+			NumInterestPointsMinor = ListInterestPointsMinor.size();
+		}
 	}
 	
 	private void CalculateEventDensityNew() {

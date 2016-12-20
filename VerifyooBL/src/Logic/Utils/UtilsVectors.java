@@ -249,10 +249,11 @@ public class UtilsVectors {
 		double numEvents = (double) listEventsExtended.size();
 		double averageDensity = 0;
 		
-		for(int idx = 0; idx < listEventsExtended.size(); idx++) {
+		for(int idx = idxStart; idx <= idxEnd; idx++) {
 			averageDensity += listEventsExtended.get(idx).EventDensityRaw;
 		}
-		averageDensity = averageDensity / numEvents;		
+		double numDensityPoints = idxEnd - idxStart;
+		averageDensity = averageDensity / numDensityPoints;
 				
 		ArrayList<InterestPoint> listInterestPoints = new ArrayList<>();
 		InterestPoint tempInterestPoint;

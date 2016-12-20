@@ -228,7 +228,7 @@ public class GestureComparer {
 		AvgSurfaceScore = AvgSurfaceScore / numStrokes;		
 		
 		for(int idx = 0; idx < mCompareResultsGesture.ListCompareResults.size(); idx++) {
-			//listParamsAuth.add(new NormalizedParam(mCompareResultsGesture.ListCompareResults.get(idx).GetName(), mCompareResultsGesture.ListCompareResults.get(idx).GetValue(), 1));
+			listParamsAuth.add(new NormalizedParam(mCompareResultsGesture.ListCompareResults.get(idx).GetName(), mCompareResultsGesture.ListCompareResults.get(idx).GetValue(), 1));
 			
 			if(mCompareResultsGesture.ListCompareResults.get(idx).GetValue() == 0) {
 				NumZeroScores++;

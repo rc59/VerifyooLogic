@@ -45,6 +45,11 @@ public class ValueFreqContainer {
 		return listFreqs;
 	}
 	
+	public ArrayList<ValueFreq> GetAllFreqs() {
+		ArrayList<ValueFreq> listFreqs = GetSortedArray();
+		return listFreqs;
+	}
+	
 	public double GetMostFreq() {
 		ArrayList<ValueFreq> listFreqs = GetSortedArray();
 		return listFreqs.get(0).GetValue();

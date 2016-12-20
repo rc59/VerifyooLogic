@@ -138,6 +138,13 @@ public class StrokeComparer {
 	public double InterestPointNewIdxLocationDiff;
 	public double InterestPointCountPercentageDiff;
 	public double InterestPointCountDiff;
+	public double InterestPointMinorCountDiff;
+	
+	public double StrokeAvgDensityScore;
+	
+	public double InterestPointNewIdxAvgVelocity;
+	public double InterestPointNewIdxIntensity;
+	public double StrokeAvgVelocity;
 	
 	public double InterestPointVelocity;
 	public double InterestPointAvgVelocity;
@@ -289,10 +296,11 @@ public class StrokeComparer {
 		}		
 	}				
 
-	private void CompareInterestPoints() {
+	private void CompareInterestPoints() {		
 		IsThereInterestPoints = false;
 		InterestPointCountPercentageDiff = Utils.GetInstance().GetUtilsMath().GetPercentageDiff(mStrokeStoredExtended.ListInterestPoints.size(), mStrokeAuthExtended.ListInterestPoints.size());
 		InterestPointCountDiff = Math.abs(mStrokeStoredExtended.ListInterestPoints.size() - mStrokeAuthExtended.ListInterestPoints.size());
+		InterestPointMinorCountDiff = Math.abs(mStrokeStoredExtended.NumInterestPointsMinor - mStrokeAuthExtended.NumInterestPointsMinor);
 		
 		if(InterestPointCountDiff == 0) {
 			IsThereInterestPoints = true;
@@ -329,6 +337,51 @@ public class StrokeComparer {
 
 		MiddlePressureScore = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_PRESSURE, intPointPressureAuth);
 		MiddleSurfaceScore = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_SURFACE, intPointSurfaceAuth);
+		
+		double intPointLocation = mStrokeAuthExtended.InterestPointLocation;
+		double intPointAvgVelocity = mStrokeAuthExtended.InterestPointAvgVelocity;
+		double strokeAvgDensity = mStrokeAuthExtended.StrokeAverageDensity;
+		double intPointIntensity = mStrokeAuthExtended.InterestPointIntensity;
+		
+		StrokeAvgDensityScore = CompareParameter(ConstsParamNames.Stroke.STROKE_AVG_DENSITY, strokeAvgDensity);
+		
+		InterestPointNewIdxLocationDiff = -1;
+		InterestPointNewIdxAvgVelocity = -1;
+		InterestPointNewIdxIntensity = -1;
+		
+		try {
+			String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(mStrokeStoredExtended.GetInstruction(), ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, mStrokeStoredExtended.GetStrokeIdx());			
+			
+			if(mStrokeStoredExtended.GetFeatureMeansHash().containsKey(key)) {				
+				if(mStrokeAuthExtended.ListInterestPoints.size() > 0) {
+					InterestPointNewIdxLocationDiff = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, intPointLocation);
+					InterestPointNewIdxAvgVelocity =  CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_AVG_VELOCITY, intPointAvgVelocity);
+					InterestPointNewIdxIntensity = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_INTENSITY, intPointIntensity);					
+				}
+				else {
+					
+					
+					InterestPointNewIdxLocationDiff = 0;
+					InterestPointNewIdxAvgVelocity = 0;
+					InterestPointNewIdxIntensity = 0;
+				}
+			}
+			else {
+				if(mStrokeAuthExtended.ListInterestPoints.size() > 0) {
+					InterestPointNewIdxLocationDiff = 0;
+					InterestPointNewIdxAvgVelocity = 0;
+					InterestPointNewIdxIntensity = 0;
+				}
+				else {
+					InterestPointNewIdxLocationDiff = 1;
+					InterestPointNewIdxAvgVelocity = 1;
+					InterestPointNewIdxIntensity = 1;
+				}				
+			}
+		}
+		catch(Exception exc) {
+			
+		}
 	}	
 
 	private void CheckStrokeTypes() {
