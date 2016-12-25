@@ -40,6 +40,8 @@ public class MotionEventExtended extends MotionEventCompact {
 	public boolean IsStartOfStroke;
 	public boolean IsEndOfStroke;
 	
+	public boolean IsIgnoreEvent;
+	
 	public double EventDensityRaw;
 	public double EventDensity;
 	public double EventDensitySignalStrength;
@@ -47,7 +49,7 @@ public class MotionEventExtended extends MotionEventCompact {
 	public double EventDistance;
 	
 	public MotionEventExtended() {
-		
+		IsIgnoreEvent = false;
 	}
 	
 	public MotionEventExtended Clone()

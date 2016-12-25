@@ -9,6 +9,7 @@ public class NormalizedParam {
 	public double Weight;
 	
 	public NormalizedParam(String name, double value, double weight) {
+		Name = name;
 		double threashold = Utils.GetInstance().GetUtilsGeneral().GetThreashold(name);
 		threashold = threashold + 0.1;
 		if(threashold > 1) {

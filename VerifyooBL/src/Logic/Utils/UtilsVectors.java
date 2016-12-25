@@ -245,14 +245,16 @@ public class UtilsVectors {
 		}
 	}
 	
-	public ArrayList<InterestPoint> FindInterestPoints(ArrayList<MotionEventExtended> listEventsExtended, int idxStart, int idxEnd, double threashold, boolean isMajorIntPoint) {	
+	public ArrayList<InterestPoint> FindInterestPoints(ArrayList<MotionEventExtended> listEventsExtended, int idxStart, int idxEnd, double threashold, boolean isMajorIntPoint, double commonDensity, double commonDensitySecond) {	
 		double numEvents = (double) listEventsExtended.size();
 		double averageDensity = 0;
-		
+			
+		double numDensityPoints = 0;
 		for(int idx = idxStart; idx <= idxEnd; idx++) {
 			averageDensity += listEventsExtended.get(idx).EventDensityRaw;
+			numDensityPoints++;
 		}
-		double numDensityPoints = idxEnd - idxStart;
+	
 		averageDensity = averageDensity / numDensityPoints;
 				
 		ArrayList<InterestPoint> listInterestPoints = new ArrayList<>();
@@ -272,6 +274,7 @@ public class UtilsVectors {
 			if(idx >= idxStart && idx < idxEnd) {
 				eventCurr = listEventsExtended.get(idx);
 				eventNext = listEventsExtended.get(idx + 1);
+								
 				diffDensity =  eventNext.EventDensityRaw - eventCurr.EventDensityRaw;
 				
 				if(diffDensity > 0) {
@@ -307,6 +310,28 @@ public class UtilsVectors {
 							listEventsExtended.get(idxIntAvg).EventDensitySignalStrength2++;
 						}
 						
+						int tempIdx = idxIntStart;
+						while(tempIdx > idxStart) {
+							if(listEventsExtended.get(tempIdx).EventDensityRaw == commonDensity) {
+								idxIntStart = tempIdx;
+								break;								
+							}
+							else {
+								tempIdx--;
+							}
+						}
+						
+						tempIdx = idxIntEnd;
+						while(idxIntEnd < idxEnd) {
+							if(listEventsExtended.get(tempIdx).EventDensityRaw == commonDensity) {
+								idxIntEnd = tempIdx;
+								break;								
+							}
+							else {
+								tempIdx++;
+							}
+						}
+						
 						tempInterestPoint = new InterestPoint(idxIntStart, idxIntEnd, numEvents);
 						listInterestPoints.add(tempInterestPoint);
 						
@@ -316,6 +341,7 @@ public class UtilsVectors {
 						break;
 					}
 				}
+				
 			}
 			else {
 				if(isMajorIntPoint) {
@@ -325,5 +351,12 @@ public class UtilsVectors {
 		}
 		
 		return listInterestPoints;
+	}
+
+	public ArrayList<InterestPoint> FindInterestPointsMinor(ArrayList<MotionEventExtended> listEventsExtended, int idxStart, int start, int i, boolean b) {
+		
+		
+		
+		return null;
 	}
 }

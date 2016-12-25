@@ -256,7 +256,7 @@ public class GestureComparer {
 		for(int idx = 0; idx < listParamsAuth.size(); idx++) {
 			if(idx >= idxStart) {
 				//weight = idx + baseWeight;
-				weight = listParamsAuth.get(idx).Weight;
+				weight = listParamsAuth.get(idx).Weight;				
 				totalScores += listParamsAuth.get(idx).NormalizedScore * weight;
 				totalWeights += weight;
 				

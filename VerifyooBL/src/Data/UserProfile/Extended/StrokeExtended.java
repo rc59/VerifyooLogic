@@ -164,7 +164,7 @@ public class StrokeExtended extends Stroke {
 	
 	protected double mNumEvents;
 	
-	int mNumElementsInRow;	
+	int mNumElementsInRow;
 	
 	public StrokeExtended(Stroke stroke, HashMap<String, IFeatureMeanData> hashFeatureMeans, String instruction, int strokeIdx)
 	{		
@@ -562,10 +562,9 @@ public class StrokeExtended extends Stroke {
 			if(stateNext != DENSITY_STATE_NEUTRAL) {
 				stateCurr = stateNext;
 			}
-		}
+		}		
 		
 		if(ListInterestPoints.size() >= 1) {
-			InterestPointLocation = ListInterestPoints.get(0).IdxLocation;
 			InterestPointIntensity = 0;
 			
 			int idxStart = (int) ListInterestPoints.get(0).IdxStart;
@@ -642,8 +641,8 @@ public class StrokeExtended extends Stroke {
 			ListEventsExtended.get(idx).EventDensityRaw = listDensities[idx];
 		}
 		
-		int idxStart = 0;
-		int idxEnd = ListEventsExtended.size() - 1;	
+		int idxIntPointAreaStart = 0;
+		int idxIntPointAreaEnd = ListEventsExtended.size() - 1;	
 				
 		ValueFreqContainer valueFreqContainer = new ValueFreqContainer();
 		
@@ -661,7 +660,7 @@ public class StrokeExtended extends Stroke {
 		for(int idx = 0; idx < ListEventsExtended.size() - 1; idx++) {
 			if(ListEventsExtended.get(idx).EventDensityRaw == commonDensity || ListEventsExtended.get(idx).EventDensityRaw == commonDensitySecond) {
 				if(ListEventsExtended.get(idx + 1).EventDensityRaw == commonDensity || ListEventsExtended.get(idx + 1).EventDensityRaw == commonDensitySecond) {
-					idxStart = idx;
+					idxIntPointAreaStart = idx;
 					break;	
 				}				
 			}			
@@ -670,21 +669,21 @@ public class StrokeExtended extends Stroke {
 		for(int idx = ListEventsExtended.size() - 1; idx > 0; idx--) {
 			if(ListEventsExtended.get(idx).EventDensityRaw == commonDensity) {
 				if(ListEventsExtended.get(idx - 1).EventDensityRaw == commonDensity) {
-					idxEnd = idx;
+					idxIntPointAreaEnd = idx;
 					break;	
 				}
 			}
 		}		
 		
-		for(int idx = idxStart; idx <= idxEnd; idx++) {
+		for(int idx = idxIntPointAreaStart; idx <= idxIntPointAreaEnd; idx++) {
 			StrokeAverageDensity += ListEventsExtended.get(idx).EventDensityRaw;
 		}
 		
-		double numDensityPoints = idxEnd - idxStart;
+		double numDensityPoints = idxIntPointAreaEnd - idxIntPointAreaStart;
 		StrokeAverageDensity = StrokeAverageDensity / numDensityPoints;
 		AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_AVG_DENSITY, mStrokeIdx, StrokeAverageDensity);
 		
-		ListInterestPoints = Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxStart, idxEnd, 1.2, true);
+		ListInterestPoints = Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxIntPointAreaStart, idxIntPointAreaEnd, 1.2, true, commonDensity, commonDensitySecond);
 				
 		if(ListInterestPoints.size() > 0) {
 			InterestPointLocation = ListInterestPoints.get(0).IdxLocation;
@@ -693,11 +692,20 @@ public class StrokeExtended extends Stroke {
 			InterestPointIntensity = 0;
 			InterestPointAvgVelocity = 0;
 			
+			double totalTime = 0;
+			double totalDistance = 0;
+			
 			for(int idx = (int)ListInterestPoints.get(0).IdxStart; idx <= ListInterestPoints.get(0).IdxEnd; idx++) {
 				InterestPointIntensity += ListEventsExtended.get(idx).EventDensityRaw;
+				
+				if(idx > 0) {
+					totalTime += ListEventsExtended.get(idx).EventTime - ListEventsExtended.get(idx - 1).EventTime;
+					totalDistance += Utils.GetInstance().GetUtilsMath().CalcDistanceInMMs(ListEventsExtended.get(idx - 1), ListEventsExtended.get(idx));
+				}
 				InterestPointAvgVelocity += ListEventsExtended.get(idx).Velocity;
 			}
 			InterestPointAvgVelocity = InterestPointAvgVelocity / (ListInterestPoints.get(0).IdxEnd - ListInterestPoints.get(0).IdxStart);
+			InterestPointAvgVelocity = totalDistance / totalTime;
 						
 			AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_AVG_VELOCITY, mStrokeIdx, InterestPointAvgVelocity);		
 			AddStrokeValue(mInstruction, ConstsParamNames.Stroke.STROKE_INT_POINT_INTENSITY, mStrokeIdx, InterestPointIntensity);
@@ -712,9 +720,52 @@ public class StrokeExtended extends Stroke {
 					break;
 				}
 			}
-			ListInterestPointsMinor = Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxStart, start, 1, false);
+			ArrayList<MotionEventExtended> listEventsTemp = new ArrayList<>();
+			for(int idx = 0; idx < ListEventsExtended.size(); idx++) {
+				listEventsTemp.add(ListEventsExtended.get(idx).Clone());
+			}
+			
+			int idxTempStart, idxTempEnd;
+			int idxCurrStart, idxCurrEnd;			
+			
+			for(int idx = 0; idx < ListInterestPoints.size(); idx++) {
+
+				idxCurrStart = (int)ListInterestPoints.get(idx).IdxStart;
+				idxCurrEnd = (int)ListInterestPoints.get(idx).IdxEnd;
+				
+				if(idx == 0) {
+					idxTempEnd = idxCurrStart;
+					idxTempStart = idxIntPointAreaStart;					
+					
+					ListInterestPointsMinor.addAll(Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxTempStart, idxTempEnd, 1, false, commonDensity, commonDensitySecond));
+				}
+				else {
+					idxTempEnd = idxCurrStart;
+					idxTempStart = (int)ListInterestPoints.get(idx - 1).IdxEnd;
+					
+					ListInterestPointsMinor.addAll(Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxTempStart, idxTempEnd, 1, false, commonDensity, commonDensitySecond));
+				}
+				
+				if((idx + 1) == ListInterestPoints.size()) {
+					idxTempStart = idxCurrEnd;
+					idxTempEnd = idxIntPointAreaEnd;
+					
+					ListInterestPointsMinor.addAll(Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxTempStart, idxTempEnd, 1, false, commonDensity, commonDensitySecond));
+				}
+				else {
+					idxTempStart = (int) ListInterestPoints.get(idx).IdxEnd;
+					idxTempEnd = (int)ListInterestPoints.get(idx + 1).IdxStart;
+					
+					ListInterestPointsMinor.addAll(Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxTempStart, idxTempEnd, 1, false, commonDensity, commonDensitySecond));
+				}
+			}
+			
+//			ListInterestPointsMinor = Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxStart, idxEnd, 1, false);
 			NumInterestPointsMajor = ListInterestPoints.size();
 			NumInterestPointsMinor = ListInterestPointsMinor.size();
+		}
+		else {
+			ListInterestPointsMinor = Utils.GetInstance().GetUtilsVectors().FindInterestPoints(ListEventsExtended, idxIntPointAreaStart, idxIntPointAreaEnd, 1, false, commonDensity, commonDensitySecond);
 		}
 	}
 	

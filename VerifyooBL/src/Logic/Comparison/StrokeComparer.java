@@ -338,30 +338,49 @@ public class StrokeComparer {
 		MiddlePressureScore = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_PRESSURE, intPointPressureAuth);
 		MiddleSurfaceScore = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_SURFACE, intPointSurfaceAuth);
 		
-		double intPointLocation = mStrokeAuthExtended.InterestPointLocation;
-		double intPointAvgVelocity = mStrokeAuthExtended.InterestPointAvgVelocity;
-		double strokeAvgDensity = mStrokeAuthExtended.StrokeAverageDensity;
-		double intPointIntensity = mStrokeAuthExtended.InterestPointIntensity;
+		double strokeAvgDensityAuth = mStrokeAuthExtended.StrokeAverageDensity;
 		
-		StrokeAvgDensityScore = CompareParameter(ConstsParamNames.Stroke.STROKE_AVG_DENSITY, strokeAvgDensity);
+		double intPointLocationAuth = mStrokeAuthExtended.InterestPointLocation;
+		double intPointAvgVelocityAuth = mStrokeAuthExtended.InterestPointAvgVelocity;		
+		double intPointIntensityAuth = mStrokeAuthExtended.InterestPointIntensity;
+		
+		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(mStrokeStoredExtended.GetInstruction(), ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, mStrokeStoredExtended.GetStrokeIdx());
+		
+//		FindInterestPointInArea(mStrokeAuthExtended, intPointLocationMean);		
+		
+		//StrokeAvgDensityScore = CompareParameter(ConstsParamNames.Stroke.STROKE_AVG_DENSITY, strokeAvgDensityAuth);
 		
 		InterestPointNewIdxLocationDiff = -1;
 		InterestPointNewIdxAvgVelocity = -1;
 		InterestPointNewIdxIntensity = -1;
 		
-		try {
-			String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(mStrokeStoredExtended.GetInstruction(), ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, mStrokeStoredExtended.GetStrokeIdx());			
+		try {			
 			
 			if(mStrokeStoredExtended.GetFeatureMeansHash().containsKey(key)) {				
 				if(mStrokeAuthExtended.ListInterestPoints.size() > 0) {
-					InterestPointNewIdxLocationDiff = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, intPointLocation);
-					InterestPointNewIdxAvgVelocity =  CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_AVG_VELOCITY, intPointAvgVelocity);
-					InterestPointNewIdxIntensity = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_INTENSITY, intPointIntensity);					
+					double intPointLocationMean = mStrokeStoredExtended.GetFeatureMeansHash().get(key).GetMean();
+					
+					double intPointMinorLocationAuth = 0;
+					if(mStrokeAuthExtended.ListInterestPointsMinor.size() > 0) {
+						intPointMinorLocationAuth = mStrokeAuthExtended.ListInterestPointsMinor.get(0).IdxLocation;
+						if(Utils.GetInstance().GetUtilsMath().GetPercentageDiff(intPointLocationMean, intPointMinorLocationAuth) > Utils.GetInstance().GetUtilsMath().GetPercentageDiff(intPointLocationMean, intPointLocationAuth)) {
+							intPointLocationAuth = intPointMinorLocationAuth;
+						}
+					}
+					
+					InterestPointNewIdxLocationDiff = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, intPointLocationAuth);
+					InterestPointNewIdxAvgVelocity =  CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_AVG_VELOCITY, intPointAvgVelocityAuth);
+					InterestPointNewIdxIntensity = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_INTENSITY, intPointIntensityAuth);
 				}
 				else {
+					if(mStrokeAuthExtended.ListInterestPointsMinor.size() > 0) {
+						intPointLocationAuth = mStrokeAuthExtended.ListInterestPointsMinor.get(0).IdxLocation;
+						InterestPointNewIdxLocationDiff = CompareParameter(ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, intPointLocationAuth);
+					}
+					else {
+						InterestPointNewIdxLocationDiff = 0;	
+					}
 					
-					
-					InterestPointNewIdxLocationDiff = 0;
 					InterestPointNewIdxAvgVelocity = 0;
 					InterestPointNewIdxIntensity = 0;
 				}
@@ -383,6 +402,42 @@ public class StrokeComparer {
 			
 		}
 	}	
+
+	private void FindInterestPointInArea(StrokeExtended strokeInput, double intPointLocationMean) {
+		
+		ArrayList<MotionEventExtended> listEventsExtended = strokeInput.ListEventsExtended;
+		int numEvents = listEventsExtended.size();
+		
+		int idxAvg = (int) (numEvents * intPointLocationMean);
+		
+		int searchDistance = (int) ((double) listEventsExtended.size() * 0.2);
+		int idxSearchStart = Math.min(numEvents - 1, idxAvg + searchDistance);
+		int idxSearchEnd = Math.max(0, idxAvg - searchDistance);		
+		
+		int idxIntPointEnd = 0;
+		int idxIntPointStart = 0;
+		
+		for(int idx = idxAvg; idx < idxSearchEnd - 1; idx++) {
+			if(listEventsExtended.get(idx).EventDensity > listEventsExtended.get(idx + 1).EventDensity) {
+				if(listEventsExtended.get(idx + 1).EventDensity > listEventsExtended.get(idx + 2).EventDensity) {
+					idxIntPointEnd = idx;
+					break;
+				}
+			}
+		}
+		
+		for(int idx = idxAvg; idx > idxSearchStart + 1; idx--) {
+			if(listEventsExtended.get(idx).EventDensity < listEventsExtended.get(idx - 1).EventDensity) {
+				if(listEventsExtended.get(idx - 1).EventDensity < listEventsExtended.get(idx - 2).EventDensity) {
+					idxIntPointStart = idx;
+					break;
+				}
+			}
+		}
+		
+		int idxIntPointAvg = (idxIntPointStart + idxIntPointEnd) / 2;
+		mStrokeAuthExtended.InterestPointLocation = idxIntPointAvg / numEvents;
+	}
 
 	private void CheckStrokeTypes() {
 		IsStrokeTypesValid = true;

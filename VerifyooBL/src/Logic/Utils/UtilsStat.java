@@ -128,8 +128,8 @@ public class UtilsStat {
 //			boundary = 0.1;
 //		}
 		
-		double firstBoundaryFactor = 2;
-		double secondBoundaryFactor = 5;
+		double firstBoundaryFactor = 1;
+		double secondBoundaryFactor = 3;
 		
 		double internalBoundaryLower = internalMean - firstBoundaryFactor * internalMean * boundary;
 		double internalBoundaryUpper = internalMean + firstBoundaryFactor * internalMean * boundary;
