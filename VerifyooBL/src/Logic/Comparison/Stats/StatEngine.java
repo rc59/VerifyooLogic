@@ -78,6 +78,7 @@ public class StatEngine implements IStatEngine {
 	
 	public IStatEngineResult CompareStrokeDoubleValues(String instruction, String paramName, int strokeIdx, int strokeKey, double authValue, HashMap<String, IFeatureMeanData> hashFeatureMeans)
 	{		
+		
 		INormData normObj = mNormMgr.GetNormDataByParamName(paramName, instruction, strokeKey);
 				
 		String key = mUtilsGeneral.GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
@@ -94,44 +95,24 @@ public class StatEngine implements IStatEngine {
 		double userInternalStd = hashFeatureMeans.get(key).GetInternalSd();
 		double avgPopinternalStd = normObj.GetInternalStandardDev();
 		
-//		if(paramName.compareTo(ConstsParamNames.Stroke.STROKE_NUM_EVENTS) == 0) {
-//			internalMean = 19.04761905;
-//		}
-//		if(paramName.compareTo(ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY) == 0) {
-//			internalMean = 0.066758204;
-//		}
-//		if(paramName.compareTo(ConstsParamNames.Stroke.STROKE_TIME_INTERVAL) == 0) {
-//			internalMean = 171.8095238;
-//		}
-//		if(paramName.compareTo(ConstsParamNames.Stroke.STROKE_LENGTH) == 0) {
-//			internalMean = 11.33789691;
-//		}
-		
 		double zScore = (internalMean - popMean) / popSd;
 		double weight = Math.abs(zScore);
 		if(weight > 2) {
 			weight = 2;
 		}
-//		
-//		if(mHashMapScaleParams.containsKey(paramName)) {
-//			double factor = internalMean / popMean; 
-//			if(factor < 1) {
-//				factor = 1;
-//			}
-//			if(factor > 2) {
-//				factor = 2;
-//			}
-//			internalSd = internalSd * factor;
-//		}
 		
 		double boundaryAdj = NormMgr.GetInstance().GetStoredMetaDataMgr().GetParamBoundary(key, popMean, avgPopinternalStd); //Utils.GetInstance().GetUtilsGeneral().GetBoundaryAdj(paramName);
 		
 		double score = Utils.GetInstance().GetUtilsStat().CalculateScore(authValue, popMean, popSd, internalMean, avgPopinternalStd, boundaryAdj);
+				
+		double temp = popMean * avgPopinternalStd;
+		double temp1 = userInternalStd / temp;
 		
 		NormMgr.GetInstance().GetStoredMetaDataMgr().UpdateParamBoundary(key, popMean, avgPopinternalStd, userInternalStd);
 		
 		weight = Utils.GetInstance().GetUtilsStat().CalcWeight(internalMean, avgPopinternalStd, popMean, popSd, boundaryAdj);
-		IStatEngineResult statResult = new StatEngineResult(score, zScore, weight);
+		IStatEngineResult statResult = new StatEngineResult(score, zScore, temp1);
+		statResult.SetBoundary(boundaryAdj);
 		return statResult;
 	}
 	

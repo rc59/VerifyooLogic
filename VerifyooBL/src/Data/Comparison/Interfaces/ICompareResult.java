@@ -12,6 +12,7 @@ public interface ICompareResult {
 	public double GetInternalSdUserOnly();
 	public double GetZScore();
 	public double GetTemplateZScore();
+	public double GetBoundary();
 	
 	public void SetName(String name);	
 	public void SetWeight(double weight);
@@ -22,4 +23,5 @@ public interface ICompareResult {
 	public void SetStandardDev(double standardDev);
 	public void SetInternalStandardDev(double standardDev);
 	public void SetInternalStandardDevUserOnly(double standardDevUserOnly);
+	public void SetBoundary(double boundary);
 }

@@ -2,6 +2,7 @@ package Data.Comparison.Abstract;
 
 import java.awt.image.RescaleOp;
 
+import Data.Boundary.BoundaryMgr;
 import Data.Comparison.Interfaces.ICompareResult;
 
 public abstract class CompareResultAbstract implements ICompareResult {
@@ -13,7 +14,8 @@ public abstract class CompareResultAbstract implements ICompareResult {
 	public double PopMean;
 	public double StandardDev;
 	public double InternalStandardDev;
-	public double InternalStandardDevUserOnly;	
+	public double InternalStandardDevUserOnly;
+	public double Boundary;
 		
 	@Override
 	public String GetName() {
@@ -65,6 +67,10 @@ public abstract class CompareResultAbstract implements ICompareResult {
 		return ((Mean - PopMean) / StandardDev);
 	}
 	
+	public double GetBoundary() { 
+		return Boundary;
+	}
+	
 	@Override
 	public void SetName(String name) {
 		Name = name;
@@ -102,5 +108,9 @@ public abstract class CompareResultAbstract implements ICompareResult {
 	
 	public void SetInternalStandardDevUserOnly(double internalStandardDevUserOnly) {
 		InternalStandardDevUserOnly = internalStandardDevUserOnly;
+	}
+	
+	public void SetBoundary(double boundary) {
+		Boundary = boundary;
 	}
 }

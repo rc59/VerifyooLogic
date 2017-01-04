@@ -7,8 +7,9 @@ public class NormalizedParam {
 	public boolean IsValid;
 	public double NormalizedScore;
 	public double Weight;
+	public double WeightInGesture;
 	
-	public NormalizedParam(String name, double value, double weight) {
+	public NormalizedParam(String name, double value, double weight, double weightInGesture) {
 		Name = name;
 		double threashold = Utils.GetInstance().GetUtilsGeneral().GetThreashold(name);
 		threashold = threashold + 0.1;
@@ -27,8 +28,9 @@ public class NormalizedParam {
 		}
 		
 		NormalizedScore = value / threashold;
+		WeightInGesture = Utils.GetInstance().GetUtilsGeneral().GetWeight(name);
 //		NormalizedScore = NormalizedScore * NormalizedScore;
-//		Weight = weight;
-		Weight = Utils.GetInstance().GetUtilsGeneral().GetWeight(name);
+		Weight = weight;
+//		Weight = Utils.GetInstance().GetUtilsGeneral().GetWeight(name);
 	}
 }

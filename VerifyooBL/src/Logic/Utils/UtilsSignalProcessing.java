@@ -600,11 +600,17 @@ public class UtilsSignalProcessing {
     
     private ArrayList<MotionEventCompact> Translate(ArrayList<MotionEventCompact> points, double dx, double dy) {
         int size = points.size();
+        ArrayList<MotionEventCompact> listPointsTranslated = new ArrayList<>();
+        MotionEventCompact tempEvent;
+        
         for (int i = 0; i < size; i++) {
-            points.get(i).Xpixel += dx;
-            points.get(i).Ypixel += dy;
+        	tempEvent = points.get(i).Clone(); 
+        	tempEvent.Xpixel += dx;
+        	tempEvent.Ypixel += dy;
+            
+            listPointsTranslated.add(tempEvent);
         }
-        return points;
+        return listPointsTranslated;
     }            
     
     private ArrayList<MotionEventCompact> Rotate(ArrayList<MotionEventCompact> listEvents, double angle) {

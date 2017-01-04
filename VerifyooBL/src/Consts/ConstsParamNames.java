@@ -23,13 +23,27 @@ public class ConstsParamNames {
 		public static final String STROKE_TIME_INTERVAL = "StrokeTimeInterval";
 		public static final String STROKE_TRANSITION_TIME = "StrokeTransitionTime";
 		
+		public static final String STROKE_SUM_X = "StrokeSumX";
+		public static final String STROKE_SUM_Y = "StrokeSumY";
+		
 		public static final String STROKE_TOTAL_AREA = "StrokeTotalArea";
 		public static final String STROKE_TOTAL_AREA_MINX_MINY = "StrokeTotalAreaMinXMinY";
+		public static final String STROKE_TOTAL_AREA_MAXX_MAXY = "StrokeTotalAreaMaxXMaxY";
+		public static final String STROKE_TOTAL_AREA_MINX_MAXY = "StrokeTotalAreaMinXMaxY";
+		public static final String STROKE_TOTAL_AREA_MAXX_MINY = "StrokeTotalAreaMaxXMinY";
 		
 		public static final String STROKE_AVG_DENSITY = "StrokeIntPointDensity"; //"StrokeAvgDensity";
 		public static final String STROKE_INT_POINT_LOCATION = "StrokeIntPointLocation";
 		public static final String STROKE_INT_POINT_AVG_VELOCITY = "StrokeIntPointAvgVelocity";
 		public static final String STROKE_INT_POINT_INTENSITY = "StrokeIntPointIntensity";
+		
+		public static final String STROKE_INT_POINT_START_INTENSITY = "StrokeIntPointStartIntensity";
+		public static final String STROKE_INT_POINT_START_AVG_VELOCITY = "StrokeIntPointStartAvgVelocity";
+		public static final String STROKE_INT_POINT_END_INTENSITY = "StrokeIntPointEndIntensity";
+		public static final String STROKE_INT_POINT_END_AVG_VELOCITY = "StrokeIntPointEndAvgVelocity";
+		
+		public static final String STROKE_INT_POINT_COUNT_MAJOR = "StrokeIntPointCountMajor";
+		public static final String STROKE_INT_POINT_COUNT_MINOR = "StrokeIntPointCountMinor";
 		
 		public static final String STROKE_INT_POINT_VELOCITY = "StrokeIntPointVelocity";
 				

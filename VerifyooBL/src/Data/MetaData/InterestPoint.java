@@ -4,7 +4,9 @@ public class InterestPoint {
 	public double IdxStart;
 	public double IdxEnd;
 	public double IdxAverage;
-	public double IdxLocation;	
+	public double IdxLocation;
+	public double AverageVelocity;
+	public double Intensity;
 	
 	public InterestPoint(int idxStart, int idxEnd, double numEvents) {
 		IdxStart = idxStart;

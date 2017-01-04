@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import com.mongodb.util.Util;
+
 import Consts.ConstsFeatures;
 import Consts.ConstsGeneral;
 import Consts.ConstsParamNames;
@@ -145,8 +147,7 @@ public class GestureComparer {
 			
 			if(pointStatus == PointStatus.NONE) {
 				CompareGestureStrokes();
-				CompareGestureFeatures();
-				CalculateFinalScoreOld();
+				CompareGestureFeatures();				
 				CalculateFinalScore();
 				CheckStrokesCosineAndStrokeDistance();
 				CheckFinalScore();
@@ -185,11 +186,20 @@ public class GestureComparer {
 		double interestPointTotalScore = 0;		
 		double interestPointScoreParams = 0;
 		
+		double intPointPenalty = 0;
+		
+		int idxTempArea;
+		
+		ArrayList<ICompareResult> tempListAreaScores = new ArrayList<>(); 
+		
 		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {
 			AvgPressureScore += mListStrokeComparers.get(idx).MiddlePressureScore;
 			AvgSurfaceScore += mListStrokeComparers.get(idx).MiddleSurfaceScore;
-				
-						
+			
+			if(!mListStrokeComparers.get(idx).NumIntPointsSimilar) {
+				intPointPenalty += 0.1;
+			}
+			
 //			interestPointTotalScore += mListStrokeComparers.get(idx).InterestPointCountPercentageDiff;
 //			interestPointScoreParams ++;
 			interestPointTotalScore += mListStrokeComparers.get(idx).InterestPointNewIdxLocationDiff;
@@ -201,34 +211,60 @@ public class GestureComparer {
 			dtwTotalScore += tempStrokeComparer.DtwSpatialTotalScore * tempWeight;
 			pcaTotalScore += tempStrokeComparer.PcaScoreFinal * tempWeight;
 			extraParamTotalWeights += tempWeight;
-			
+						
 			for(int idxStrokeParam = 0; idxStrokeParam < tempStrokeComparer.GetResultsSummary().ListCompareResults.size(); idxStrokeParam++) {
 				tempCompareResult = tempStrokeComparer.GetResultsSummary().ListCompareResults.get(idxStrokeParam);				
 				
 				if(tempCompareResult.GetValue() == 0) {
 					NumZeroScores++;
 				}
-				
-				listParamsAuth.add(new NormalizedParam(tempCompareResult.GetName(), tempCompareResult.GetValue(), tempWeight));
-				if(tempCompareResult.GetName().compareTo(ConstsParamNames.Stroke.STROKE_INTEREST_POINT_PARAM) == 0) {
-					
+								
+				if(tempCompareResult.GetName().compareTo(ConstsParamNames.Stroke.STROKE_TOTAL_AREA) == 0 || 
+				   tempCompareResult.GetName().compareTo(ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY) == 0 ||
+				   tempCompareResult.GetName().compareTo(ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MAXY) == 0 || 
+				   tempCompareResult.GetName().compareTo(ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MAXX_MINY) == 0 || 
+				   tempCompareResult.GetName().compareTo(ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MAXX_MAXY) == 0) {
+					tempListAreaScores.add(tempCompareResult);				
+				}
+				else {
+					listParamsAuth.add(new NormalizedParam(tempCompareResult.GetName(), tempCompareResult.GetValue(), tempCompareResult.GetWeight(), tempWeight));
 				}
 			}
+			
+			Collections.sort(tempListAreaScores, new Comparator<ICompareResult>() {
+	            @Override
+	            public int compare(ICompareResult value1, ICompareResult value2) {
+	                if (value1.GetValue() > value2.GetValue()) {
+	                    return -1;
+	                }
+	                if (value1.GetValue() < value2.GetValue()) {
+	                    return 1;
+	                }
+	                return 0;
+	            }
+	        });
+
+			idxTempArea = Utils.GetInstance().GetUtilsMath().GetMinValue(2, tempListAreaScores.size());
+			for(int idxAreaScore = 0; idxAreaScore < idxTempArea; idxAreaScore++) {
+				mListStrokeComparers.get(idx).TotalAreaScore += tempListAreaScores.get(idxAreaScore).GetValue();
+			}
+			mListStrokeComparers.get(idx).TotalAreaScore = mListStrokeComparers.get(idx).TotalAreaScore / idxTempArea;
+			listParamsAuth.add(new NormalizedParam(ConstsParamNames.Stroke.STROKE_TOTAL_AREA, mListStrokeComparers.get(idx).TotalAreaScore, 1, tempWeight));
 		}
 				
 		double totalWeights = 0;
 		double totalScores = 0;
 		double weight;
 				
-		InterestPointScore = interestPointTotalScore / interestPointScoreParams;
+		//InterestPointScore = interestPointTotalScore / interestPointScoreParams;
 		
 		double numStrokes = mListStrokeComparers.size();		
 		
 		AvgPressureScore = AvgPressureScore / numStrokes;
-		AvgSurfaceScore = AvgSurfaceScore / numStrokes;		
+		AvgSurfaceScore = AvgSurfaceScore / numStrokes;
 		
 		for(int idx = 0; idx < mCompareResultsGesture.ListCompareResults.size(); idx++) {
-			listParamsAuth.add(new NormalizedParam(mCompareResultsGesture.ListCompareResults.get(idx).GetName(), mCompareResultsGesture.ListCompareResults.get(idx).GetValue(), 1));
+			listParamsAuth.add(new NormalizedParam(mCompareResultsGesture.ListCompareResults.get(idx).GetName(), mCompareResultsGesture.ListCompareResults.get(idx).GetValue(), mCompareResultsGesture.ListCompareResults.get(idx).GetWeight(), 1));
 			
 			if(mCompareResultsGesture.ListCompareResults.get(idx).GetValue() == 0) {
 				NumZeroScores++;
@@ -238,10 +274,10 @@ public class GestureComparer {
 		Collections.sort(listParamsAuth, new Comparator<NormalizedParam>() {
             @Override
             public int compare(NormalizedParam value1, NormalizedParam value2) {
-                if (value1.NormalizedScore > value2.NormalizedScore) {
+                if (value1.Weight > value2.Weight) {
                     return -1;
                 }
-                if (value1.NormalizedScore < value2.NormalizedScore) {
+                if (value1.Weight < value2.Weight) {
                     return 1;
                 }
                 return 0;
@@ -252,11 +288,17 @@ public class GestureComparer {
 		UtilsAccumulator utilsAccumulator = new UtilsAccumulator(); 
 		int idxStart = mListStrokeComparers.size();
 		
-		idxStart = 0;
+		DtwScore = dtwTotalScore / extraParamTotalWeights;
+		PcaScore = pcaTotalScore / extraParamTotalWeights;
+		
+//		listParamsAuth.add(new NormalizedParam("DtwScore", DtwScore, 1));
+		
+//		idxStart = 0;
 		for(int idx = 0; idx < listParamsAuth.size(); idx++) {
 			if(idx >= idxStart) {
 				//weight = idx + baseWeight;
-				weight = listParamsAuth.get(idx).Weight;				
+				weight = listParamsAuth.get(idx).WeightInGesture;
+				weight = 1;
 				totalScores += listParamsAuth.get(idx).NormalizedScore * weight;
 				totalWeights += weight;
 				
@@ -267,22 +309,18 @@ public class GestureComparer {
 		ScoreMean = utilsAccumulator.Mean();
 		ScoreStd = utilsAccumulator.Stddev();
 		
-		totalScores = totalScores / totalWeights;	
-		
-		DtwScore = dtwTotalScore / extraParamTotalWeights;
-		PcaScore = pcaTotalScore / extraParamTotalWeights;
+		totalScores = totalScores / totalWeights;			
 				
-		NormalizedParam pcaScoreNormalizedParam = new NormalizedParam("PcaScore", PcaScore, 1);
-		NormalizedParam dtwScoreNormalizedParam = new NormalizedParam("DtwScore", DtwScore, 1);		
+		NormalizedParam pcaScoreNormalizedParam = new NormalizedParam("PcaScore", PcaScore, 1, 1);
+		NormalizedParam dtwScoreNormalizedParam = new NormalizedParam("DtwScore", DtwScore, 1, 1);		
 		
 		mCompareResultsGesture.Score = 				
 				dtwScoreNormalizedParam.NormalizedScore * 0.2 +
-				pcaScoreNormalizedParam.NormalizedScore * 0.2 +
-				InterestPointScore * 0.05 +
-				totalScores * 0.55;
+				totalScores * 0.8;
 		
 		double removeMiddlePressureScore = (1 - AvgSurfaceScore) / 5;
 		mCompareResultsGesture.Score -= removeMiddlePressureScore;
+		mCompareResultsGesture.Score -= intPointPenalty;
 		
 //		if(InterestPointScore == 0) {
 //			mCompareResultsGesture.Score = 0;
@@ -536,14 +574,13 @@ public class GestureComparer {
 	protected void CalcDoubleParameter(String paramName, double value)
 	{
 		IStatEngineResult finalScore = mStatEngine.CompareGestureDoubleValues(mGestureStored.GetGestureKey(), paramName, value, mGestureStored.GetFeatureMeansHash());
-		AddDoubleParameter(paramName, finalScore, ConstsParamWeights.MEDIUM, value);
+		AddDoubleParameter(paramName, finalScore, ConstsParamWeights.MEDIUM, value, finalScore.GetBoundary());
 	}
 
 	protected void CalcScoreWithoutDistribution(String paramName, double value)
-	{
-		
+	{		
 		IStatEngineResult finalScore = mStatEngine.CompareGestureScoreWithoutDistribution(mGestureStored.Instruction, paramName, value, mGestureStored.GetFeatureMeansHash());
-		AddDoubleParameter(paramName, finalScore, ConstsParamWeights.MEDIUM, value);
+		AddDoubleParameter(paramName, finalScore, ConstsParamWeights.MEDIUM, value, finalScore.GetBoundary());
 	}
 	
 	protected void CompareGestureStrokeShapes()
@@ -592,253 +629,7 @@ public class GestureComparer {
 	public double GetMinCosineDistance()
 	{
 		return mMinCosineDistanceScore;
-	}
-	
-	protected void CalculateFinalScoreOld()
-	{
-		mIsGesturesIdentical = true;
-		for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {			
-			if(!mListStrokeComparers.get(idx).IsStrokesIdentical()) {
-				mIsGesturesIdentical = false;
-			}
-		}
-				
-		ArrayList<ICompareResult> listScores = new ArrayList<>();
-		DtwScore = 0;		
-		PcaScore = 0;
-		InterestPointScore = 0;
-		InterestPointDensity = 0;
-		InterestPointLocation = 0;
-		
-		double scorePenalty = 0;
-		
-		if(!mIsGesturesIdentical) {
-			double avgPressureScore = 0;
-			double avgSurfaceScore = 0;
-			
-			double tempDtwScore;
-			double tempPcaScore;
-			double tempInterestPointScore;
-						
-			NormalizedParam tempBooleanParam;
-			ArrayList<NormalizedParam> listBooleanParams = new ArrayList<>();
-			
-			IsStrokeTypesValid = true;
-			
-			double strokeTypePenalty = 0;
-			
-			for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {			
-				listScores.addAll(mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResults);
-				listScores.addAll(mListStrokeComparers.get(idx).GetResultsSummary().ListCompareResultsExtra);														
-			
-				if(mListStrokeComparers.get(idx).IsStrokeTypesValid) {					
-					strokeTypePenalty += 1;
-				}
-				else {
-					IsStrokeTypesValid = false;
-				}
-				
-				DtwScore += mListStrokeComparers.get(idx).DtwSpatialTotalScore;
-				PcaScore += Math.abs(mListStrokeComparers.get(idx).PcaScore);
-								
-//				if(mListStrokeComparers.get(idx).MaxInterestPointDTWVelocity > 0.17 || mListStrokeComparers.get(idx).MaxInterestPointDTWCoords > 0.4) {
-//					scorePenalty += 2;
-//				}
-				
-//				InterestPointDensity += mListStrokeComparers.get(idx).MaxInterestPointDensity;
-//				InterestPointLocation += mListStrokeComparers.get(idx).MaxInterestPointLocation;
-				
-				InterestPointScore += mListStrokeComparers.get(idx).InterestPointScore;
-				
-				avgPressureScore += mListStrokeComparers.get(idx).MiddlePressureScore;
-				avgSurfaceScore += mListStrokeComparers.get(idx).MiddleSurfaceScore;					
-				
-				tempBooleanParam = new NormalizedParam("DtwScore", mListStrokeComparers.get(idx).DtwSpatialTotalScore, 1);
-				listBooleanParams.add(tempBooleanParam);
-				
-//				tempBooleanParam = new BooleanParam("PcaScore", mListStrokeComparers.get(idx).PcaScoreFinal, 1);
-//				listBooleanParams.add(tempBooleanParam);
-//				
-//				tempBooleanParam = new BooleanParam("InterestPointDensity", mListStrokeComparers.get(idx).MaxInterestPointDensity, 1);
-//				listBooleanParams.add(tempBooleanParam);
-//				
-//				tempBooleanParam = new BooleanParam("InterestPointLocation", mListStrokeComparers.get(idx).MaxInterestPointLocation, 1);
-//				listBooleanParams.add(tempBooleanParam);
-//				
-//				tempBooleanParam = new BooleanParam("InterestPointVelocity", mListStrokeComparers.get(idx).MaxInterestPointVelocity, 1);
-//				listBooleanParams.add(tempBooleanParam);
-//				
-//				tempBooleanParam = new BooleanParam("InterestPointAcceleration", mListStrokeComparers.get(idx).MaxInterestPointAcceleration, 1);
-//				listBooleanParams.add(tempBooleanParam);
-//				
-//				tempBooleanParam = new BooleanParam("InterestPointIndex", mListStrokeComparers.get(idx).MaxInterestPointIndex, 1);
-//				listBooleanParams.add(tempBooleanParam);
-//				
-//				tempBooleanParam = new BooleanParam("InterestPointAvgVelocity", mListStrokeComparers.get(idx).MaxInterestPointAvgVelocity, 1);
-//				listBooleanParams.add(tempBooleanParam);
-//				
-//				tempBooleanParam = new BooleanParam("InterestPointDeltaTeta", mListStrokeComparers.get(idx).MaxInterestPointDeltaTeta, 1);
-//				listBooleanParams.add(tempBooleanParam);
-//				
-//				tempBooleanParam = new BooleanParam("InterestPointMaxVelocity", mListStrokeComparers.get(idx).MaxInterestPointMaxVelocity, 1);
-//				listBooleanParams.add(tempBooleanParam);
-//				
-//				tempBooleanParam = new BooleanParam("InterestPointMaxAcceleration", mListStrokeComparers.get(idx).MaxInterestPointMaxAcceleration, 1);
-//				listBooleanParams.add(tempBooleanParam);
-				
-//				if(!mListStrokeComparers.get(idx).IsInterestPointFound) {
-//					interestPointPenalty += 0.2;
-//				}
-			}
-
-			strokeTypePenalty = strokeTypePenalty / mListStrokeComparers.size();
-			strokeTypePenalty = (1 - strokeTypePenalty) * 0.05;
-			
-			listScores.addAll(mCompareResultsGesture.ListCompareResults);			
-			
-			for(int idx = listScores.size() - 1; idx >= 0; idx--) {
-				if(listScores.get(idx).GetName().compareTo(ConstsParamNames.Stroke.STROKE_TOTAL_AREA) == 0 || listScores.get(idx).GetName().compareTo(ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY) == 0) { 
-					double prop = listScores.get(idx).GetSD() / listScores.get(idx).GetPopMean();
-					if(prop > 0.4) {
-						listScores.remove(idx);
-					}
-				}
-			}
-			
-			Collections.sort(listScores, new Comparator<ICompareResult>() {
-	            @Override
-	            public int compare(ICompareResult value1, ICompareResult value2) {
-	                if (Math.abs(value1.GetValue()) > Math.abs(value2.GetValue())) {
-	                    return 1;
-	                }
-	                if (Math.abs(value1.GetValue()) < Math.abs(value2.GetValue())) {
-	                    return -1;
-	                }
-	                return 0;
-	            }
-	        });			
-			
-			double numStrokes = mListStrokeComparers.size();
-			
-			double totalScores = 0;
-			double totalWeights = 0;
-
-			double tempScore = 0;
-										
-			double totalParams = 0;
-			double numValidParams = 0;
-			BooleanParamsScore = 0;		
-			
-			for(int idx = (3 * mListStrokeComparers.size()); idx < listScores.size(); idx++) {
-//				if(listScores.get(idx).GetName().compareTo(ConstsParamNames.Stroke.STROKE_MAX_RADIAL_ACCELERATION) != 0) {
-//					totalScores += listScores.get(idx).GetValue() * listScores.get(idx).GetWeight();
-//					totalWeights += listScores.get(idx).GetWeight();					
-//				}
-				
-				totalScores += listScores.get(idx).GetValue() * listScores.get(idx).GetWeight();
-				totalWeights += listScores.get(idx).GetWeight();
-				
-				if(listScores.get(idx).GetName().compareTo(ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERVAL) == 0) {
-					tempScore = listScores.get(idx).GetValue();
-				}
-				
-				tempBooleanParam = new NormalizedParam(listScores.get(idx).GetName(), listScores.get(idx).GetValue(), listScores.get(idx).GetWeight());
-				listBooleanParams.add(tempBooleanParam);
-			}		
-			
-//			for(int idx = 0; idx < mListStrokeComparers.size(); idx++) {
-//				totalScores += mListStrokeComparers.get(idx).InterestPointScore * 3;
-//				totalWeights += 3;				
-//			}			
-						
-			avgPressureScore = avgPressureScore / numStrokes;
-			avgSurfaceScore = avgSurfaceScore / numStrokes;
-			
-			DtwScore = DtwScore / numStrokes;
-			PcaScore = PcaScore / numStrokes;
-			InterestPointDensity = InterestPointDensity / numStrokes;
-			InterestPointLocation = InterestPointLocation / numStrokes;
-			InterestPointScore = InterestPointScore / numStrokes;					
-			
-			NormalizedParamsScore = 0;
-			totalWeights = 0;
-			
-			Collections.sort(listBooleanParams, new Comparator<NormalizedParam>() {
-	            @Override
-	            public int compare(NormalizedParam value1, NormalizedParam value2) {
-	                if (value1.NormalizedScore > value1.NormalizedScore) {
-	                    return 1;
-	                }
-	                if (value1.NormalizedScore < value1.NormalizedScore) {
-	                    return -1;
-	                }
-	                return 0;
-	            }
-	        });
-
-			for(int idx = 0; idx < listBooleanParams.size(); idx++) {
-				NormalizedParamsScore += listBooleanParams.get(idx).NormalizedScore * listBooleanParams.get(idx).Weight;
-				totalWeights += listBooleanParams.get(idx).Weight;
-				
-				if(listBooleanParams.get(idx).IsValid) {
-					numValidParams++;
-				}
-				totalParams++;
-			}
-			
-			NormalizedParamsScore = NormalizedParamsScore / totalWeights;
-			BooleanParamsScore = numValidParams / totalParams;
-			
-			double paramsTotalScore = totalScores / totalWeights;
-			mCompareResultsGesture.Score = paramsTotalScore;
-			
-//			mCompareResultsGesture.Score = Utils.GetInstance().GetUtilsMath().GetMinValue(BooleanParamsScore, NormalizedParamsScore);
-			mCompareResultsGesture.Score = NormalizedParamsScore;
-//			mCompareResultsGesture.Score -= scorePenalty;
-			
-			double removeMiddlePressureScore = (1 - avgSurfaceScore * avgSurfaceScore) / 5;
-			mCompareResultsGesture.Score -= removeMiddlePressureScore;
-			
-//			mCompareResultsGesture.Score -= strokeTypePenalty;
-			
-//			UpdateScore2(PcaScore, 0.55, 2, 0.2, true);
-//			UpdateScore2(DtwScore, 0.3, 0.55, 0.2, false);
-			CheckStrokesCosineAndStrokeDistance();
-		}		
-		else 
-		{
-			mCompareResultsGesture.Score = 1;
-		}
-	}	
-	
-	private void UpdateScore(double score, double weight) {
-		mCompareResultsGesture.Score = mCompareResultsGesture.Score * (1 - weight) + score * weight;
-	}
-	
-	private void UpdateScore2(double value, double lower, double upper, double weight, boolean isReverse) {
-		double updateValue = value - lower;
-		if(updateValue < 0) {
-			updateValue = 0;
-		}
-		double diff = upper - lower;
-		double finalScore = updateValue / diff;
-		if(finalScore > 1) {
-			finalScore = 1;			
-		}
-		if(finalScore < 0) {
-			finalScore = 0;			
-		}
-		
-		if(isReverse) {
-			finalScore = 1 - finalScore;
-		}
-		
-		double tempScore = mCompareResultsGesture.Score; 
-		mCompareResultsGesture.Score = mCompareResultsGesture.Score * (1 - weight) + finalScore * weight;
-		if(mCompareResultsGesture.Score > tempScore) {
-			mCompareResultsGesture.Score = tempScore;
-		}
-	}
+	}		
 
 	protected void CheckStrokesDistanceScore() {
 		mIsStrokeCosineDistanceValid = true;
@@ -869,7 +660,7 @@ public class GestureComparer {
 				mCompareResultsGesture.Score = 0;
 				mIsStrokeCosineDistanceValid = false;					
 			}
-//			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScore);
+			CheckStrokeDistanceAndUpdateScore(mListStrokeComparers.get(idxStrokeComparer).StrokeDistanceTotalScore);
 		}
 	}
 	
@@ -888,7 +679,7 @@ public class GestureComparer {
 		mStrokesScore = avgScore / mListStrokeComparers.size();
 	}
 
-	protected void AddDoubleParameter(String parameterName, IStatEngineResult finalScore, double weight, double originalValue)
+	protected void AddDoubleParameter(String parameterName, IStatEngineResult finalScore, double weight, double originalValue, double boundary)
 	{
 		double score = finalScore.GetScore();
 		weight = finalScore.GetZScore();
@@ -915,6 +706,7 @@ public class GestureComparer {
 		
 		ICompareResult compareResult = 
 				(ICompareResult) new CompareResultGeneric(parameterName, score, originalValue, mean, popMean, popSd, internalSd, internalSdUserOnly);
+		compareResult.SetBoundary(boundary);
 		mCompareResultsGesture.ListCompareResults.add(compareResult);
 	}
 	

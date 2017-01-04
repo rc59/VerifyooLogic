@@ -120,6 +120,33 @@ public class UtilsStat {
 		return score;
 	}
 	
+	protected final double BOUNDARY_FACTOR1 = 1.5;
+	protected final double BOUNDARY_FACTOR2 = 3;
+	
+	public double GetLowerBoundary1(double internalMean, double boundary) {
+		double firstBoundaryFactor = BOUNDARY_FACTOR1;
+		double internalBoundaryLower = internalMean - firstBoundaryFactor * internalMean * boundary;
+		return internalBoundaryLower;
+	}
+	
+	public double GetHighBoundary1(double internalMean, double boundary) {
+		double firstBoundaryFactor = BOUNDARY_FACTOR1;
+		double internalBoundaryUpper = internalMean + firstBoundaryFactor * internalMean * boundary;
+		return internalBoundaryUpper;
+	}
+	
+	public double GetLowerBoundary2(double internalMean, double boundary) {
+		double secondBoundaryFactor = BOUNDARY_FACTOR2;
+		double secondLowerPopulationInternalSD = internalMean - secondBoundaryFactor * internalMean * boundary;
+		return secondLowerPopulationInternalSD;
+	}
+	
+	public double GetHighBoundary2(double internalMean, double boundary) {
+		double secondBoundaryFactor = BOUNDARY_FACTOR2;
+		double secondUpperPopulationInternalSD = internalMean + secondBoundaryFactor * internalMean * boundary;
+		return secondUpperPopulationInternalSD;
+	}
+	
 	public double CalculateScore(double authValue, double populationMean, double populationSd, double internalMean, double internalSd, double boundaryAdj) {
 		double boundary = boundaryAdj; //CalculateBoundaryFactor(populationMean, populationSd, internalMean, boundaryAdj);	
 		
@@ -128,14 +155,18 @@ public class UtilsStat {
 //			boundary = 0.1;
 //		}
 		
-		double firstBoundaryFactor = 1;
+		if(authValue == internalMean) {
+			return 1;
+		}
+		
+		double firstBoundaryFactor = 1.5;
 		double secondBoundaryFactor = 3;
 		
-		double internalBoundaryLower = internalMean - firstBoundaryFactor * internalMean * boundary;
-		double internalBoundaryUpper = internalMean + firstBoundaryFactor * internalMean * boundary;
+		double internalBoundaryLower = GetLowerBoundary1(internalMean, boundary);
+		double internalBoundaryUpper = GetHighBoundary2(internalMean, boundary);
 		
-		double secondLowerPopulationInternalSD = internalMean - secondBoundaryFactor * internalMean * boundary;
-		double secondUpperPopulationInternalSD = internalMean + secondBoundaryFactor * internalMean * boundary;
+		double secondLowerPopulationInternalSD = GetLowerBoundary2(internalMean, boundary);
+		double secondUpperPopulationInternalSD = GetHighBoundary2(internalMean, boundary);
 		
 		double score = 0;
 		

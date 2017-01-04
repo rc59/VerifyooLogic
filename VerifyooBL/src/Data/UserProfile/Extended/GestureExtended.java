@@ -498,7 +498,7 @@ public class GestureExtended extends Gesture {
 			}
 			catch(Exception exc) {
 				String msg = exc.getMessage();
-			}			
+			}
 		}
 		
 		AddGestureValue(ConstsParamNames.Gesture.GESTURE_TOTAL_AREA, GestureTotalArea);

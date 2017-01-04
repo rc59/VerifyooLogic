@@ -3,8 +3,10 @@ package Logic.Utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 
 import Consts.ConstsGeneral;
+import Consts.ConstsParamNames;
 import Data.UserProfile.Extended.MotionEventExtended;
 import Data.UserProfile.Extended.TemplateExtended;
 import Data.UserProfile.Raw.Gesture;
@@ -13,6 +15,7 @@ import Data.UserProfile.Raw.Stroke;
 import Data.UserProfile.Raw.Template;
 import Logic.Comparison.Stats.FeatureMatrix;
 import Logic.Comparison.Stats.Data.Interface.IStatEngineResult;
+import Logic.Comparison.Stats.Interfaces.IFeatureMeanData;
 import Logic.Utils.DTW.DTWObjCoordinate;
 import Logic.Utils.DTW.IDTWObj;
 import Logic.Utils.DTW.UtilsDTW;
@@ -44,6 +47,29 @@ public class UtilsComparison {
 		}
 		
 		return matrix;		
+	}
+	
+	public ArrayList<Double> GetNumOfInterestPoints(String instruction, int strokeIdx, HashMap<String, IFeatureMeanData> hashFeatureMeans) {
+		int numInterestPoints = 0;
+		
+		String paramName = String.format("%s-IntPoint%s", ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, numInterestPoints);
+		String key = Utils.GetInstance().GetUtilsGeneral().GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
+		
+		ArrayList<Double> listExistingIntPointLocations = new ArrayList<>();
+		
+		while(true) {
+			if(hashFeatureMeans.containsKey(key)) {
+				listExistingIntPointLocations.add(hashFeatureMeans.get(key).GetMean());				
+				numInterestPoints++;
+				paramName = String.format("%s-IntPoint%s", ConstsParamNames.Stroke.STROKE_INT_POINT_LOCATION, numInterestPoints);
+				key = Utils.GetInstance().GetUtilsGeneral().GenerateStrokeFeatureMeanKey(instruction, paramName, strokeIdx);
+			}
+			else {
+				break;
+			}
+		}
+		
+		return listExistingIntPointLocations;
 	}
 	
 	public ArrayList<MotionEventExtended> ListEventsToExtended(ArrayList<MotionEventCompact> listAvgVector, double length, double xdpi, double ydpi) {
@@ -187,5 +213,19 @@ public class UtilsComparison {
 		}
 		
 		return listShifted;
+	}
+	
+	public boolean IsLineBucket(int idxBucket) {
+		if(idxBucket == 0 ||
+				idxBucket == 1 ||
+				idxBucket == 2 ||
+				idxBucket == 3 ||
+				idxBucket == 6 ||
+				idxBucket == 16 ||
+				idxBucket == 17) {
+			return true;
+		}
+		
+		return false;
 	}
 }

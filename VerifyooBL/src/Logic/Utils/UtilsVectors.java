@@ -349,14 +349,36 @@ public class UtilsVectors {
 				}
 			}
 		}
+			
+		double totalTime;		
+		double totalDistance;
+		
+		int idxCurrIntStart, idxCurrIntEnd;
+		for(int idxIntPoint = 0; idxIntPoint < listInterestPoints.size(); idxIntPoint++) {
+			tempInterestPoint = listInterestPoints.get(idxIntPoint);
+						
+			totalDistance = 0;
+			totalTime = 0;
+			idxCurrIntStart = (int)tempInterestPoint.IdxStart;
+			idxCurrIntEnd = (int)tempInterestPoint.IdxEnd;
+			
+			for(int idx = idxCurrIntStart; idx <= idxCurrIntEnd; idx++) {
+				tempInterestPoint.Intensity += listEventsExtended.get(idx).EventDensityRaw;
+				
+				if(idx > 0) {
+					totalTime += listEventsExtended.get(idx).EventTime - listEventsExtended.get(idx - 1).EventTime;
+					totalDistance += Utils.GetInstance().GetUtilsMath().CalcDistanceInMMs(listEventsExtended.get(idx - 1), listEventsExtended.get(idx));
+				}			
+			}
+			
+			if(totalTime > 0) {
+				tempInterestPoint.AverageVelocity = totalDistance / totalTime;	
+			}
+			else {
+				tempInterestPoint.AverageVelocity = listEventsExtended.get(idxCurrIntStart).Velocity;
+			}
+		}		
 		
 		return listInterestPoints;
-	}
-
-	public ArrayList<InterestPoint> FindInterestPointsMinor(ArrayList<MotionEventExtended> listEventsExtended, int idxStart, int start, int i, boolean b) {
-		
-		
-		
-		return null;
 	}
 }

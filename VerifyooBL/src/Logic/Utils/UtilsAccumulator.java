@@ -9,6 +9,7 @@ public class UtilsAccumulator {
      * Initializes an accumulator.
      */
     public UtilsAccumulator() {
+    	
     }
 
     /**

@@ -6,6 +6,7 @@ public abstract class StatEngineResultAbstract implements IStatEngineResult {
 	public double mScore;
 	public double mZscore;
 	public double mWeight;
+	public double mBoundary;
 	
 	public StatEngineResultAbstract(double score, double zScore, double weight)
 	{
@@ -27,6 +28,16 @@ public abstract class StatEngineResultAbstract implements IStatEngineResult {
 	@Override
 	public double GetWeight() {
 		return mWeight;
+	}
+	
+	@Override
+	public double GetBoundary() {
+		return mBoundary;
+	}
+	
+	@Override
+	public void SetBoundary(double boundary) {
+		mBoundary = boundary;;
 	}
 //	@Override
 //	public boolean IsValid() {

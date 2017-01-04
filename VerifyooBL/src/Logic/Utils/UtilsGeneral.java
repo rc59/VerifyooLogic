@@ -11,6 +11,10 @@ import Logic.Utils.DTW.DTWObjCoordinate;
 import Logic.Utils.DTW.IDTWObj;
 
 public class UtilsGeneral {
+	public String GenerateInterestPointKey(String param, int idx) {
+		return String.format("%s-IntPoint%s", param, idx);			  
+	}
+	
 	public String GenerateGestureFeatureMeanKey(String instruction, String paramName)
 	{
 		String key = String.format("%s-%s", instruction, paramName);
@@ -271,19 +275,19 @@ public class UtilsGeneral {
 	
 		switch(paramName) {
 			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_TIME_INTERVAL:
-				weight = 3;
+				weight = 1.5;
 			break;
 			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA_MINX_MINY:
-				weight = 3;
+				weight = 0.5;
 			break;
 			case Consts.ConstsParamNames.Gesture.GESTURE_TOTAL_AREA:
-				weight = 3;
+				weight = 1;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_AVERAGE_VELOCITY:
-				weight = 3;
+				weight = 2.7;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_LENGTH:
-				weight = 3;
+				weight = 2.3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MAX_ACCELERATION:
 				weight = 3;
@@ -301,22 +305,22 @@ public class UtilsGeneral {
 				weight = 1;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MIDDLE_SURFACE:
-				weight = 3;
+				weight = 1;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_NUM_EVENTS:
-				weight = 3;
+				weight = 2.3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_TIME_INTERVAL:
-				weight = 3;
+				weight = 2.4;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA:
 				weight = 3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_TOTAL_AREA_MINX_MINY:
-				weight = 2;
+				weight = 2.3;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_TRANSITION_TIME:
-				weight = 3;
+				weight = 2.5;
 			break;
 			case Consts.ConstsParamNames.Stroke.STROKE_MID_VELOCITY:
 				weight = 2;
@@ -327,23 +331,26 @@ public class UtilsGeneral {
 			case "PcaScore":
 				weight = 3;
 			break;
-			case "InterestPointDensity":
-				weight = 0.768;
-			case "InterestPointLocation":
-				weight = 0.724;
+			case "StrokeIntPointLocation-IntPoint1":
+				weight = 1;
+			case "StrokeIntPointLocation-IntPoint0":
+				weight = 1.15;
 			break;
-			case "InterestPointIndex":
-				weight = 2;
+			case "StrokeIntPointIntensity-IntPoint1":
+				weight = 2.2;
 			break;
-			case "InterestPointDeltaTeta":
-				weight = 2;
+			case "StrokeIntPointAvgVelocity-IntPoint1":
+				weight = 2.4;
 			break;
-			case "InterestPointVelocity":
-				weight = 2;
-			break;			
+			case "StrokeIntPointAvgVelocity-IntPoint0":
+				weight = 2.4;
+			break;	
+			case "StrokeIntPointIntensity-IntPoint0":
+				weight = 2.5;
+			break;				
 		}
 		
-		return 1;
+		return weight;
 	}
 	
 	public String NormStrokeListToString(ArrayList<NormStroke> listNormStrokes) {
